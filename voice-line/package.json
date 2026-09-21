@@ -1,0 +1,19 @@
+{
+  "name": "sikavoice-voice-line",
+  "version": "0.1.0",
+  "description": "SikaVoice Track 2 — toll-free IVR Voice Line for feature-phone users (Twi/Ewe). See README.md.",
+  "private": true,
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npx --prefix .. tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "npx --prefix .. tsc -p tsconfig.json && node dist/index.js",
+    "typecheck": "npx --prefix .. tsc --noEmit -p tsconfig.json",
+    "smoke": "node smoke.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}
