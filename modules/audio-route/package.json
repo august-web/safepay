@@ -1,0 +1,7 @@
+{
+  "name": "expo-audio-route",
+  "version": "1.0.0",
+  "description": "SikaVoice local module: reports whether audio output is currently private (headphones / earbuds / Bluetooth).",
+  "main": "index.ts",
+  "private": true
+}
