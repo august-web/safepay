@@ -39,3 +39,15 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# generated icon review sheet (npm run icons:preview)
+assets/_iconreview/
+
+# local Expo module build output
+modules/*/android/build/
+
+# AI editor session state
+.freebuff/
+
+# local Android build toolchain (JDK + SDK), multi-GB — see README
+.tools/
