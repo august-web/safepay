@@ -1,7 +1,8 @@
 {
   "app": {
-    "name": "SikaVoice",
-    "securityBadge": "MTN MoMo SafePay Ahobammbɔ"
+    "name": "SafePay",
+    "securityBadge": "SafePay · MTN MoMo Ahobammɔ",
+    "securityBadgeShort": "Ahobammɔ"
   },
   "common": {
     "language": "Kasa",
@@ -13,7 +14,10 @@
     "retry": "Yɛw bio",
     "close": "To mu",
     "back": "San kɔ",
-    "processing": "Yɛ dwuma no…"
+    "processing": "Yɛ dwuma no…",
+    "beta": "Beta – wɔde English bɛka",
+    "betaDesc": "English voice na ɛkɔso; wodea Twi voice akyire",
+    "backHint": "Bɔ mmienu san kɔ akyire"
   },
   "privacy": {
     "privateTitle": "Asotwe mu Kasa",
@@ -55,7 +59,7 @@
     "noTransactions": "Ndwuma biara nni hɔ da",
     "unknownRecipient": "Onyani a yɛnnim no",
     "listen": "Tie",
-    "listenHint": "Tia so bio na tie dwuma yi ho asɛm",
+    "listenHint": "Bɔ mmienu tie adey yi",
     "transactionLabel": "{{name}}. {{type}}. {{amount}}. {{status}}.",
     "type": {
       "send": "Sika a wɔsomaa",
@@ -68,7 +72,8 @@
       "confirmed": "Adi mu",
       "failed": "Anyɛ yie"
     },
-    "loading": "Ɛreba…"
+    "loading": "Ɛreba…",
+    "accountHolder": "Akonta sofo"
   },
   "statement": {
     "title": "MoMo Sika Krataa",
@@ -90,7 +95,9 @@
     "filterSend": "A wɔsomae",
     "filterAirtime": "Airtime",
     "noFilterTransactions": "Dwuma biara nni fitaa yi mu.",
-    "empty": "Dwuma biara nni hɔ da."
+    "empty": "Dwuma biara nni hɔ da.",
+    "prevHint": "Bɔ mmienu sane aba akyire",
+    "nextHint": "Bɔ mmienu kɔ nkyɛn"
   },
   "send": {
     "title": "Kɔma sika",
@@ -150,7 +157,9 @@
     "backToHome": "San kɔ fie",
     "sendAnother": "Kɔma sika bio",
     "failureNetwork": "Ntam a ɛnni ho. Yɛw bio.",
-    "failureFunds": "Wo sika nnyi papa mu. Hwɛ wo balance."
+    "failureFunds": "Wo sika nnyi papa mu. Hwɛ wo balance.",
+    "voiceExample": "Kɔma sika cedi aduonum ma Ama",
+    "voiceReadBack": "Worekɔma {{amount}} ma {{recipient}}. Ka aane, anaasɛ bɔ Continue."
   },
   "airtime": {
     "title": "Tɔ Airtime & Data",
@@ -171,7 +180,9 @@
     "confirmedAnnouncement": "Airtime a wotɔe no adi mu. {{amount}} akɔ {{phone}} so.",
     "buyMore": "Tɔ Airtime bio",
     "errorAmount": "Hyɛ sika dodoɔ a ɛsen zero gu mu",
-    "errorPhone": "Hyɛ Ghana fono nɔma pa gu mu"
+    "errorPhone": "Hyɛ Ghana fono nɔma pa gu mu",
+    "voiceExample": "Tɔ cedi edu data ma me line",
+    "voiceReadBack": "Woretɔ {{amount}} {{service}} ma {{phone}}. Ka aane, anaasɛ bɔ Continue."
   },
   "cashout": {
     "title": "Yi Sika wɔ MoMo Wɛnda hɔ",
@@ -195,11 +206,14 @@
     "pinWarningBody": "Nka wo PIN nkyerɛ akuayɛfoɔ. Wo nsa ho agyinaeɛ na ɛbɛyɛ sika a wobɛyi no ahotɔ.",
     "voucherTag": "MTN MoMo Sika a Wobɛyi",
     "voucherSub": "Sika a wobɛkora so afiri akuayɛfoɔ hɔ",
-    "voucherAgent": "Wɛnda"
+    "voucherAgent": "Wɛnda",
+    "voiceExample": "Yi sika cedi aduonu wɔ agent 123456 hɔ",
+    "voiceReadBack": "Woreyi {{amount}} fi agent {{agentCode}} hɔ. Ka aane, anaasɛ bɔ Continue."
   },
   "settings": {
     "title": "Ahobammbɔ & Nhyehyɛeɛ",
-    "subtitle": "Siesie SikaVoice sɛnea ɛbɛyɛ ma wo",
+    "titleShort": "Nhyehyɛeɛ",
+    "subtitle": "Siesie SafePay sɛnea ɛbɛyɛ ma wo",
     "navSection": "Kwan a yɛfa so kɔ ne ba (WCAG 2.2)",
     "navLinear": "Nhyehyɛeɛ a ɛtoa so (TalkBack)",
     "navLinearDesc": "Ɛyɛ ma anifuraefoɔ a wɔde fon akenkanfoɔ di dwuma",
@@ -226,16 +240,22 @@
       }
     },
     "voiceCheckSection": "Nne Nhwehwɛmu",
-    "voiceChannelTts": "SikaVoice de n’ankasa nne reka",
-    "voiceChannelScreenReader": "W’akenkanfoɔ no rekan SikaVoice den",
+    "voiceChannelTts": "SafePay de n’ankasa nne reka",
+    "voiceChannelScreenReader": "W’akenkanfoɔ no rekan SafePay den",
     "voiceRoutePrivate": "Headphone aka ho ({{devices}}) — nne a wɔka no yɛ kokoam",
     "voiceRoutePublic": "Speaker so — wɔbɛka sika dodoɔ anaa ɛbɛwoso dwoodwoo",
     "voiceLocaleLine": "Nne kasa: {{locale}} · {{voice}}",
     "testVoice": "Sɔ nne no hwɛ",
     "testVoiceHint": "Ɛbɛka nsɛmfua tiawa bi ma woahwɛ sɛ nne no te saa ansa na wode sika akɔ",
-    "voiceSample": "SikaVoice nne nhwɛsodeɛ. Wobɛtumi ate w’akaunt mu sika ne nsɛm bere biara.",
+    "voiceSample": "SafePay nne nhwɛsodeɛ. Wobɛtumi ate w’akaunt mu sika ne nsɛm bere biara.",
     "voiceFallback": "device nne a wɔde di dwuma",
-    "voiceClipLine": "Ghana nne clips a wɔde aka ho: {{count}}"
+    "voiceClipLine": "Ghana nne clips a wɔde aka ho: {{count}}",
+    "autoListen": "Tie wɔ app no mu bue",
+    "autoListenHint": "Microphone no bue ne nsa ano, enti wobɛtumi aka ahyɛdeɛ berɛ biara",
+    "openSettingsHint": "Bɔ mmienu bu akwanhyɛ so",
+    "runSetup": "San yɛ nhyehyɛeɛ no",
+    "runSetupDesc": "San fa nhyehyɛeɛ no so: kwanma, kasa, nne ne nsa nkyerɛwde",
+    "runSetupHint": "Bɔ mmienu fi aseɛ"
   },
   "sms": {
     "title": "MoMo SMS Nhyehyɛeɛ",
@@ -254,7 +274,68 @@
     "parsedTag": "Wotutu na wode kɔmu"
   },
   "onboarding": {
-    "voiceWelcome": "Akwaaba wɔ SikaVoice SafePay. Wowɔ fie krataafa so. Pia Speak Balance mpɛn mmienu na wote w’akaunt mu sika, anaa fa MoMo adwuma no di dwuma."
+    "voiceWelcome": "Akwaaba wɔ SafePay. Wowɔ fie krataafa so. Pia Speak Balance mpɛn mmienu na wote w’akaunt mu sika, anaa fa MoMo adwuma no di dwuma.",
+    "screenTitle": "SafePay nhyehyɛeɛ",
+    "stepOf": "Nhyehyɛeɛ nkyɛmu {{x}} wɔ {{y}} mu",
+    "welcomeTitle": "Akwaaba",
+    "welcomeBody": "Akwaaba. SafePay ma wote wo sika, na wo PIN rennsɛ da. Nhyehyɛeɛ yi ti kakra. Fa wo nne anaa wo nsa yɛ.",
+    "start": "Fi aseɛ",
+    "micTitle": "Microphone",
+    "micBody": "Microphone no ho akwannya? SafePay te nne bere a app no rebue, enti wobɛtumi aka wo ahyɛdeɛ.",
+    "micAllow": "Gye microphone no tom",
+    "micGranted": "Microphone no agye tom. SafePay betumi ate wo nne.",
+    "micDenied": "Ɛnnɛ nnyɛ hwee. Akyire yi wubɛtumi agye tom wɔ Settings mu.",
+    "micPermanent": "Wɔatow microphone no agu SafePay. Bu no mu wɔ wo fono settings mu, na san bue SafePay.",
+    "listeningTitle": "Nne a ɛda so",
+    "listeningBody": "Bere a SafePay rebue no, microphone no da so. Ɛnsɛ sɛ wuhu bɔtɔn bi. Ka gyae anaagyɛ stop, na SafePay abu so.",
+    "next": "Tɔ so",
+    "nextHint": "Bɔ mmienu kɔ anamɔn a ɛdi so",
+    "skip": "Ɛnyɛ ɛnnɛ",
+    "skipHint": "Bɔ mmienu twa anamɔn no mu",
+    "contactsTitle": "Contacts",
+    "contactsBody": "Akyire yi, sɛ woka din te sɛ Ama a, SafePay betumi ahunu ne fono nomba. Nea edi kan no, ɛbɛbisa wo kwan. Wo contacts da wo fono mu pɛpɛɛpɛ.",
+    "languageTitle": "Kasa bɛn na wopɛ?",
+    "languageChanged": "Kasa no asesa.",
+    "talkbackTitle": "Sɛn na wupɛ sɛ wodwo krataafa no so?",
+    "talkbackBody": "Sɛn na wupɛ sɛ wodwo krataafa no so?",
+    "srOn": "Wo screen reader no resi so.",
+    "srOff": "Wo screen reader no aso. SafePay bɛka ne ho.",
+    "navLinear": "Anammɔn anammɔn",
+    "navSpatial": "Baabi a ɛgyina",
+    "navSaved": "Wɔasie no yie.",
+    "micTestTitle": "Sɔ microphone no hwɛ",
+    "micTestBody": "Sɛ wo nne. Sɛ nhwɛso: SafePay, ɛte sɛn?",
+    "micTestHeard": "Metee wo: {{text}}.",
+    "micTestOk": "Microphone no yɛ adwuma.",
+    "micTestRetry": "Mantie hwee. Ka bio, yɛ den kakra.",
+    "voiceTestTitle": "Hwɛ nne no so",
+    "voiceTestBody": "Te SafePay nne.",
+    "voiceTestPlayAgain": "Bɔ bio",
+    "voiceTestAsk": "Wote nhwɛso no?",
+    "voiceTestOk": "Ɛyɛ. Wobɛtumi asesa nne so bere biara.",
+    "voiceTestNo": "Yɛ nne no den, na tie bio.",
+    "bioTitle": "Wo nsa nkyerɛwde",
+    "bioBody": "SafePay gye dwuma biara to mu de wo nsa nkyerɛwde. Wo PIN rennsɛ da.",
+    "bioTest": "Sɔ wo nsa nkyerɛwde hwɛ",
+    "bioReady": "Wo nsa nkyerɛwde asiesie.",
+    "bioNone": "Wo fono yi nnisa nkyerɛwde nnihɔ. SafePay de wo nne bɛgye to mu.",
+    "bioNotEnrolled": "Wonsa nkyerɛwde nnsi hɔ dada. Fa ka ho wɔ wo fono settings, Security ase. SafePay bɛde wo nne agye tomu kɔsi ɛno.",
+    "bioSuccess": "Nsa nkyerɛwde no agye to mu. Wo sika ho ban yɛ den.",
+    "bioFailed": "Nsa nkyerɛwde no annye to mu. Bɔ mmɔden bio bere biara.",
+    "bioCancelled": "Wogyaee. Ɛnsesa biribi.",
+    "bioLockout": "Mbɔden bebree dodo. Twɛn kakra.",
+    "teachTitle": "Ahyɛdeɛ mmiɛnsa",
+    "teachBody": "Ahyɛdeɛ mmiɛnsa. Ka: me sika a aka, na wote wo sika. Ka: kɔma sika, na wokɔma sika. Ka: gyae, na SafePay abu so.",
+    "teachTry": "Sɔ bi hwɛ ɛnnɛ.",
+    "teachBalance": "Ɛyɛ! Me sika a aka ne sika a ɛwɔ mu ahyɛdeɛ.",
+    "teachSend": "Ɛyɛ! Kɔma sika ne sika a wokɔma no ahyɛdeɛ.",
+    "teachStop": "Ɛyɛ! Gyae tu SafePay so.",
+    "teachAgain": "Bɔ mmɔden bio. Ahyɛdeɛ no ne: me sika a aka, kɔma sika, gyae.",
+    "teachNext": "Mekae no",
+    "doneTitle": "Woasiesie",
+    "doneBody": "SafePay asiesie. Wobɛtumi ate wo sika ne wo dwuma nyinaa, na wo PIN rennsɛ da. Ka me sika a aka, na wote wo sika.",
+    "doneFinish": "Bue SafePay",
+    "exited": "Nhyehyɛeɛ no agyae. San fi aseɛ wɔ Settings mu."
   },
   "voice": {
     "listen": "Nne ahyɛde",
@@ -270,9 +351,83 @@
     "nothingToRepeat": "Hwee nni hɔ a mɛbɛka bio.",
     "noSpeech": "Mante hwee. Pia microphone no na kasa.",
     "permissionDenied": "Wɔhia microphone kwan ma nne ahyɛde. Wobɛtumi ama kwan wɔ wo fon setting mu.",
-    "permissionDeniedShort": "Microphone kwan no akyi ma SikaVoice",
+    "permissionDeniedShort": "Microphone kwan no akyi ma SafePay",
     "notAvailable": "Nne ahyɛde nni saa fon yi so.",
     "notAvailableShort": "Nne ahyɛde nni saa fon yi so",
-    "failed": "Nne ahyɛde nni hɔ seesei."
+    "failed": "Nne ahyɛde nni hɔ seesei.",
+    "dictationCard": "Kasa so",
+    "dictationStart": "Ka adey no",
+    "dictationStop": "Gyae kasa",
+    "dictationListening": "Metie… ka adey no nyinaa",
+    "dictationIdle": "Bɔ mic no na ka bi koraa",
+    "dictationPreview": "Metee wo so:"
+  },
+  "num": {
+    "0": "hwee",
+    "1": "koro",
+    "2": "mmienu",
+    "3": "mmiɛnsa",
+    "4": "ɛnan",
+    "5": "ɛnum",
+    "6": "ɛnsia",
+    "7": "ɛnson",
+    "8": "ɛnwɔtwe",
+    "9": "ɛnkron",
+    "10": "du",
+    "11": "du baako",
+    "12": "du mmienu",
+    "13": "du mmiɛnsa",
+    "14": "du ɛnan",
+    "15": "du ɛnum",
+    "16": "du ɛnsia",
+    "17": "du ɛnson",
+    "18": "du ɛnwɔtwe",
+    "19": "du ɛnkron",
+    "20": "aduonu",
+    "30": "aduasa",
+    "40": "aduanan",
+    "50": "aduonum",
+    "60": "aduɔsia",
+    "70": "aduɔson",
+    "80": "aduɔwɔtwe",
+    "90": "aduɔkron",
+    "100": "ɔha",
+    "1000": "apem"
+  },
+  "money": {
+    "cedis": "sedie",
+    "pesewas": "pesewa"
+  },
+  "vcmd": {
+    "helpNative": "Gye wo tom. Wobɛtumi aka: Me sika, Sika krataa, Kɔma sika, Tɔ airtime, Yi sika, Fie, San ka bio, anaagyɛ Gyae.",
+    "notCommandNative": "Mante ahyɛdeɛ no aseɛ. Ka Me sika anaa Fie bio.",
+    "balanceIs": "Wo sika a ɛwɔ mu ne",
+    "sendTo": "Worekɔma",
+    "amountToPay": "dodoɔ a wobɛtua",
+    "feeIs": "ka a wɔbɔ ne",
+    "totalIs": "nyinaa bom ne",
+    "confirmWithFingerprint": "Fa wo nsa nkyerɛwde so ahu gye to mu",
+    "transactionComplete": "Dwuma no adi mu pɛpɛɛpɛ",
+    "reference": "Nkyerɛase",
+    "callingPhone": "Worefrɛ fono",
+    "topUpFor": "Woretɔ airtime ma",
+    "withdrawing": "Woreyi sika",
+    "whoToPay": "Hwan na worekɔma no sika?",
+    "askAmount": "Dodoɔ bɛn na worekɔma?",
+    "askPhone": "Dɛn ne ne fono nomba no?",
+    "selfOrOther": "Woara, anaagyɛ obi foforɔ?",
+    "heardAmount": "Wokae",
+    "flowNotUnderstood": "Mepa kyɛw, mantee. Yɛwɔ mmɔdemmɔ bio.",
+    "flowCancelled": "Wogyaee.",
+    "sayYesNo": "Ka aane gyee to mu, anaagyɛ dabi gya no.",
+    "noFingerprint": "Nsa nkyerɛwde nnihɔ, enti wo nne na ɛgye to mu.",
+    "confirmSend": "Worekɔma",
+    "confirmTo": "ma",
+    "agentQuestion": "Dɛn ne agent koodu no?",
+    "noBiometrics": "Wo nne na ɛgye to mu.",
+    "contactNumber": "Dɛn ne ne fono nomba? Ka no mmienu mmienu.",
+    "askReference": "Nkyerɛkyerɛmu bi wɔ hɔ ama saa som yi? Ka skip sɛ ɛnnhia.",
+    "heard": "Wo kae",
+    "stepOf": "Nkyɛmu {{x}} wɔ {{y}} mu"
   }
 }
