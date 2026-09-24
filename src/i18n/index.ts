@@ -19,7 +19,7 @@ export const LANGUAGE_NAMES: Record<AppLanguage, string> = {
   en: 'English',
 };
 
-const LANGUAGE_STORAGE_KEY = 'safepay.language';
+const LANGUAGE_STORAGE_KEY = 'sikavoice.language';
 const DEFAULT_LANGUAGE: AppLanguage = 'tw';
 
 let currentLanguage: AppLanguage = DEFAULT_LANGUAGE;
@@ -29,7 +29,7 @@ function isSupportedLanguage(value: string | null): value is AppLanguage {
 }
 
 /**
- * Initializes i18next. Defaults to Akan (Twi) per the SafePay brief,
+ * Initializes i18next. Defaults to Akan (Twi) per the SikaVoice brief,
  * then restores the user's saved language choice if one exists.
  */
 export async function initI18n(): Promise<AppLanguage> {
