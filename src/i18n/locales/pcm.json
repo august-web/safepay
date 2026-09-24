@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "SafePay",
-    "securityBadge": "MTN MoMo SafePay Protection"
+    "securityBadge": "SafePay · MTN MoMo Protection",
+    "securityBadgeShort": "Secure"
   },
   "common": {
     "language": "Language",
@@ -13,7 +14,10 @@
     "retry": "Try again",
     "close": "Close",
     "back": "Go back",
-    "processing": "E dey process…"
+    "processing": "E dey process…",
+    "beta": "Beta – English fallback",
+    "betaDesc": "Na English voice first; full voice go come later",
+    "backHint": "Double-tap make you go back"
   },
   "privacy": {
     "privateTitle": "Secret Earphone Audio",
@@ -55,7 +59,7 @@
     "noTransactions": "No transaction dey here yet",
     "unknownRecipient": "Person wey we no know",
     "listen": "Listen",
-    "listenHint": "Double tap to listen to this transaction again",
+    "listenHint": "Double-tap hear this transaction",
     "transactionLabel": "{{name}}. {{type}}. {{amount}}. {{status}}.",
     "type": {
       "send": "Money wey you send",
@@ -68,7 +72,8 @@
       "confirmed": "E don complete",
       "failed": "E no go"
     },
-    "loading": "E dey load…"
+    "loading": "E dey load…",
+    "accountHolder": "Account owner"
   },
   "statement": {
     "title": "MoMo Statement",
@@ -90,7 +95,9 @@
     "filterSend": "Money Out",
     "filterAirtime": "Airtime",
     "noFilterTransactions": "No transaction dey this filter.",
-    "empty": "No transaction dey record yet."
+    "empty": "No transaction dey record yet.",
+    "prevHint": "Double-tap go back one transaction",
+    "nextHint": "Double-tap go forward one transaction"
   },
   "send": {
     "title": "Send Money",
@@ -150,7 +157,9 @@
     "backToHome": "Back to Home",
     "sendAnother": "Send another money",
     "failureNetwork": "Network no dey fail. Try again.",
-    "failureFunds": "Yu no get enough money inside."
+    "failureFunds": "Yu no get enough money inside.",
+    "voiceExample": "Send 50 cedis give Ama",
+    "voiceReadBack": "You dey send {{amount}} to {{recipient}}. Talk confirm, abi press Continue."
   },
   "airtime": {
     "title": "Buy Airtime & Data",
@@ -171,7 +180,9 @@
     "confirmedAnnouncement": "Airtime complete. {{amount}} don go to {{phone}}.",
     "buyMore": "Buy more airtime",
     "errorAmount": "Put amount wey pass zero",
-    "errorPhone": "Put correct Ghana phone number"
+    "errorPhone": "Put correct Ghana phone number",
+    "voiceExample": "Buy 10 cedis data for my line",
+    "voiceReadBack": "You dey buy {{amount}} {{service}} for {{phone}}. Talk confirm, abi press Continue."
   },
   "cashout": {
     "title": "Cash Out from MoMo Agent",
@@ -195,10 +206,13 @@
     "pinWarningBody": "No talk your PIN to the vendor. Your biometric go finish the cash out safe.",
     "voucherTag": "MTN MoMo Cash Out",
     "voucherSub": "Cash you go collect from vendor",
-    "voucherAgent": "Agent"
+    "voucherAgent": "Agent",
+    "voiceExample": "Carry 200 cedis comot from agent 123456",
+    "voiceReadBack": "You dey withdraw {{amount}} from agent {{agentCode}}. Talk confirm, abi press Continue."
   },
   "settings": {
     "title": "Accessibility & Settings",
+    "titleShort": "Settings",
     "subtitle": "Tune SafePay make e fit your style",
     "navSection": "Navigation Preset (WCAG 2.2)",
     "navLinear": "Linear Sequential (TalkBack)",
@@ -226,16 +240,22 @@
       }
     },
     "voiceCheckSection": "Voice Output Check",
-    "voiceChannelTts": "SikaVoice dey talk with e own voice",
-    "voiceChannelScreenReader": "Your screen reader dey read SikaVoice out loud",
+    "voiceChannelTts": "SafePay dey talk with e own voice",
+    "voiceChannelScreenReader": "Your screen reader dey read SafePay out loud",
     "voiceRoutePrivate": "Headphone dey ({{devices}}) — private read-back dey on",
     "voiceRoutePublic": "Speaker — we go talk or vibrate the amount small small",
     "voiceLocaleLine": "Voice locale: {{locale}} · {{voice}}",
     "testVoice": "Test the voice",
     "testVoiceHint": "E go talk small sample so you go sabi the volume before you send money",
-    "voiceSample": "SikaVoice voice check. You fit hear your balance and your transactions any time.",
+    "voiceSample": "SafePay voice check. You fit hear your balance and your transactions any time.",
     "voiceFallback": "device default voice",
-    "voiceClipLine": "Native Ghana voice clips wey dey: {{count}}"
+    "voiceClipLine": "Native Ghana voice clips wey dey: {{count}}",
+    "autoListen": "Dey listen wen app open",
+    "autoListenHint": "Microphone go open imsef, so you fit talk command any time",
+    "openSettingsHint": "Double-tap open settings",
+    "runSetup": "Run setup again",
+    "runSetupDesc": "Waka through setup again: permissions, language, voice and fingerprint check",
+    "runSetupHint": "Double-tap make you start the setup"
   },
   "sms": {
     "title": "MoMo SMS Parser",
@@ -254,7 +274,68 @@
     "parsedTag": "We don parse and save am"
   },
   "onboarding": {
-    "voiceWelcome": "Welcome to SikaVoice SafePay. You dey the home screen. Double tap Speak Balance make you hear your money, or use the MoMo Services tiles to send money, hear your statement, buy airtime or cash out."
+    "voiceWelcome": "Welcome to SafePay. You dey the home screen. Double tap Speak Balance make you hear your money, or use the MoMo Services tiles to send money, hear your statement, buy airtime or cash out.",
+    "screenTitle": "Set up SafePay",
+    "stepOf": "Setup step {{x}} of {{y}}",
+    "welcomeTitle": "You welcome",
+    "welcomeBody": "You welcome to SafePay. SafePay go read your money give you, and your PIN no dey talk at all. This setup no too long. You fit use your voice or your hand.",
+    "start": "Make we start",
+    "micTitle": "Microphone",
+    "micBody": "Make SafePay use the microphone? E dey listen while the app dey open, so you go fit talk your command.",
+    "micAllow": "Allow the microphone",
+    "micGranted": "The microphone don gree. SafePay fit hear your voice.",
+    "micDenied": "No wahala. You fit allow the microphone later inside Settings.",
+    "micPermanent": "Them don off the microphone for SafePay. Go on for your phone settings, then open SafePay again.",
+    "listeningTitle": "E dey listen all the time",
+    "listeningBody": "While SafePay dey open, the microphone dey on. You no go need find any button. Talk gyae or stop, make SafePay keep quiet.",
+    "next": "Continue",
+    "nextHint": "Double-tap make you continue",
+    "skip": "Not now",
+    "skipHint": "Double-tap make you skip this step",
+    "contactsTitle": "Contacts",
+    "contactsBody": "Later, if you talk person name, SafePay fit find im number. The first time wey you use am, SafePay go ask you. Your contacts no comot from your phone.",
+    "languageTitle": "Which language you want?",
+    "languageChanged": "Language don change.",
+    "talkbackTitle": "How you dey move for screen?",
+    "talkbackBody": "How you wan dey move for screen?",
+    "srOn": "Your screen reader dey on.",
+    "srOff": "Your screen reader dey off. SafePay go talk by imsef.",
+    "navLinear": "Step by step",
+    "navSpatial": "Same place",
+    "navSaved": "Your style don save.",
+    "micTestTitle": "Talk something",
+    "micTestBody": "Talk anything. For example: hello SafePay.",
+    "micTestHeard": "I hear you: {{text}}.",
+    "micTestOk": "The microphone dey work.",
+    "micTestRetry": "I no hear anything. Talk am again, small loud.",
+    "voiceTestTitle": "Check the voice",
+    "voiceTestBody": "Listen to SafePay voice.",
+    "voiceTestPlayAgain": "Play am again",
+    "voiceTestAsk": "You hear the sample?",
+    "voiceTestOk": "Good. You fit change volume anytime.",
+    "voiceTestNo": "Make the volume high, then listen again.",
+    "bioTitle": "Your fingerprint",
+    "bioBody": "SafePay dey confirm every payment with your fingerprint. Your PIN no dey talk.",
+    "bioTest": "Test the fingerprint",
+    "bioReady": "Your fingerprint don ready.",
+    "bioNone": "This phone no get fingerprint. SafePay go use your voice confirm.",
+    "bioNotEnrolled": "You no enroll any fingerprint. You fit add one inside your phone settings, under Security. SafePay go use your voice until then.",
+    "bioSuccess": "Fingerprint gree. Your money dey safe.",
+    "bioFailed": "The fingerprint no match. You fit try again anytime.",
+    "bioCancelled": "You cancel. Nothing change.",
+    "bioLockout": "You try too many times. Wait small.",
+    "teachTitle": "Three commands",
+    "teachBody": "Three commands. Talk: me sika a aka, make you hear your balance. Talk: kɔma sika, make you send money. Talk: gyae, make SafePay quiet.",
+    "teachTry": "Try one now.",
+    "teachBalance": "Yes! Me sika a aka na the balance command.",
+    "teachSend": "Yes! Kɔma sika na the send money command.",
+    "teachStop": "Yes! Gyae go stop SafePay.",
+    "teachAgain": "Try again. The commands be: me sika a aka, kɔma sika, gyae.",
+    "teachNext": "I remember them",
+    "doneTitle": "You don ready",
+    "doneBody": "SafePay don ready. Your balance and your transactions fit read aloud, and your PIN no dey talk. Talk me sika a aka make you hear your balance.",
+    "doneFinish": "Open SafePay",
+    "exited": "Setup pause. You fit run am again inside Settings."
   },
   "voice": {
     "listen": "Voice command",
@@ -270,9 +351,21 @@
     "nothingToRepeat": "Nothing dey to repeat yet.",
     "noSpeech": "I no hear anything. Tap the microphone and talk.",
     "permissionDenied": "We need microphone access for voice commands. You can allow am for your phone settings.",
-    "permissionDeniedShort": "Microphone access off for SikaVoice",
+    "permissionDeniedShort": "Microphone access off for SafePay",
     "notAvailable": "Voice commands no dey this phone.",
     "notAvailableShort": "Voice commands no dey this phone",
-    "failed": "Voice commands no dey work now."
+    "failed": "Voice commands no dey work now.",
+    "dictationCard": "Voice input",
+    "dictationStart": "Talk the transaction",
+    "dictationStop": "Stop voice input",
+    "dictationListening": "I dey hear… talk the whole thing",
+    "dictationIdle": "Press the mic make you talk am once",
+    "dictationPreview": "I hear say:"
+  },
+  "vcmd": {
+    "contactNumber": "What is {{name}}'s mobile money number? Say it digit by digit.",
+    "askReference": "Any reference or note for this transfer? Say it, or say skip.",
+    "heard": "You said",
+    "stepOf": "Step {{x}} of {{y}}"
   }
 }
