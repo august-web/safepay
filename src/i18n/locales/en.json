@@ -1,7 +1,8 @@
 {
   "app": {
-    "name": "SikaVoice",
-    "securityBadge": "MTN MoMo SafePay Verified"
+    "name": "SafePay",
+    "securityBadge": "SafePay · MTN MoMo Secure",
+    "securityBadgeShort": "Secure"
   },
   "common": {
     "language": "Language",
@@ -13,7 +14,10 @@
     "retry": "Try again",
     "close": "Close",
     "back": "Back",
-    "processing": "Processing…"
+    "processing": "Processing…",
+    "beta": "Beta – English fallback",
+    "betaDesc": "English voice fallback; full native voice after launch",
+    "backHint": "Double-tap to return to the previous screen"
   },
   "privacy": {
     "privateTitle": "Private Audio Mode",
@@ -55,7 +59,7 @@
     "noTransactions": "No transactions yet",
     "unknownRecipient": "Unknown recipient",
     "listen": "Listen",
-    "listenHint": "Double tap to listen to this transaction details",
+    "listenHint": "Double-tap to hear this transaction read aloud",
     "transactionLabel": "{{name}}. {{type}}. {{amount}}. {{status}}.",
     "type": {
       "send": "Money sent",
@@ -68,7 +72,8 @@
       "confirmed": "Confirmed",
       "failed": "Failed"
     },
-    "loading": "Loading transactions…"
+    "loading": "Loading transactions…",
+    "accountHolder": "Account holder"
   },
   "statement": {
     "title": "MoMo Statement",
@@ -90,7 +95,9 @@
     "filterSend": "Sent",
     "filterAirtime": "Airtime",
     "noFilterTransactions": "No transactions in this filter.",
-    "empty": "No transactions on record."
+    "empty": "No transactions on record.",
+    "prevHint": "Double-tap to step back one transaction in the narration",
+    "nextHint": "Double-tap to step forward one transaction in the narration"
   },
   "send": {
     "title": "Send money",
@@ -150,7 +157,9 @@
     "backToHome": "Back to home",
     "sendAnother": "Send another payment",
     "failureNetwork": "Network problem. Please try again.",
-    "failureFunds": "Not enough balance in your wallet."
+    "failureFunds": "Not enough balance in your wallet.",
+    "voiceExample": "Send 50 cedis to Ama",
+    "voiceReadBack": "Sending {{amount}} to {{recipient}}. Say confirm, or tap Continue."
   },
   "airtime": {
     "title": "Buy Airtime & Data",
@@ -171,7 +180,9 @@
     "confirmedAnnouncement": "Airtime purchase successful. {{amount}} sent to {{phone}}.",
     "buyMore": "Buy More Airtime",
     "errorAmount": "Please enter a valid airtime amount greater than 0",
-    "errorPhone": "Please enter a valid 10-digit mobile number"
+    "errorPhone": "Please enter a valid 10-digit mobile number",
+    "voiceExample": "Buy 10 cedis data for my line",
+    "voiceReadBack": "Buying {{amount}} {{service}} for {{phone}}. Say confirm, or tap Continue."
   },
   "cashout": {
     "title": "Cash Out at MoMo Vendor",
@@ -195,11 +206,14 @@
     "pinWarningBody": "Do not speak your PIN to the vendor. Your biometric authorization completes the cash out safely.",
     "voucherTag": "MTN MoMo Cash Out",
     "voucherSub": "Cash to collect from vendor",
-    "voucherAgent": "Agent"
+    "voucherAgent": "Agent",
+    "voiceExample": "Withdraw 200 cedis from agent 123456",
+    "voiceReadBack": "Withdrawing {{amount}} from agent {{agentCode}}. Say confirm, or tap Continue."
   },
   "settings": {
     "title": "Accessibility & Settings",
-    "subtitle": "Tailor SikaVoice to your assistive preferences",
+    "titleShort": "Settings",
+    "subtitle": "Tailor SafePay to your assistive preferences",
     "navSection": "Navigation Preset (WCAG 2.2)",
     "navLinear": "Linear Sequential (TalkBack)",
     "navLinearDesc": "Step-by-step layout optimized for screen readers (congenitally blind)",
@@ -226,16 +240,22 @@
       }
     },
     "voiceCheckSection": "Voice Output Check",
-    "voiceChannelTts": "SikaVoice is speaking with its own voice",
-    "voiceChannelScreenReader": "Your screen reader is reading SikaVoice aloud",
+    "voiceChannelTts": "SafePay is speaking with its own voice",
+    "voiceChannelScreenReader": "Your screen reader is reading SafePay aloud",
     "voiceRoutePrivate": "Headphones connected ({{devices}}) — private read-back is on",
     "voiceRoutePublic": "Speaker — amounts are spoken or vibrated discreetly",
     "voiceLocaleLine": "Voice locale: {{locale}} · {{voice}}",
     "testVoice": "Test voice output",
     "testVoiceHint": "Speaks a sample sentence so you can check the volume before a transaction",
-    "voiceSample": "SikaVoice voice check. Your balance and your transactions can be read aloud at any time.",
+    "voiceSample": "SafePay voice check. Your balance and your transactions can be read aloud at any time.",
     "voiceFallback": "device default voice",
-    "voiceClipLine": "Native Ghanaian voice clips installed: {{count}}"
+    "voiceClipLine": "Native Ghanaian voice clips installed: {{count}}",
+    "autoListen": "Listen when the app opens",
+    "autoListenHint": "The microphone opens by itself so you can speak a command at any time",
+    "openSettingsHint": "Double-tap to open contrast, language and voice settings",
+    "runSetup": "Run setup again",
+    "runSetupDesc": "Walk through setup again: permissions, language, voice and fingerprint checks",
+    "runSetupHint": "Double-tap to start the setup walkthrough"
   },
   "sms": {
     "title": "MoMo SMS Parser",
@@ -254,7 +274,68 @@
     "parsedTag": "Parsed & Imported"
   },
   "onboarding": {
-    "voiceWelcome": "Welcome to SikaVoice SafePay. You are on the home screen. Double tap Speak Balance to hear your balance, or use the MoMo Services tiles to send money, hear your statement, buy airtime, or cash out."
+    "voiceWelcome": "Welcome to SafePay. You are on the home screen. Double tap Speak Balance to hear your balance, or use the MoMo Services tiles to send money, hear your statement, buy airtime, or cash out.",
+    "screenTitle": "Setting up SafePay",
+    "stepOf": "Setup step {{x}} of {{y}}",
+    "welcomeTitle": "Welcome to SafePay",
+    "welcomeBody": "Welcome to SafePay. SafePay reads your money out loud, and your secret PIN is never spoken. This short setup works by voice and by touch.",
+    "start": "Get started",
+    "micTitle": "Microphone",
+    "micBody": "May SafePay use the microphone? It listens while the app is open, so you can speak your commands.",
+    "micAllow": "Allow the microphone",
+    "micGranted": "The microphone is allowed. SafePay can hear your commands.",
+    "micDenied": "No problem. You can allow the microphone later in Settings.",
+    "micPermanent": "The microphone is turned off for SafePay. Allow it in your phone settings, then open SafePay again.",
+    "listeningTitle": "Always listening",
+    "listeningBody": "While SafePay is open, the microphone stays on. You never have to find a button. Say gyae, or stop, any time you want SafePay to be quiet.",
+    "next": "Continue",
+    "nextHint": "Double-tap to continue to the next step",
+    "skip": "Not now",
+    "skipHint": "Double-tap to skip this step",
+    "contactsTitle": "Contacts",
+    "contactsBody": "Later, SafePay can find a number when you say a name, for example send money to Ama. When you first use it, SafePay will ask for permission. Your contacts stay on your phone.",
+    "languageTitle": "Which language do you want?",
+    "languageChanged": "Language changed.",
+    "talkbackTitle": "How do you move around the screen?",
+    "talkbackBody": "How do you want to move around the screen?",
+    "srOn": "Your screen reader is on.",
+    "srOff": "Your screen reader is off. SafePay will speak for itself.",
+    "navLinear": "Step by step",
+    "navSpatial": "Fixed places",
+    "navSaved": "Navigation style saved.",
+    "micTestTitle": "Try the microphone",
+    "micTestBody": "Now say anything. For example: hello SafePay.",
+    "micTestHeard": "I heard: {{text}}.",
+    "micTestOk": "The microphone works.",
+    "micTestRetry": "I did not hear anything. Say it again, a little louder.",
+    "voiceTestTitle": "Check the voice",
+    "voiceTestBody": "Listen to SafePay speaking.",
+    "voiceTestPlayAgain": "Play it again",
+    "voiceTestAsk": "Did you hear the sample?",
+    "voiceTestOk": "Good. You can change the volume at any time.",
+    "voiceTestNo": "Turn the volume up, and listen again.",
+    "bioTitle": "Your fingerprint",
+    "bioBody": "SafePay confirms every payment with your fingerprint. Your PIN is never spoken.",
+    "bioTest": "Test the fingerprint",
+    "bioReady": "Your fingerprint is set up and ready.",
+    "bioNone": "This phone has no fingerprint sensor. SafePay will use your voice confirmation instead.",
+    "bioNotEnrolled": "No fingerprint is enrolled yet. You can add one in your phone settings, under Security. SafePay will use your voice confirmation until then.",
+    "bioSuccess": "Fingerprint confirmed. Your payments are protected.",
+    "bioFailed": "The fingerprint did not match. You can try again any time.",
+    "bioCancelled": "Cancelled. Nothing was changed.",
+    "bioLockout": "Too many attempts. Please wait a moment.",
+    "teachTitle": "Three commands",
+    "teachBody": "Three commands. Say: me sika a aka, to hear your balance. Say: kɔma sika, to send money. Say: gyae, to stop SafePay.",
+    "teachTry": "Try one now.",
+    "teachBalance": "Yes. Me sika a aka is the balance command.",
+    "teachSend": "Yes. Kɔma sika is the send money command.",
+    "teachStop": "Yes. Gyae stops SafePay.",
+    "teachAgain": "Try again. The commands are: me sika a aka, kɔma sika, gyae.",
+    "teachNext": "I remember them",
+    "doneTitle": "You are ready",
+    "doneBody": "SafePay is ready. Your balance and your transactions can be read aloud, and your PIN is never spoken. Say me sika a aka to hear your balance.",
+    "doneFinish": "Open SafePay",
+    "exited": "Setup paused. You can run it again from Settings."
   },
   "voice": {
     "listen": "Voice command",
@@ -270,9 +351,47 @@
     "nothingToRepeat": "There is nothing to repeat yet.",
     "noSpeech": "I did not hear anything. Tap the microphone and speak.",
     "permissionDenied": "Microphone access is needed for voice commands. You can allow it in your phone settings.",
-    "permissionDeniedShort": "Microphone access is turned off for SikaVoice",
+    "permissionDeniedShort": "Microphone access is turned off for SafePay",
     "notAvailable": "Voice commands are not available on this phone.",
     "notAvailableShort": "Voice commands are not available on this phone",
-    "failed": "Voice commands are not available right now."
+    "failed": "Voice commands are not available right now.",
+    "dictationCard": "Voice input",
+    "dictationStart": "Speak the transaction",
+    "dictationStop": "Stop voice input",
+    "dictationListening": "Listening… say the whole transaction",
+    "dictationIdle": "Tap the mic and say it in one sentence",
+    "dictationPreview": "I heard:"
+  },
+  "vcmd": {
+    "helpNative": "You can say: my balance, statement, send money, airtime, cash out, home, repeat, or stop.",
+    "notCommandNative": "I didn't catch a command. Say my balance, or go home.",
+    "balanceIs": "Your balance is",
+    "sendTo": "Sending to",
+    "amountToPay": "Amount to pay",
+    "feeIs": "Fee is",
+    "totalIs": "Total is",
+    "confirmWithFingerprint": "Confirm with your fingerprint",
+    "transactionComplete": "Transaction complete",
+    "reference": "Reference",
+    "callingPhone": "Dialing",
+    "topUpFor": "Buying airtime for",
+    "withdrawing": "Withdrawing",
+    "whoToPay": "Who are you sending money to?",
+    "askAmount": "How much are you sending?",
+    "askPhone": "What is the recipient's phone number?",
+    "selfOrOther": "For yourself, or for someone else?",
+    "heardAmount": "You said",
+    "flowNotUnderstood": "Sorry, I didn't catch that. Please try again.",
+    "flowCancelled": "Cancelled.",
+    "sayYesNo": "Say yes to confirm, or no to cancel.",
+    "noFingerprint": "No fingerprint is set up, so your voice confirmation will be used.",
+    "confirmSend": "You are sending",
+    "confirmTo": "to",
+    "agentQuestion": "Which agent code?",
+    "noBiometrics": "Using voice confirmation.",
+    "contactNumber": "What is their mobile money number? Say it digit by digit.",
+    "askReference": "Any reference or note for this transfer? Say it, or say skip.",
+    "heard": "You said",
+    "stepOf": "Step {{x}} of {{y}}"
   }
 }
