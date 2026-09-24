@@ -12,7 +12,8 @@ import { hapticAmount, hapticConfirm, hapticTick } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { getCachedSettings, loadSettings, type NavPreset } from '../services/settings';
 import { speak, stopSpeaking } from '../services/speech';
-import { getBalance, listTransactions, type Transaction } from '../services/transactions';
+import { DEMO_ACCOUNT_NAME, getBalance, listTransactions, type Transaction } from '../services/transactions';
+import { sayPlan, type SayPlan } from '../voice/say';
 
 const GHS = 'GH₵';
 
@@ -80,29 +81,50 @@ export function HomeScreen({
   const speakBalance = () => {
     if (balance == null) return;
     void hapticTick();
-    const message = `${t('home.balanceLabel')}: ${formatMoney(balance)}`;
-    if (isPrivateAudio) {
-      speak(message, getAppLanguage());
-    } else {
-      void hapticAmount();
-      announce(message);
-    }
+    void hapticAmount();
+    const plan: SayPlan = [
+      { kind: 'key', key: 'vcmd.balanceIs' },
+      { kind: 'money', amount: balance },
+    ];
+    sayPlan(plan, {
+      // Native path: vcmd clip + composed number atoms, no English accent.
+      native: undefined,
+      fallback: () => {
+        const message = `${t('home.balanceLabel')}: ${formatMoney(balance)}`;
+        if (isPrivateAudio) {
+          speak(message, getAppLanguage());
+        } else {
+          announce(message);
+        }
+      },
+    });
   };
 
   const speakSingleTransaction = (txn: Transaction) => {
     void hapticTick();
-    const text = t('home.transactionLabel', {
-      name: txn.recipientName,
-      type: t(`home.type.${txn.type}`),
-      amount: formatMoney(txn.amount),
-      status: t(`home.status.${txn.status}`),
+    void hapticConfirm();
+    const language = getAppLanguage();
+    const plan: SayPlan = [
+      { kind: 'name', name: txn.recipientName },
+      { kind: 'key', key: `home.type.${txn.type}` },
+      { kind: 'money', amount: txn.amount },
+      { kind: 'key', key: `home.status.${txn.status}` },
+    ];
+    sayPlan(plan, {
+      fallback: () => {
+        const text = t('home.transactionLabel', {
+          name: txn.recipientName,
+          type: t(`home.type.${txn.type}`),
+          amount: formatMoney(txn.amount),
+          status: t(`home.status.${txn.status}`),
+        });
+        if (isPrivateAudio) {
+          speak(text, language);
+        } else {
+          announce(text);
+        }
+      },
     });
-    if (isPrivateAudio) {
-      speak(text, getAppLanguage());
-    } else {
-      void hapticConfirm();
-      announce(text);
-    }
   };
 
   const balanceDisplay = balanceVisible && balance != null ? formatMoney(balance) : '••••••';
@@ -127,12 +149,22 @@ export function HomeScreen({
                 source={require('../../assets/safepay-symbol.png')}
                 style={styles.cardLogoSymbol}
                 resizeMode="contain"
-                accessibilityLabel="SafePay Logo"
+                accessibilityLabel="SafePay logo"
                 accessibilityHint="SafePay verified account emblem"
                 accessibilityIgnoresInvertColors
               />
               <Text style={styles.cardPillText}>{t('home.momoAccount', 'MTN Mobile Money')}</Text>
             </View>
+
+            {/* Demo account holder (Polish 9): a real name, not initials. */}
+            <Text
+              accessibilityRole="text"
+              accessibilityLabel={`${t('home.accountHolder', 'Account holder')}: ${DEMO_ACCOUNT_NAME}`}
+              accessibilityHint="Name of the logged-in demo account"
+              style={styles.accountHolder}
+            >
+              {DEMO_ACCOUNT_NAME}
+            </Text>
 
             <AccessibleButton
               label={balanceVisible ? t('home.hideBalance', 'Hide') : t('home.showBalance', 'Show')}
@@ -439,13 +471,15 @@ export function HomeScreen({
                     </Text>
 
                     <AccessibleButton
-                      label="🔊"
-                      hint={`${t('home.listen')}: ${txn.recipientName} ${formatMoney(txn.amount)}`}
+                      label={`${t('home.listen', 'Listen')}: ${txn.recipientName}`}
+                      hint={`${t('home.listenHint', 'Double-tap to hear this transaction read aloud')}: ${formatMoney(txn.amount)}`}
                       variant="ghost"
                       onPress={() => speakSingleTransaction(txn)}
                       style={styles.speakBtn}
                       textStyle={styles.speakBtnText}
-                    />
+                    >
+                      <Text style={styles.speakBtnText}>🔊</Text>
+                    </AccessibleButton>
                   </View>
                 </View>
               );
@@ -559,6 +593,13 @@ const styles = themedStyles((colors) => ({
     fontWeight: '700',
     opacity: 0.8,
     marginBottom: 4,
+  },
+  accountHolder: {
+    fontSize: theme.typography.tiny,
+    fontWeight: '800',
+    color: colors.navyMidnight,
+    opacity: 0.9,
+    marginBottom: 2,
   },
   balanceAmount: {
     fontSize: 38,
