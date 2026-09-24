@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { theme, themedStyles } from '../constants/theme';
 import { AccessibleButton } from './AccessibleButton';
-import { MicButton } from './MicButton';
 
 export interface HeaderBarProps {
   title?: string;
@@ -26,28 +25,30 @@ export function HeaderBar({
   showVoice = true,
 }: HeaderBarProps) {
   const { t } = useTranslation();
-  const displayTitle = title ?? t('app.name', 'SikaVoice');
+  const displayTitle = title ?? t('app.name', 'SafePay');
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         {showBack ? (
           <AccessibleButton
-            label="←"
-            hint={t('common.back', 'Back')}
+            label={t('common.back', 'Back')}
+            hint={t('common.backHint', 'Double-tap to return to the previous screen')}
             variant="ghost"
             onPress={onBack}
             style={styles.backButton}
             textStyle={styles.backButtonText}
-          />
+          >
+            <Text style={styles.backButtonText}>‹</Text>
+          </AccessibleButton>
         ) : (
           <View style={styles.brandIconContainer}>
             <Image
               source={require('../../assets/safepay-symbol.png')}
               style={styles.brandIconImage}
               resizeMode="contain"
-              accessibilityLabel="SafePay Icon"
-              accessibilityHint="Official SafePay tactile emblem"
+              accessibilityLabel="SafePay logo"
+              accessibilityHint="SafePay brand emblem"
               accessibilityIgnoresInvertColors
             />
           </View>
@@ -58,6 +59,8 @@ export function HeaderBar({
             accessibilityRole="header"
             accessibilityLabel={`${displayTitle}${subtitle ? `, ${subtitle}` : ''}`}
             accessibilityHint="Header navigation"
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={styles.title}
           >
             {displayTitle}
@@ -65,11 +68,13 @@ export function HeaderBar({
           {subtitle != null ? (
             <Text style={styles.subtitle}>{subtitle}</Text>
           ) : !showBack ? (
-            <Text style={styles.yelloGreeting}>{t('home.yelloGreeting', "Y'ello! MoMo Companion")}</Text>
+            <Text numberOfLines={2} style={styles.yelloGreeting}>
+              {t('home.yelloGreeting', "Y'ello! MoMo Companion")}
+            </Text>
           ) : null}
         </View>
 
-        {/* On sub-pages the SafePay badge is hidden so long localized titles
+        {/* On sub-pages the secure badge is hidden so long localized titles
             keep the full width and never collide with the back arrow. */}
         {!showBack || rightAction != null || showVoice ? (
         <View style={styles.rightContainer}>
@@ -77,36 +82,20 @@ export function HeaderBar({
             rightAction
           ) : (
             <>
-              <View
-                accessible
-                accessibilityRole="text"
-                accessibilityLabel={t('app.securityBadge', 'MTN MoMo SafePay Verified')}
-                accessibilityHint="Security certification badge"
-                style={styles.securityBadge}
-              >
-                <Image
-                  source={require('../../assets/safepay-symbol.png')}
-                  style={styles.badgeLogo}
-                  resizeMode="contain"
-                  accessibilityLabel="SafePay verified badge"
-                  accessibilityHint="Verified secure transaction shield"
-                  accessibilityIgnoresInvertColors
-                />
-                <Text style={styles.securityText}>SafePay</Text>
-              </View>
               {onOpenSettings ? (
                 <AccessibleButton
-                  label="⚙️"
-                  hint={t('settings.openSettings', 'Open accessibility settings')}
+                  label={t('settings.openSettings', 'Open accessibility settings')}
+                  hint={t('settings.openSettingsHint', 'Double-tap to open contrast, language and voice settings')}
                   variant="ghost"
                   onPress={onOpenSettings}
                   style={styles.settingsButton}
                   textStyle={styles.settingsButtonText}
-                />
+                >
+                  <Text style={styles.settingsButtonText}>⚙️</Text>
+                </AccessibleButton>
               ) : null}
             </>
           )}
-          {showVoice ? <MicButton /> : null}
         </View>
         ) : null}
       </View>
@@ -130,13 +119,14 @@ const styles = themedStyles((colors) => ({
     minHeight: theme.touchTarget.minSize,
   },
   backButton: {
-    minWidth: 44,
+    minWidth: 56,
     minHeight: 44,
     paddingHorizontal: theme.spacing.sm,
     marginRight: theme.spacing.xs,
   },
   backButtonText: {
-    fontSize: 22,
+    fontSize: 38,
+    lineHeight: 38,
     fontWeight: '900',
     color: colors.navyMidnight,
   },
@@ -158,12 +148,15 @@ const styles = themedStyles((colors) => ({
   },
   titleContainer: {
     flex: 1,
+    minWidth: 0,
+    flexShrink: 1,
     justifyContent: 'center',
   },
   title: {
     fontSize: theme.typography.heading,
     fontWeight: '900',
     color: colors.safepayBlue,
+    flexShrink: 1,
     letterSpacing: -0.3,
   },
   yelloGreeting: {
@@ -180,26 +173,6 @@ const styles = themedStyles((colors) => ({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: theme.spacing.sm,
-  },
-  securityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.safepayTint,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: theme.radii.full,
-    gap: 6,
-    borderWidth: 1.5,
-    borderColor: colors.safepayBlue,
-  },
-  badgeLogo: {
-    width: 16,
-    height: 16,
-  },
-  securityText: {
-    fontSize: theme.typography.tiny,
-    fontWeight: '800',
-    color: colors.navyMidnight,
   },
   settingsButton: {
     minWidth: 44,
