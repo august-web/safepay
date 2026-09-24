@@ -27,11 +27,22 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
     >
       {SUPPORTED_LANGUAGES.map((language) => {
         const selected = language === active;
+        // Ga and Pidgin ship as English-fallback betas (P1 scope per brief):
+        // they stay selectable but visibly say so, so an English-accented
+        // read-back reads as an intentional scoping choice, not a bug.
+        const isBeta = language === 'ga' || language === 'pcm';
+        const name = isBeta
+          ? `${LANGUAGE_NAMES[language]} (${t('common.beta', 'Beta')})`
+          : LANGUAGE_NAMES[language];
         return (
           <AccessibleButton
             key={language}
-            label={`${selected ? '✓ ' : ''}${LANGUAGE_NAMES[language]}`}
-            hint={`${LANGUAGE_NAMES[language]} language${selected ? ', currently selected' : ', double tap to select'}`}
+            label={`${selected ? '✓ ' : ''}${name}`}
+            hint={
+              isBeta
+                ? `${name} – ${t('common.betaDesc', 'English voice fallback, full native voice coming after launch')}`
+                : `${LANGUAGE_NAMES[language]} language${selected ? ', currently selected' : ', double tap to select'}`
+            }
             accessibilityState={selected ? { selected: true } : { selected: false }}
             variant={selected ? 'gold' : 'outline'}
             onPress={() => {
