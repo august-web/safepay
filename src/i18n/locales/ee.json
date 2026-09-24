@@ -1,7 +1,8 @@
 {
   "app": {
-    "name": "SikaVoice",
-    "securityBadge": "MTN MoMo SafePay Kpɔkplɔ"
+    "name": "SafePay",
+    "securityBadge": "SafePay · MTN MoMo Kpɔkplɔ",
+    "securityBadgeShort": "Kpɔkplɔ"
   },
   "common": {
     "language": "Gbe",
@@ -13,7 +14,10 @@
     "retry": "Gbugbɔ ɖo",
     "close": "Tɔ",
     "back": "Gatrɔ",
-    "processing": "Míele dɔa wɔm…"
+    "processing": "Míele dɔa wɔm…",
+    "beta": "Beta – English lia ɖe eme",
+    "betaDesc": "English gbe lia ɖe eme; Eʋegbe gbe vevé ame",
+    "backHint": "Tia eve be ye yi ɖime"
   },
   "privacy": {
     "privateTitle": "Asitefe Nuƒo",
@@ -55,7 +59,7 @@
     "noTransactions": "Dɔwɔwɔ aɖeke meli o",
     "unknownRecipient": "Ame si míemale",
     "listen": "Se",
-    "listenHint": "Ɖo to dɔwɔwɔ sia ƒe gɔmeɖoanyi",
+    "listenHint": "Tia eve se nya sia",
     "transactionLabel": "{{name}}. {{type}}. {{amount}}. {{status}}.",
     "type": {
       "send": "Ga si wotsɔ ɖo",
@@ -68,7 +72,8 @@
       "confirmed": "Wodo ŋu",
       "failed": "Womeɖo ŋu o"
     },
-    "loading": "Éle dɔwɔwɔwo ƒe ɖoɖo wɔm…"
+    "loading": "Éle dɔwɔwɔwo ƒe ɖoɖo wɔm…",
+    "accountHolder": "Akɔ̃nta ɖola"
   },
   "statement": {
     "title": "MoMo Ga Kpɔkplɔ",
@@ -90,7 +95,9 @@
     "filterSend": "Si woɖo",
     "filterAirtime": "Airtime",
     "noFilterTransactions": "Dɔwɔwɔ aɖeke mele afi sia o.",
-    "empty": "Dɔwɔwɔ aɖeke mele go sia me o."
+    "empty": "Dɔwɔwɔ aɖeke mele go sia me o.",
+    "prevHint": "Tia eve va ɖime eƒe xexlẽme",
+    "nextHint": "Tia eve yi ɖego"
   },
   "send": {
     "title": "Gatsɔ ga",
@@ -150,7 +157,9 @@
     "backToHome": "Gatrɔ aƒe",
     "sendAnother": "Gatsɔ ga gake",
     "failureNetwork": "Network kpɔa dodo. Gbugbɔ ɖo.",
-    "failureFunds": "Wò ga li ƒe kpeɖeŋu. Kpɔ wò balance."
+    "failureFunds": "Wò ga li ƒe kpeɖeŋu. Kpɔ wò balance.",
+    "voiceExample": "Ɖo ga alafa eve ɖe Ama gbɔ",
+    "voiceReadBack": "Ele ga {{amount}} ɖo ɖe {{recipient}} gbɔ. Gblɔ ɛ̃, alo bɔ Continue."
   },
   "airtime": {
     "title": "Tso Airtime & Data",
@@ -171,7 +180,9 @@
     "confirmedAnnouncement": "Airtime tso kple dzidzedze. {{amount}} yi {{phone}} gbɔ.",
     "buyMore": "Gatso Airtime gake",
     "errorAmount": "De ga si sɔ gbɔ na zero",
-    "errorPhone": "De Ghana fon nɔma si sɔ"
+    "errorPhone": "De Ghana fon nɔma si sɔ",
+    "voiceExample": "Ɗu alafa eve data na nye line",
+    "voiceReadBack": "Ele ga {{amount}} {{service}} ɗu na {{phone}}. Gblɔ ɛ̃, alo bɔ Continue."
   },
   "cashout": {
     "title": "Ɖe Ga le MoMo Agent gbɔ",
@@ -195,11 +206,14 @@
     "pinWarningBody": "Magblɔ nà PIN na agbetawo o. Wò ŋusẽkpɔɖɔmenu kple ŋkuẽnutowo ye adi dze akpa ɖe gaɖeke ɖe go me.",
     "voucherTag": "MTN MoMo Gaɖeke ɖe go",
     "voucherSub": "Ga si nèakpɔ tso agbeta si",
-    "voucherAgent": "Agent"
+    "voucherAgent": "Agent",
+    "voiceExample": "Xe ga blaato tso agent 123456 gbɔ",
+    "voiceReadBack": "Ele ga {{amount}} xe tso agent {{agentCode}} gbɔ. Gblɔ ɛ̃, alo bɔ Continue."
   },
   "settings": {
     "title": "Ɖoɖowo & Nɔnɔmewo",
-    "subtitle": "Sɔ SikaVoice ɖe wò kpekpeɖeŋu zãnuwo nu",
+    "titleShort": "Ɖoɖowo",
+    "subtitle": "Sɔ SafePay ɖe wò kpekpeɖeŋu zãnuwo nu",
     "navSection": "Ɖoɖo Mɔnu (WCAG 2.2)",
     "navLinear": "Ɖoɖo kukuɖe nu (TalkBack)",
     "navLinearDesc": "Ɖoɖo tso afi yi afi na ŋkunɔwo",
@@ -226,16 +240,22 @@
       }
     },
     "voiceCheckSection": "Gbe Dzesi",
-    "voiceChannelTts": "SikaVoice gblɔa nya kple eƒe gbe ŋutɔ",
-    "voiceChannelScreenReader": "Wò screen reader xlẽa SikaVoice ɖe go",
+    "voiceChannelTts": "SafePay gblɔa nya kple eƒe gbe ŋutɔ",
+    "voiceChannelScreenReader": "Wò screen reader xlẽa SafePay ɖe go",
     "voiceRoutePrivate": "Headphone le asa ({{devices}}) — nya gblɔ le ɣaɣla me",
     "voiceRoutePublic": "Speaker dzi — wogblɔa ga ƒe agbɔsɔsɔ alo wolia ɖe ɣaɣla me",
     "voiceLocaleLine": "Gbe ƒe dzesi: {{locale}} · {{voice}}",
     "testVoice": "Te gbe ɖa",
     "testVoiceHint": "Egblɔa nya kpui aɖe be nàte ŋu adzesi gbe ŋu hafi aɖo ga ɖa",
-    "voiceSample": "SikaVoice gbe dzesi. Àte ŋu ase wò ga kple asitsa ƒe nya ɣesiaɣi.",
+    "voiceSample": "SafePay gbe dzesi. Àte ŋu ase wò ga kple asitsa ƒe nya ɣesiaɣi.",
     "voiceFallback": "gbale gbe si le dziƒo",
-    "voiceClipLine": "Ghana gbe ƒe clips si wo de kpe ɖe eŋu: {{count}}"
+    "voiceClipLine": "Ghana gbe ƒe clips si wo de kpe ɖe eŋu: {{count}}",
+    "autoListen": "To gbe ɖe esi nedzi",
+    "autoListenHint": "Microphone la ʋu vɔ vɔ, alebe nàte ŋu agblɔ ahyɛdeɛ ɣesiake",
+    "openSettingsHint": "Tia eve be ɖu kpɔɖeŋuwo",
+    "runSetup": "Gbugbɔ ɖoɖoa ɖo",
+    "runSetupDesc": "Gbugbɔ ɖoɖoa ɖo: kɔkɔɖeƒewo, gbe, gbe kple ŋusẽ me ŋkuɖodzi",
+    "runSetupHint": "Zi eve be ye dɔ ɖe"
   },
   "sms": {
     "title": "MoMo SMS Ɖoɖo",
@@ -254,7 +274,68 @@
     "parsedTag": "Woɖu yi eye woaklɔ"
   },
   "onboarding": {
-    "voiceWelcome": "Woezɔ ɖe SikaVoice SafePay. Èle aƒe me ɖe. Zi Speak Balance zi eve be nàse wò ga, alo zã MoMo dɔwɔɖoɖoawo."
+    "voiceWelcome": "Woezɔ ɖe SafePay. Èle aƒe me ɖe. Zi Speak Balance zi eve be nàse wò ga, alo zã MoMo dɔwɔɖoɖoawo.",
+    "screenTitle": "SafePay ƒe ɖoɖo",
+    "stepOf": "Ɖoɖo fifi {{x}} ƒe {{y}} me",
+    "welcomeTitle": "Woezɔ",
+    "welcomeBody": "Woezɔ ɖe SafePay. SafePay gblɔ wo ga na wò, eye wò PIN meƒo o. Ɖoɖo sia didi aɖeke mele o. Zã wò gbe alo wò ŋusẽ.",
+    "start": "Míadɔ",
+    "micTitle": "Microphone",
+    "micBody": "Wòaxɔ microphone ɖe? SafePay kpɔa nusiwo gblɔm le app la me, eye nèade ahyɛde vevewo gblɔ.",
+    "micAllow": "Xɔ microphone la",
+    "micGranted": "Microphone la xɔ ɖe. SafePay ate ŋu akpɔ wò gbe.",
+    "micDenied": "Mava o. Emegbe nàxoe ɖe le Settings me.",
+    "micPermanent": "Microphone la tutu ɖe SafePay ta. Ɖoe le wò fono ƒe settings me, eye trɔ bu SafePay.",
+    "listeningTitle": "Kpɔkpɔ ɖaa",
+    "listeningBody": "Ne SafePay le eme la, microphone la li ɖaa. Mele be nàdia bɔtɔn o. Gblɔ dzo ɖa alo stop, be SafePay nawɔ kokoko.",
+    "next": "Tso ke",
+    "nextHint": "Zi eve be ye yi fifi si kplɔe ɖe",
+    "skip": "Emegbe",
+    "skipHint": "Zi eve be nàtrɔ fifi sia",
+    "contactsTitle": "Contacts",
+    "contactsBody": "Emegbe, neègblɔ ame ŋkɔ, SafePay ate ŋu adze eƒe fono nɔmbra. Gbegbe gbãtɔ si nàzãe la, èabià wò ŋusẽ. Wò contacts nɔ wo fono me ko.",
+    "languageTitle": "Gbe kae nèpɔ?",
+    "languageChanged": "Gbe la trɔ.",
+    "talkbackTitle": "Nèzɔa ɖe ɖe screen la dzi ɖe?",
+    "talkbackBody": "Nèzɔa ɖe ɖe screen la dzi ɖe?",
+    "srOn": "Wò screen reader le eme.",
+    "srOff": "Wò screen reader mele eme o. SafePay aku eƒe gbe ɖe.",
+    "navLinear": "Le ɖoɖo nu",
+    "navSpatial": "Teƒe gbadzaa",
+    "navSaved": "Wosɔe ɖi.",
+    "micTestTitle": "Gblɔ nu ɖeka",
+    "micTestBody": "Gblɔ nu ɖeka ɖe. Le le: SafePay, nùkwɔm?",
+    "micTestHeard": "Mesese be: {{text}}.",
+    "micTestOk": "Microphone la dɔa dɔ.",
+    "micTestRetry": "Mesese nu o. Gbugbɔ gblɔ, kpe ɖe edzi.",
+    "voiceTestTitle": "Kpɔ gbe la ɖe",
+    "voiceTestBody": "Se SafePay ƒe gbe.",
+    "voiceTestPlayAgain": "Gbugbɔe gɔ",
+    "voiceTestAsk": "Nèse nususru la ɖe?",
+    "voiceTestOk": "Ɛyɛ. Nàte ŋu akpɔ akesi ɖa ɣesiaɣi.",
+    "voiceTestNo": "Kpɔ akesi ƒe lolome ɖe edzi, eye nègbugbɔ se.",
+    "bioTitle": "Wò ŋusẽ me ŋkuɖodzi",
+    "bioBody": "SafePay ɖe asi na gaɖoɖo bliboe kple wò ŋusẽ me ŋkuɖodzi. Wò PIN meƒo o.",
+    "bioTest": "Sɔ ŋusẽ me ŋkuɖodzi la ɖo",
+    "bioReady": "Wò ŋusẽ me ŋkuɖodzi le dɔm.",
+    "bioNone": "Fono sia mele ŋusẽ me ŋkuɖodzi o. SafePay azã wò gbe ɖe asi.",
+    "bioNotEnrolled": "Wò ŋusẽ me ŋkuɖodzi mele ɖoɖo nu o. Nàde eme le fono ƒe settings, Security te. Va se ɖe eme la, SafePay azã wò gbe.",
+    "bioSuccess": "Ŋusẽ me ŋkuɖodzi la ɖe asi. Wò ga me tsi tre ɖe o.",
+    "bioFailed": "Ŋusẽ me ŋkuɖodzi la meɖe asi o. Nàte ŋu agbugbɔ ɖo ɣesiaɣi.",
+    "bioCancelled": "Wogbe. Nusi megadze o.",
+    "bioLockout": "Ɖodze akpaa dodo. Nànɔ eme kakra.",
+    "teachTitle": "Ahyɛde etɔ̃",
+    "teachBody": "Ahyɛde etɔ̃. Gblɔ be: nye ga, nàse wò ga. Gblɔ be: ɖo ga, nàɖo ga. Gblɔ be: dzo ɖa, be SafePay nawɔ kokoko.",
+    "teachTry": "Gbɔ ɖeka ɖe ɣemaɣi.",
+    "teachBalance": "Ɛ̃! Nye ga nye ga ƒe ahyɛde.",
+    "teachSend": "Ɛ̃! Ɖo ga nye gaɖoɖo ƒe ahyɛde.",
+    "teachStop": "Ɛ̃! Dzo ɖa na SafePay nawɔ kokoko.",
+    "teachAgain": "Gbugbɔ ɖo. Ahyɛdeawo nye: nye ga, ɖo ga, dzo ɖa.",
+    "teachNext": "Metso wo ŋu",
+    "doneTitle": "Dɔdɔ du ɖe",
+    "doneBody": "SafePay ƒe ɖoɖo du ɖe. Nàse wò ga kple ga ƒe ŋkɔkɔ, eye wò PIN meƒo o. Gblɔ nye ga, nàse wò ga.",
+    "doneFinish": "Ƒu SafePay",
+    "exited": "Ɖoɖo la gbe ɖe. Àgagbɔ ɖo le Settings me."
   },
   "voice": {
     "listen": "Gbe ƒe sedede",
@@ -270,9 +351,83 @@
     "nothingToRepeat": "Naneke mele eme be magagblɔ o.",
     "noSpeech": "Nyemese naneke o. Zi microphone la eye nàgblɔ.",
     "permissionDenied": "Wohiã microphone mɔ na gbe ƒe sededeawo. Àte ŋu ana mɔ le wò telefon ƒe ɖoɖo me.",
-    "permissionDeniedShort": "Microphone mɔ xa na SikaVoice",
+    "permissionDeniedShort": "Microphone mɔ xa na SafePay",
     "notAvailable": "Gbe ƒe sededeawo mele telefon sia dzi o.",
     "notAvailableShort": "Gbe ƒe sededeawo mele telefon sia dzi o",
-    "failed": "Gbe ƒe sededeawo mele esi fifia o."
+    "failed": "Gbe ƒe sededeawo mele esi fifia o.",
+    "dictationCard": "Kpɔɖeŋu gbe",
+    "dictationStart": "Gblɔ nya vovo",
+    "dictationStop": "Ɖu gbe",
+    "dictationListening": "Mese… gblɔ nya vovo",
+    "dictationIdle": "Da mic la dzi gbe",
+    "dictationPreview": "Mese be:"
+  },
+  "num": {
+    "0": "aeke",
+    "1": "deka",
+    "2": "eve",
+    "3": "etɔ̃",
+    "4": "ene",
+    "5": "atɔ̃",
+    "6": "ade",
+    "7": "adrɛ̃",
+    "8": "enyi",
+    "9": "asieke",
+    "10": "ewo",
+    "11": "wodeka",
+    "12": "woeve",
+    "13": "woetɔ̃",
+    "14": "woene",
+    "15": "woatɔ̃",
+    "16": "woade",
+    "17": "woadrɛ̃",
+    "18": "woenyi",
+    "19": "woasieke",
+    "20": "bladevɛ",
+    "30": "blaetɔ̃",
+    "40": "blaene",
+    "50": "blaatɔ̃",
+    "60": "blaade",
+    "70": "blaadrɛ̃",
+    "80": "blaenyi",
+    "90": "blaasieke",
+    "100": "alafa",
+    "1000": "akpe"
+  },
+  "money": {
+    "cedis": "cedis",
+    "pesewas": "pesewa"
+  },
+  "vcmd": {
+    "helpNative": "Mietsi wo dom. Àte ŋu agblɔ be: nye ga, ga ƒe ŋkɔkɔ, ɖo ga, airtime, xe ga, aƒe, gbugbɔ gakpɔ, alo dzo ɖa.",
+    "notCommandNative": "Nyemete ŋu se ahyɛdeɛ la o. Gblɔ nye ga alo aƒe gake.",
+    "balanceIs": "Ga si le asinye nye",
+    "sendTo": "Woaɖo ga na",
+    "amountToPay": "ga si woaɖoe",
+    "feeIs": "Ga si wobia ne",
+    "totalIs": "Nyaa nu nyui la nye",
+    "confirmWithFingerprint": "De woŋusẽ me be nàɖe asi",
+    "transactionComplete": "Dɔa xu ɖe",
+    "reference": "Nɔmbra",
+    "callingPhone": "Wole fono ƒo ɖe",
+    "topUpFor": "Wole airtime tsɔe na",
+    "withdrawing": "Wole xe ga",
+    "whoToPay": "Ameka nèɖo ga na?",
+    "askAmount": "Ga si ka nèɖona?",
+    "askPhone": "Deko nye eƒe fono nɔmbra?",
+    "selfOrOther": "Nèƒe dokui, alo ame bubu?",
+    "heardAmount": "Ègblɔ be",
+    "flowNotUnderstood": "Kukue, nyemete ŋu se o. Gbugbɔ gblɔ.",
+    "flowCancelled": "Wogbe.",
+    "sayYesNo": "Gblɔ ɛ̃ be nàɖoe, alo gblɔ ave be nàya kpo.",
+    "noFingerprint": "Ŋusẽ me ŋkuɖodzi li o, eyata wo gbe koe wòɖe asi.",
+    "confirmSend": "Èle ga ɖom",
+    "confirmTo": "na",
+    "agentQuestion": "Deko nye agent kɔd?",
+    "noBiometrics": "Wo gbe koe wòɖe asi.",
+    "contactNumber": "Deko nye fono nɔmbra? Gblɔ no eve eve.",
+    "askReference": "Gbeɖeɖe aɖe li na gaɖoɖo sia? Gblɔ skip ne mèle o.",
+    "heard": "Nègblɔ",
+    "stepOf": "Fifi {{x}} ƒe {{y}} me"
   }
 }
