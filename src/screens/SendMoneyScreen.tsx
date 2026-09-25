@@ -7,6 +7,7 @@ import { useAnnounceOnFocus } from '../a11y/useAnnounceOnFocus';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleField } from '../components/AccessibleField';
 import { HeaderBar } from '../components/HeaderBar';
+import { PrivateBalance } from '../components/PrivateBalance';
 import { theme, themedStyles } from '../constants/theme';
 import { getAppLanguage } from '../i18n';
 import { localizedFailureReason } from '../i18n/failureReason';
@@ -15,10 +16,14 @@ import {
   getBiometricCapability,
   getBiometricTypeName,
 } from '../services/biometrics';
-import { hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
+import { hapticAmount, hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { speak, stopSpeaking } from '../services/speech';
 import { calculateFee, getBalance, sendMoney, type SendResult } from '../services/transactions';
+import { sayPlan } from '../voice/say';
+import { parseSendUtterance } from '../voice/dictation';
+import { useScreenDictation } from '../voice/useScreenDictation';
+import { VoiceDictationCard } from '../components/VoiceDictationCard';
 
 const GHS = 'GH₵';
 
@@ -71,6 +76,53 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
   const total = Number.isFinite(amount) && amount > 0 ? amount + fee : 0;
   const reviewName = nameText.trim() || t('home.unknownRecipient');
 
+  /** Example utterance shown (and spoken as a hint) for this screen's dictation. */
+  const voiceExample = t('send.voiceExample', 'Send 50 cedis to Ama');
+
+  /**
+   * Applies one spoken sentence to the form (P2). Whatever was understood
+   * fills the fields; the rest stays blank for manual entry. The result is
+   * ALWAYS read back aloud - never a silent fill, never a silent submit.
+   */
+  const applyVoiceForm = useCallback(
+    (transcript: string) => {
+      const fields = parseSendUtterance(transcript);
+      if (fields.amount != null) setAmountText(String(fields.amount));
+      if (fields.phone != null) setPhoneText(fields.phone);
+      if (fields.recipientName != null) setNameText(fields.recipientName);
+
+      void hapticAmount();
+      const understoodRecipient = fields.recipientName ?? fields.phone;
+      const spoken = t('send.voiceReadBack', {
+        amount: fields.amount != null ? formatMoney(fields.amount) : '—',
+        recipient: understoodRecipient ?? '—',
+      });
+      const parts: Parameters<typeof sayPlan>[0] = [
+        { kind: 'key', key: 'vcmd.sendTo' },
+        ...(fields.recipientName != null
+          ? [{ kind: 'name' as const, name: fields.recipientName }]
+          : fields.phone != null
+            ? [{ kind: 'phone' as const, phone: fields.phone }]
+            : []),
+        { kind: 'key', key: 'vcmd.amountToPay' },
+        ...(fields.amount != null ? [{ kind: 'money' as const, amount: fields.amount }] : []),
+        { kind: 'key', key: 'vcmd.confirmWithFingerprint' },
+      ];
+      sayPlan(parts, {
+        fallback: () => {
+          if (privateAudio) {
+            speak(spoken, getAppLanguage());
+          } else {
+            announce(spoken);
+          }
+        },
+      });
+    },
+    [privateAudio, t],
+  );
+
+  const { dictationActive, preview, startDictation, stopDictation } = useScreenDictation(applyVoiceForm);
+
   useEffect(() => {
     void getBalance().then(setBalance);
     return () => {
@@ -92,13 +144,33 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
   /** Spoken read-back when the audio route is private, haptics otherwise. */
   const playReadBack = useCallback(() => {
     void hapticTick();
-    if (privateAudio) {
-      speak(readBackMessage, getAppLanguage());
-    } else {
-      void hapticConfirm();
-      announce(readBackMessage);
-    }
-  }, [privateAudio, readBackMessage]);
+    void hapticConfirm();
+    // Native path for Twi/Ewe: vcmd clips + composed numbers - the money
+    // read-back is the most safety-critical sentence in the app, so it must
+    // never be read by an English-accented voice.
+    sayPlan(
+      [
+        { kind: 'key', key: 'vcmd.sendTo' },
+        { kind: 'name', name: reviewName },
+        { kind: 'key', key: 'vcmd.amountToPay' },
+        { kind: 'money', amount },
+        { kind: 'key', key: 'vcmd.feeIs' },
+        { kind: 'money', amount: fee },
+        { kind: 'key', key: 'vcmd.totalIs' },
+        { kind: 'money', amount: total },
+        { kind: 'key', key: 'vcmd.confirmWithFingerprint' },
+      ],
+      {
+        fallback: () => {
+          if (privateAudio) {
+            speak(readBackMessage, getAppLanguage());
+          } else {
+            announce(readBackMessage);
+          }
+        },
+      },
+    );
+  }, [privateAudio, readBackMessage, amount, fee, total, reviewName]);
 
   const validate = useCallback((): boolean => {
     const nextErrors: typeof errors = {};
@@ -314,9 +386,9 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
       <View style={styles.screen}>
         <HeaderBar
           title={t('send.title')}
-          subtitle={formatMoney(balance)}
           showBack
           onBack={onDone}
+          rightAction={<PrivateBalance amount={balance} />}
         />
 
         <ScrollView
@@ -326,6 +398,18 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
           accessibilityHint="Form to enter recipient and amount"
         >
           {renderStepIndicator()}
+
+          {/* Voice dictation: say the whole transaction in one sentence (P2) */}
+          <VoiceDictationCard
+            active={dictationActive}
+            preview={preview}
+            onStart={() => {
+              void hapticTick();
+              startDictation();
+            }}
+            onStop={stopDictation}
+            screenHint={voiceExample}
+          />
 
           <View style={styles.formCard}>
             <AccessibleField
@@ -426,7 +510,7 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
           {/* Digital Receipt Voucher */}
           <View style={styles.voucherCard}>
             <View style={styles.voucherTop}>
-              <Text style={styles.voucherTag}>MTN MoMo SafePay</Text>
+              <Text style={styles.voucherTag}>MTN MoMo Secure</Text>
               <Text style={styles.voucherTotalAmount}>{formatMoney(total)}</Text>
               <Text style={styles.voucherTotalCaption}>{t('send.reviewTotalLabel')}</Text>
             </View>
