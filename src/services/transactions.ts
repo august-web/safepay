@@ -48,7 +48,7 @@ const DEMO_TRANSACTIONS: Transaction[] = [
     recipientPhone: '+233241234567',
     recipientName: 'Kwame Mensah',
     fee: 0,
-    reference: 'MOCK-RCV-0001',
+    reference: '151023456789',
     status: 'confirmed',
     createdAt: Date.now() - 1000 * 60 * 60 * 26,
   },
@@ -60,7 +60,7 @@ const DEMO_TRANSACTIONS: Transaction[] = [
     recipientPhone: '0209876543',
     recipientName: 'Ama Serwaa',
     fee: 0.5,
-    reference: 'MOCK-SND-0002',
+    reference: '150987123404',
     status: 'confirmed',
     createdAt: Date.now() - 1000 * 60 * 60 * 5,
   },
@@ -72,13 +72,34 @@ const DEMO_TRANSACTIONS: Transaction[] = [
     recipientPhone: '0241234567',
     recipientName: 'Self',
     fee: 0,
-    reference: 'MOCK-AIR-0003',
+    reference: '150811456210',
     status: 'confirmed',
     createdAt: Date.now() - 1000 * 60 * 40,
   },
 ];
 
 const STARTING_BALANCE = 1200;
+
+/**
+ * Demo account identity (Polish 9). One explicit holder name used by every
+ * screen that shows "who is logged in" - never bare initials, which read as
+ * a placeholder ("IJ") during a demo. Swap this one constant for a real
+ * Appwrite `users` lookup in Track 1's backend step.
+ */
+export const DEMO_ACCOUNT_NAME = 'Yaa Ofori';
+
+/**
+ * Realistic MoMo reference (Polish 7): live MTN MoMo confirmations carry a
+ * 12-digit reference starting with 15 (e.g. 151234567890). The mock generator
+ * produces the same shape so the demo statement never reads as fake. A
+ * UTC timestamp keeps references unique and roughly sortable, exactly like
+ * the real system's sequence numbers.
+ */
+function makeReference(): string {
+  const timestamp = Date.now().toString().slice(-8); // 8 digits, unique per ms
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `15${timestamp}${random}`;
+}
 
 let memoryBalance: number | null = null;
 let memoryTransactions: Transaction[] | null = null;
@@ -159,11 +180,28 @@ export interface SendResult {
  * Simulated MoMo transfer: ~15% network failure so error announcements and
  * retry paths are demonstrable in the demo.
  */
+/**
+ * Demo wallet contacts. The flow controller uses this to resolve a spoken
+ * contact number so the user's dictated number is what actually gets sent to.
+ */
+export const DEMO_CONTACTS: readonly { name: string; phone: string }[] = [
+  { name: 'Ama', phone: '0209876543' },
+  { name: 'Kwame', phone: '0241234567' },
+  { name: 'Kofi', phone: '0551234567' },
+  { name: 'Abena', phone: '0271234567' },
+];
+
+/**
+ * Simulated MoMo transfer: ~15% network failure so error announcements and
+ * retry paths are demonstrable in the demo.
+ */
 export async function sendMoney(params: {
   amount: number;
   fee: number;
   recipientPhone: string;
   recipientName: string;
+  /** Optional narration captured by voice; stored on the transaction. */
+  reference?: string;
 }): Promise<SendResult> {
   await new Promise((resolve) => setTimeout(resolve, 1200));
 
@@ -182,7 +220,7 @@ export async function sendMoney(params: {
     recipientPhone: params.recipientPhone,
     recipientName: params.recipientName,
     fee: params.fee,
-    reference: failed ? `MOCK-ERR-${Date.now() % 10000}` : `MOCK-OK-${Date.now() % 10000}`,
+    reference: params.reference ?? makeReference(),
     status: failed ? 'failed' : 'confirmed',
     createdAt: Date.now(),
   };
@@ -219,7 +257,7 @@ export async function buyAirtime(params: {
     recipientPhone: params.recipientPhone,
     recipientName: params.recipientName || 'Airtime Top-up',
     fee: 0,
-    reference: `AIR-${Date.now() % 10000}`,
+    reference: makeReference(),
     status: failed ? 'failed' : 'confirmed',
     createdAt: Date.now(),
   };
@@ -253,7 +291,7 @@ export async function cashOut(params: {
     recipientPhone: params.agentCode,
     recipientName: params.agentName || `Agent ${params.agentCode}`,
     fee: params.fee,
-    reference: `CSH-${Date.now() % 10000}`,
+    reference: makeReference(),
     status: failed ? 'failed' : 'confirmed',
     createdAt: Date.now(),
   };
