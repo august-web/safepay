@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useEffect, useState } from 'react';
 import {ScrollView, Text, View} from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -6,14 +7,19 @@ import { announce, announceError, announceSuccess } from '../a11y/announcer';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleField } from '../components/AccessibleField';
 import { HeaderBar } from '../components/HeaderBar';
+import { PrivateBalance } from '../components/PrivateBalance';
 import { theme, themedStyles } from '../constants/theme';
 import { getAppLanguage } from '../i18n';
 import { localizedFailureReason } from '../i18n/failureReason';
 import { authenticateWithBiometrics, getBiometricCapability } from '../services/biometrics';
-import { hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
+import { hapticAmount, hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { speak, stopSpeaking } from '../services/speech';
 import { buyAirtime, getBalance, type SendResult } from '../services/transactions';
+import { sayPlan } from '../voice/say';
+import { parseAirtimeUtterance } from '../voice/dictation';
+import { useScreenDictation } from '../voice/useScreenDictation';
+import { VoiceDictationCard } from '../components/VoiceDictationCard';
 
 const GHS = 'GH₵';
 
@@ -41,6 +47,65 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
   const [result, setResult] = useState<SendResult | null>(null);
 
   const amount = Number.parseFloat(amountText.replace(/,/g, ''));
+
+  /** Example utterance for this screen's dictation. */
+  const voiceExample = t('airtime.voiceExample', 'Buy 10 cedis data for my line');
+
+  /**
+   * Applies one spoken sentence to the airtime form (P2): amount, credit vs
+   * data, self vs other, and the recipient number when "someone else".
+   */
+  const applyVoiceForm = useCallback(
+    (transcript: string) => {
+      const fields = parseAirtimeUtterance(transcript);
+      if (fields.amount != null) setAmountText(String(fields.amount));
+      if (fields.serviceType != null) setServiceType(fields.serviceType);
+      if (fields.recipientType === 'other') {
+        setRecipientType('other');
+        if (fields.phone != null) setPhone(fields.phone);
+      } else if (fields.recipientType === 'self') {
+        setRecipientType('self');
+        setPhone(MY_NUMBER);
+      }
+
+      void hapticAmount();
+      const spoken = t('airtime.voiceReadBack', {
+        amount: fields.amount != null ? formatMoney(fields.amount) : '—',
+        service:
+          fields.serviceType === 'data'
+            ? t('airtime.data')
+            : fields.serviceType === 'credit'
+              ? t('airtime.credit')
+              : '—',
+        phone: fields.phone ?? (fields.recipientType === 'self' ? MY_NUMBER : '—'),
+      });
+      const parts: Parameters<typeof sayPlan>[0] = [
+        { kind: 'key', key: 'vcmd.topUpFor' },
+        ...(fields.amount != null ? [{ kind: 'money' as const, amount: fields.amount }] : []),
+        ...(fields.serviceType != null
+          ? [
+              {
+                kind: 'key' as const,
+                key: fields.serviceType === 'data' ? 'airtime.data' : 'airtime.credit',
+              },
+            ]
+          : []),
+        ...(fields.phone != null ? [{ kind: 'phone' as const, phone: fields.phone }] : []),
+      ];
+      sayPlan(parts, {
+        fallback: () => {
+          if (isPrivateAudio) {
+            speak(spoken, getAppLanguage());
+          } else {
+            announce(spoken);
+          }
+        },
+      });
+    },
+    [isPrivateAudio, t],
+  );
+
+  const { dictationActive, preview, startDictation, stopDictation } = useScreenDictation(applyVoiceForm);
 
   useEffect(() => {
     void getBalance().then(setBalance);
@@ -79,12 +144,25 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
 
   const playReadBack = () => {
     void hapticTick();
-    if (isPrivateAudio) {
-      speak(readBackMessage, getAppLanguage());
-    } else {
-      void hapticConfirm();
-      announce(readBackMessage);
-    }
+    void hapticConfirm();
+    // Native composition for Twi/Ewe: vcmd clips + number atoms.
+    sayPlan(
+      [
+        { kind: 'key', key: 'vcmd.topUpFor' },
+        { kind: 'money', amount: amount || 0 },
+        { kind: 'key', key: serviceName === t('airtime.data') ? 'airtime.data' : 'airtime.credit' },
+        { kind: 'phone', phone: phone || MY_NUMBER },
+      ],
+      {
+        fallback: () => {
+          if (isPrivateAudio) {
+            speak(readBackMessage, getAppLanguage());
+          } else {
+            announce(readBackMessage);
+          }
+        },
+      },
+    );
   };
 
   const validate = (): boolean => {
@@ -171,9 +249,9 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
       <View style={styles.screen}>
         <HeaderBar
           title={t('airtime.title')}
-          subtitle={formatMoney(balance)}
           showBack
           onBack={onDone}
+          rightAction={<PrivateBalance amount={balance} />}
         />
 
         <ScrollView
@@ -182,6 +260,18 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
           accessibilityLabel={t('airtime.title')}
           accessibilityHint="Buy airtime or data bundles"
         >
+          {/* Voice dictation: say the whole top-up in one sentence (P2) */}
+          <VoiceDictationCard
+            active={dictationActive}
+            preview={preview}
+            onStart={() => {
+              void hapticTick();
+              startDictation();
+            }}
+            onStop={stopDictation}
+            screenHint={voiceExample}
+          />
+
           {/* Recipient Segmented Selector */}
           <View style={styles.card}>
             <Text style={styles.label}>{t('airtime.recipient')}</Text>
@@ -193,20 +283,20 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
               style={styles.segmentedRow}
             >
               <AccessibleButton
-                label={t('airtime.self')}
+                label={`${recipientType === 'self' ? '✓ ' : ''}${t('airtime.self')}`}
                 hint="Buy for your own registered phone number"
                 accessibilityState={{ selected: recipientType === 'self' }}
                 variant={recipientType === 'self' ? 'momo' : 'outline'}
                 onPress={() => selectRecipient('self')}
-                style={styles.segmentBtn}
+                style={[styles.segmentBtn, recipientType === 'self' ? styles.selectedChip : null]}
               />
               <AccessibleButton
-                label={t('airtime.other')}
+                label={`${recipientType === 'other' ? '✓ ' : ''}${t('airtime.other')}`}
                 hint="Enter another mobile phone number"
                 accessibilityState={{ selected: recipientType === 'other' }}
                 variant={recipientType === 'other' ? 'momo' : 'outline'}
                 onPress={() => selectRecipient('other')}
-                style={styles.segmentBtn}
+                style={[styles.segmentBtn, recipientType === 'other' ? styles.selectedChip : null]}
               />
             </View>
           </View>
@@ -222,20 +312,20 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
               style={styles.segmentedRow}
             >
               <AccessibleButton
-                label={t('airtime.credit')}
+                label={`${serviceType === 'credit' ? '✓ ' : ''}${t('airtime.credit')}`}
                 hint="Select normal airtime credit balance"
                 accessibilityState={{ selected: serviceType === 'credit' }}
                 variant={serviceType === 'credit' ? 'momo' : 'outline'}
                 onPress={() => selectService('credit')}
-                style={styles.segmentBtn}
+                style={[styles.segmentBtn, serviceType === 'credit' ? styles.selectedChip : null]}
               />
               <AccessibleButton
-                label={t('airtime.data')}
+                label={`${serviceType === 'data' ? '✓ ' : ''}${t('airtime.data')}`}
                 hint="Select internet data bundle"
                 accessibilityState={{ selected: serviceType === 'data' }}
                 variant={serviceType === 'data' ? 'momo' : 'outline'}
                 onPress={() => selectService('data')}
-                style={styles.segmentBtn}
+                style={[styles.segmentBtn, serviceType === 'data' ? styles.selectedChip : null]}
               />
             </View>
           </View>
@@ -270,12 +360,12 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
                 return (
                   <AccessibleButton
                     key={val}
-                    label={`GH₵ ${val}`}
+                    label={`${isSelected ? '✓ ' : ''}GH₵ ${val}`}
                     hint={`Select ${val} cedis airtime`}
                     accessibilityState={{ selected: isSelected }}
                     variant={isSelected ? 'momo' : 'outline'}
                     onPress={() => selectPresetAmount(val)}
-                    style={styles.quickBtn}
+                    style={[styles.quickBtn, isSelected ? styles.selectedChip : null]}
                   />
                 );
               })}
@@ -480,6 +570,12 @@ const styles = themedStyles((colors) => ({
     flex: 1,
     minHeight: 44,
     borderRadius: theme.radii.md,
+  },
+  // WCAG 2.2 selection affordance: a visible ✓ beside the colour change so
+  // the selected state never relies on colour alone (matches LanguageSwitcher).
+  selectedChip: {
+    borderWidth: 2.5,
+    borderColor: colors.navyMidnight,
   },
   quickGrid: {
     flexDirection: 'row',
