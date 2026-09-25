@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, Switch, Text, View} from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { announce, voiceChannel } from '../a11y/announcer';
@@ -17,12 +17,20 @@ import { speak, stopSpeaking, voiceStatusFor, warmUpSpeech } from '../services/s
 import { sayKey } from '../voice/say';
 import { voiceClipCount } from '../voice/voicePack';
 
-export function SettingsScreen({ onDone }: { onDone: () => void }) {
+export function SettingsScreen({
+  onDone,
+  onRunSetup,
+}: {
+  onDone: () => void;
+  /** When present, offers the Phase 2 onboarding walkthrough again. */
+  onRunSetup?: () => void;
+}) {
   const { t } = useTranslation();
 
   const [navPreset, setNavPreset] = useState<NavPreset>(getCachedSettings().navPreset);
   const [speechRate, setSpeechRate] = useState<number>(getCachedSettings().speechRate);
   const [privacyMode, setPrivacyMode] = useState<PrivacyMode>(getCachedSettings().privacyMode);
+  const [autoListen, setAutoListen] = useState<boolean>(getCachedSettings().autoListen);
 
   const { palette, setPalette } = useContrastTheme();
   const audioRoute = useAudioRoute();
@@ -53,6 +61,7 @@ export function SettingsScreen({ onDone }: { onDone: () => void }) {
         setNavPreset(s.navPreset);
         setSpeechRate(s.speechRate);
         setPrivacyMode(s.privacyMode);
+        setAutoListen(s.autoListen);
       }
     })();
     return () => {
@@ -76,7 +85,7 @@ export function SettingsScreen({ onDone }: { onDone: () => void }) {
     setSpeechRate(rate);
     void saveSettings({ speechRate: rate });
     stopSpeaking();
-    speak(`Speech rate set to ${label}. SikaVoice MoMo.`, getAppLanguage(), rate);
+    speak(`Speech rate set to ${label}. SafePay MoMo.`, getAppLanguage(), rate);
   };
 
   const selectPrivacy = (mode: PrivacyMode) => {
@@ -95,7 +104,7 @@ export function SettingsScreen({ onDone }: { onDone: () => void }) {
   return (
     <View style={styles.screen}>
       <HeaderBar
-        title={t('settings.title', 'Settings')}
+        title={t('settings.titleShort', 'Settings')}
         subtitle={t('settings.subtitle')}
         showBack
         onBack={onDone}
@@ -121,24 +130,24 @@ export function SettingsScreen({ onDone }: { onDone: () => void }) {
             style={styles.optionsColumn}
           >
             <AccessibleButton
-              label={t('settings.navLinear', 'Linear Sequential (TalkBack)')}
+              label={`${navPreset === 'linear' ? '✓ ' : ''}${t('settings.navLinear', 'Linear Sequential (TalkBack)')}`}
               hint={t('settings.navLinearDesc', 'Step-by-step layout optimized for screen readers (congenitally blind)')}
               accessibilityState={{ selected: navPreset === 'linear' }}
               variant={navPreset === 'linear' ? 'momo' : 'outline'}
               onPress={() => selectNav('linear')}
-              style={styles.optionBtn}
+              style={[styles.optionBtn, navPreset === 'linear' ? styles.selectedOption : null]}
             />
             <Text style={styles.optionDesc}>
               {t('settings.navLinearDesc', 'Step-by-step layout optimized for screen readers (congenitally blind)')}
             </Text>
 
             <AccessibleButton
-              label={t('settings.navSpatial', 'Spatial Grid (Memory-Based)')}
+              label={`${navPreset === 'spatial' ? '✓ ' : ''}${t('settings.navSpatial', 'Spatial Grid (Memory-Based)')}`}
               hint={t('settings.navSpatialDesc', 'Fixed-position tactile layout for muscle memory (adventitiously blind)')}
               accessibilityState={{ selected: navPreset === 'spatial' }}
               variant={navPreset === 'spatial' ? 'momo' : 'outline'}
               onPress={() => selectNav('spatial')}
-              style={styles.optionBtn}
+              style={[styles.optionBtn, navPreset === 'spatial' ? styles.selectedOption : null]}
             />
             <Text style={styles.optionDesc}>
               {t('settings.navSpatialDesc', 'Fixed-position tactile layout for muscle memory (adventitiously blind)')}
@@ -160,28 +169,28 @@ export function SettingsScreen({ onDone }: { onDone: () => void }) {
             style={styles.speedRow}
           >
             <AccessibleButton
-              label="0.75×"
+              label={`${speechRate === 0.75 ? '✓ ' : ''}0.75×`}
               hint={t('settings.speedSlow', '0.75× Slow')}
               accessibilityState={{ selected: speechRate === 0.75 }}
               variant={speechRate === 0.75 ? 'momo' : 'outline'}
               onPress={() => selectSpeechRate(0.75, '0.75')}
-              style={styles.speedBtn}
+              style={[styles.speedBtn, speechRate === 0.75 ? styles.selectedOption : null]}
             />
             <AccessibleButton
-              label="0.85×"
+              label={`${speechRate === 0.85 ? '✓ ' : ''}0.85×`}
               hint={t('settings.speedStandard', '0.85× Accessible')}
               accessibilityState={{ selected: speechRate === 0.85 }}
               variant={speechRate === 0.85 ? 'momo' : 'outline'}
               onPress={() => selectSpeechRate(0.85, '0.85')}
-              style={styles.speedBtn}
+              style={[styles.speedBtn, speechRate === 0.85 ? styles.selectedOption : null]}
             />
             <AccessibleButton
-              label="1.0×"
+              label={`${speechRate === 1.0 ? '✓ ' : ''}1.0×`}
               hint={t('settings.speedNormal', '1.0× Normal')}
               accessibilityState={{ selected: speechRate === 1.0 }}
               variant={speechRate === 1.0 ? 'momo' : 'outline'}
               onPress={() => selectSpeechRate(1.0, '1.0')}
-              style={styles.speedBtn}
+              style={[styles.speedBtn, speechRate === 1.0 ? styles.selectedOption : null]}
             />
           </View>
         </View>
@@ -245,28 +254,28 @@ export function SettingsScreen({ onDone }: { onDone: () => void }) {
             style={styles.optionsColumn}
           >
             <AccessibleButton
-              label={t('settings.privacyAuto', 'Auto (Headphones = Voice, Speaker = Haptics)')}
+              label={`${privacyMode === 'auto' ? '✓ ' : ''}${t('settings.privacyAuto', 'Auto (Headphones = Voice, Speaker = Haptics)')}`}
               hint="Automatically switch to haptics when not using headphones"
               accessibilityState={{ selected: privacyMode === 'auto' }}
               variant={privacyMode === 'auto' ? 'momo' : 'outline'}
               onPress={() => selectPrivacy('auto')}
-              style={styles.optionBtn}
+              style={[styles.optionBtn, privacyMode === 'auto' ? styles.selectedOption : null]}
             />
             <AccessibleButton
-              label={t('settings.privacyVoiceOnly', 'Always Speak Aloud')}
+              label={`${privacyMode === 'voice' ? '✓ ' : ''}${t('settings.privacyVoiceOnly', 'Always Speak Aloud')}`}
               hint="Always speak transaction details aloud"
               accessibilityState={{ selected: privacyMode === 'voice' }}
               variant={privacyMode === 'voice' ? 'momo' : 'outline'}
               onPress={() => selectPrivacy('voice')}
-              style={styles.optionBtn}
+              style={[styles.optionBtn, privacyMode === 'voice' ? styles.selectedOption : null]}
             />
             <AccessibleButton
-              label={t('settings.privacyHapticsOnly', 'Always Silent Haptics')}
+              label={`${privacyMode === 'haptic' ? '✓ ' : ''}${t('settings.privacyHapticsOnly', 'Always Silent Haptics')}`}
               hint="Never speak aloud, always use tactile vibrations"
               accessibilityState={{ selected: privacyMode === 'haptic' }}
               variant={privacyMode === 'haptic' ? 'momo' : 'outline'}
               onPress={() => selectPrivacy('haptic')}
-              style={styles.optionBtn}
+              style={[styles.optionBtn, privacyMode === 'haptic' ? styles.selectedOption : null]}
             />
           </View>
         </View>
@@ -287,15 +296,33 @@ export function SettingsScreen({ onDone }: { onDone: () => void }) {
             {THEME_PALETTE_NAMES.map((name) => (
               <AccessibleButton
                 key={name}
-                label={t(`settings.contrast.${name}.label`)}
+                label={`${palette === name ? '✓ ' : ''}${t(`settings.contrast.${name}.label`)}`}
                 hint={t(`settings.contrast.${name}.hint`)}
                 accessibilityState={{ selected: palette === name }}
                 variant={palette === name ? 'momo' : 'outline'}
                 onPress={() => selectContrast(name)}
-                style={styles.optionBtn}
+                style={[styles.optionBtn, palette === name ? styles.selectedOption : null]}
               />
             ))}
           </View>
+        </View>
+
+        {/* Always-on listening */}
+        <View style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>{t('settings.autoListen', 'Listen when the app opens')}</Text>
+          <Text style={styles.optionDesc}>
+            {t('settings.autoListenHint', 'The microphone opens by itself so you can speak a command at any time')}
+          </Text>
+          <Switch
+            value={autoListen}
+            onValueChange={(value) => {
+              void hapticTick();
+              setAutoListen(value);
+              void saveSettings({ autoListen: value });
+            }}
+            accessibilityLabel={t('settings.autoListen', 'Listen when the app opens')}
+            accessibilityHint={t('settings.autoListenHint')}
+          />
         </View>
 
         {/* Language Selection */}
@@ -303,6 +330,29 @@ export function SettingsScreen({ onDone }: { onDone: () => void }) {
           <Text style={styles.sectionTitle}>{t('common.language', 'Language')}</Text>
           <LanguageSwitcher />
         </View>
+
+        {/* Onboarding rerun (Phase 2): permissions and audio checks stay
+            retryable long after first launch, per the build plan. */}
+        {onRunSetup != null ? (
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>
+              {t('onboarding.screenTitle', 'Setting up SafePay')}
+            </Text>
+            <Text style={styles.optionDesc}>
+              {t('settings.runSetupDesc')}
+            </Text>
+            <AccessibleButton
+              label={t('settings.runSetup', 'Run setup again')}
+              hint={t('settings.runSetupHint')}
+              variant="outline"
+              onPress={() => {
+                void hapticTick();
+                onRunSetup();
+              }}
+              style={styles.optionBtn}
+            />
+          </View>
+        ) : null}
 
         <AccessibleButton
           label={t('common.back', 'Back')}
@@ -351,6 +401,12 @@ const styles = themedStyles((colors) => ({
   optionBtn: {
     minHeight: 48,
     borderRadius: theme.radii.md,
+  },
+  // WCAG 2.2: selected state must not rely on colour alone - a bolder border
+  // plus the ✓ in the label carries it for low-vision and colour-blind users.
+  selectedOption: {
+    borderWidth: 2.5,
+    borderColor: colors.navyMidnight,
   },
   optionDesc: {
     fontSize: theme.typography.tiny,
