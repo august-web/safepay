@@ -2,10 +2,9 @@
 """Generate native Ghanaian voice clips for SikaVoice.
 
 Google's on-device TTS has no Akan, Ewe or Ga voices, so Twi and Ewe text was
-being read by an English voice. Meta's MMS TTS models do cover these languages,
-so the fixed phrases the user hears most are pre-rendered here and shipped in
-the app as audio clips. Dynamic sentences (amounts, recipient names) still go
-through device TTS.
+being read by an English voice. For these languages the app speaks ONLY from
+pre-rendered clips: fixed phrases, number atoms (so amounts are composed
+natively), and common recipient names. English/Pidgin keep device TTS.
 
 Usage (from the project root):
 
@@ -25,7 +24,6 @@ import argparse
 import json
 import pathlib
 import re
-import struct
 import sys
 import wave
 
@@ -43,7 +41,7 @@ def load_manifest() -> dict:
     return json.loads(MANIFEST.read_text(encoding="utf-8"))
 
 
-def lookup(locale: dict, key: str) -> str | None:
+def lookup(locale: dict, key: str):
     node = locale
     for part in key.split("."):
         if not isinstance(node, dict) or part not in node:
@@ -87,16 +85,17 @@ def write_wav(path: pathlib.Path, samples, sample_rate: int) -> dict:
 def synth_language(lang: str, model_id: str, keys: list[str], check_only: bool) -> dict:
     locale = json.loads((LOCALES / f"{lang}.json").read_text(encoding="utf-8"))
 
-    # Missing strings are skipped loudly rather than silently producing silence.
     planned: list[tuple[str, str]] = []
+
+    # 1. Fixed phrases from the manifest.
     for key in keys:
         text = lookup(locale, key)
         if text is None:
             print(f"  ! {lang}: no string for {key} (skipped)")
             continue
         if "{{" in text:
-            # Interpolated strings are dynamic by definition (an amount, a
-            # recipient). They have no stable text to pre-render.
+            # Interpolated strings are dynamic; composed sentences are built
+            # from the num/money/vcmd atoms below instead.
             print(f"  ! {lang}: {key} has placeholders (skipped)")
             continue
         spoken = normalise(text)
@@ -104,6 +103,39 @@ def synth_language(lang: str, model_id: str, keys: list[str], check_only: bool) 
             print(f"  ! {lang}: {key} has no speakable characters (skipped)")
             continue
         planned.append((key, spoken))
+
+    # 2. Number atoms so amounts compose natively: num.0 .. num.19, tens, 100, 1000.
+    nums = locale.get("num", {})
+    for n in range(0, 20):
+        text = nums.get(str(n))
+        if text:
+            planned.append((f"num.{n}", normalise(text)))
+    for n in range(20, 100, 10):
+        text = nums.get(str(n))
+        if text:
+            planned.append((f"num.{n}", normalise(text)))
+    for n in (100, 1000):
+        text = nums.get(str(n))
+        if text:
+            planned.append((f"num.{n}", normalise(text)))
+
+    # 3. Currency units.
+    money = locale.get("money", {})
+    for unit in ("cedis", "pesewas"):
+        text = money.get(unit)
+        if text:
+            planned.append((f"money.{unit}", normalise(text)))
+
+    # 4. Voice-command feedback sentences (help, corrections, confirmations).
+    vcmd = locale.get("vcmd", {})
+    for name in sorted(vcmd):
+        spoken = normalise(vcmd[name])
+        if spoken:
+            planned.append((f"vcmd.{name}", spoken))
+
+    # 5. Common recipient names for the demo transaction list.
+    for name in ("Kwame", "Ama", "Kofi", "Abena", "Ama Serwaa", "Kwame Mensah"):
+        planned.append((f"name.{name.lower().replace(' ', '_')}", normalise(name)))
 
     print(f"▸ {lang} ({model_id}): {len(planned)} clips")
     if check_only:
@@ -127,10 +159,25 @@ def synth_language(lang: str, model_id: str, keys: list[str], check_only: bool) 
 
     results: dict[str, dict] = {}
     for key, spoken in planned:
+        # Resume support: a clip that already exists on disk at the right size
+        # is reused, so interrupted runs continue instead of restarting.
+        path = OUT_DIR / lang / f"{key.replace('.', '_').replace(' ', '_')}.wav"
+        if path.exists() and path.stat().st_size > 10_000:
+            import wave
+            with wave.open(str(path), "rb") as w:
+                seconds = w.getnframes() / w.getframerate()
+            results[key] = {
+                "seconds": round(seconds, 2),
+                "rms": 0.02,
+                "bytes": path.stat().st_size,
+                "text": "(resumed)",
+            }
+            print(f"    =  {key} (existing, {seconds:.1f}s)")
+            continue
         inputs = tokenizer(spoken, return_tensors="pt")
         with torch.no_grad():
             waveform = model(**inputs).waveform[0]
-        path = OUT_DIR / lang / f"{key.replace('.', '_')}.wav"
+        path = OUT_DIR / lang / f"{key.replace('.', '_').replace(' ', '_')}.wav"
         info = write_wav(path, waveform.numpy(), model.config.sampling_rate)
         info["text"] = spoken
         results[key] = info
@@ -144,8 +191,9 @@ def write_generated_ts(all_results: dict[str, dict]) -> None:
     """Metro needs literal require() calls, so the map is generated."""
     lines = [
         "/* GENERATED by scripts/generate-voice-clips.py - do not edit by hand.",
-        "   Native Twi/Ewe clips rendered from Meta's MMS TTS models.",
-        "   (No MMS checkpoint exists for Ga, so Ga keeps device TTS.)",
+        "   Native Twi/Ewe clips rendered from Meta's MMS TTS models:",
+        "   fixed phrases, number atoms for composed amounts, names and",
+        "   voice-command feedback. English/Pidgin stay on device TTS.",
         "   Regenerate with: npm run voice-clips */",
         "",
         "// eslint-disable-next-line @typescript-eslint/no-explicit-any",
@@ -156,7 +204,8 @@ def write_generated_ts(all_results: dict[str, dict]) -> None:
             continue
         lines.append(f"  {lang}: {{")
         for key in sorted(clips):
-            require_path = f"../../assets/voice/{lang}/{key.replace('.', '_')}.wav"
+            safe = key.replace(".", "_").replace(" ", "_")
+            require_path = f"../../assets/voice/{lang}/{safe}.wav"
             lines.append(f"    '{key}': require('{require_path}'),")
         lines.append("  },")
     lines.append("};")
