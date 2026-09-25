@@ -1,4 +1,4 @@
-# SikaVoice — Track 1 Companion App
+# SafePay — Track 1 Companion App
 
 An accessibility-first mobile money companion app for visually impaired MoMo
 users in Ghana. Built for the **MTN Ghana Tɛkyerɛma Pa Hackathon 2026**.
@@ -21,8 +21,14 @@ confirm — the "privacy tax" is the thing this app removes.
 
 ```bash
 npm install
-npx expo start          # scan with Expo Go, or press i / a / w
+npx expo run:android    # build/install the native app (required for voice commands)
+# npx expo start         # use Metro after the native app is installed
 ```
+
+Voice commands cannot run in Expo Go because `expo-speech-recognition` is a
+native module. Use the Android development build above, grant microphone and
+speech-recognition permission on first launch, then leave "Listen when the app
+opens" enabled in Settings.
 
 ```bash
 npm run typecheck       # tsc --noEmit
@@ -93,7 +99,12 @@ npm run voice-clips                                   # regenerate every clip
   duration and peak/RMS per clip so silent output is caught at generation time.
 - `src/voice/voicePack.generated.ts` - the `require()` map Metro needs, written
   by the generator. Do not edit by hand.
-- `src/voice/say.ts` - `sayKey('home.sendMoney')` plays the clip when one exists
+- `src/voice/commandText.ts` - clip-key composition: numbers decompose into
+  atom clips (`num.20` + `num.3`), money into amount + `money.cedis`, phone
+  numbers digit by digit
+- `src/voice/say.ts` - `sayKey('home.sendMoney')` plays the clip when one exists;
+  `sayPlan([...])` composes full sentences ("your balance is … cedis …") entirely
+  from native clips, with an explicit fallback chain for English/Pidgin
   and falls back to device TTS otherwise, so dynamic sentences (amounts,
   recipients) still speak.
 
@@ -101,18 +112,28 @@ Settings → **Voice Output Check** reports the voice the engine picked and how
 many native clips are installed, so the state of the voice pipeline is never a
 mystery during a demo.
 
-### Spoken commands
+### Spoken commands (always-on, voice-first)
 
 `expo-speech-recognition` (from the brief's App Track package list) is wired to
-`src/voice/commands.ts`, a local grammar covering English plus Twi/Ewe/Gã words -
-"balance", "me sika", "ga", "soma sika", "twe sika", "help", "repeat", "stop"
-and more. Matching is longest-phrase-wins and runs on device; the app confirms
-every command out loud before acting, because a user who cannot see the screen
-must never be left guessing whether they were heard. The recogniser is also fed
-the command vocabulary as biasing strings, which measurably improves accuracy.
+`src/voice/commands.ts`. The listener is **on from app launch** (Settings →
+"Listen when the app opens", default on) and restarts itself between utterances,
+so a blind user never has to find the mic button: they open the app and speak.
+The mic button remains as an explicit override.
 
-Note: on-device logcat shows the worked example - a Tap on *Speak Balance* used
-to produce haptics and nothing else.
+The grammar covers English plus Twi/Ewe/Gã phrases — "me sika", "ga",
+"kɔma sika", "ɖo ga", "xe ga", "yi sika", "fie", "ŋkɔkɔ", "help", "repeat",
+"gyae", "dzo ɖa". Because Android has no Twi/Ewe recogniser model, the engine
+transcribes native words with English spelling drift ("koma sika"); matching
+therefore folds diacritics and tolerates edit distance, and prefers the most
+specific reading when a drifted multi-word utterance contains a shorter generic
+word. The app confirms every command out loud before acting, because a user who
+cannot see the screen must never be left guessing whether they were heard.
+Amount extraction reads spoken Twi/Ewe/English numbers ("kɔma sika cedi
+aduonu" → 20) so flows can move at voice speed.
+
+While the mic is open the app holds `MODE_IN_COMMUNICATION` + speakerphone via
+`modules/audio-route`, so prompts stay audible on the loudspeaker instead of
+Android dropping media into the earpiece during recognition.
 
 ## Colour & contrast
 
@@ -173,7 +194,7 @@ src/            # Track 1: smartphone companion app (Expo)
   components/   # AccessibleButton, AccessibleField, LanguageSwitcher
   constants/    # theme (WCAG 2.2 touch targets)
   i18n/         # config, storage, en/tw/ee locales
-  screens/      # HomeScreen, SendMoneyScreen
+  screens/      # HomeScreen, SendMoneyScreen, OnboardingScreen (first-run walkthrough)
   services/     # biometrics, speech, haptics, headphones, transactions (mock)
 modules/
   audio-route/  # local Expo module: real AudioManager output-route detection
