@@ -11,15 +11,22 @@ import { i18n, initI18n } from './src/i18n';
 import { formatMoney, getBalance } from './src/services/transactions';
 import { stopSpeaking, warmUpSpeech } from './src/services/speech';
 import { VoiceCommandProvider } from './src/voice/VoiceCommandProvider';
-import { sayKey } from './src/voice/say';
+import { VoiceFlowController } from './src/voice/VoiceFlowController';
+import { sayKey, sayPlan, type SayPlan } from './src/voice/say';
+import { configureVoiceAudioMode } from './src/voice/voicePack';
+import { getCachedSettings, loadSettings } from './src/services/settings';
 import type { VoiceIntent } from './src/voice/commands';
 import { BuyAirtimeScreen } from './src/screens/BuyAirtimeScreen';
 import { CashOutScreen } from './src/screens/CashOutScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
+import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { SendMoneyScreen } from './src/screens/SendMoneyScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { SmsImportScreen } from './src/screens/SmsImportScreen';
 import { StatementScreen } from './src/screens/StatementScreen';
+import { VoiceFlowHud } from './src/components/VoiceFlowHud';
+import type { TranscriptSink } from './src/voice/VoiceCommandProvider';
+import type { VoiceFlowStatus } from './src/voice/VoiceFlowController';
 import { theme, themedStyles } from './src/constants/theme';
 import { ContrastThemeProvider, useContrastTheme } from './src/theme/ContrastThemeProvider';
 
@@ -42,12 +49,18 @@ export default function App() {
     void (async () => {
       try {
         await initI18n();
+        // Settings must be known before the navigator mounts, so the
+        // always-on voice listener honours the user's saved choice.
+        await loadSettings();
         // Know whether a screen reader is running before anything is spoken, so
         // the app never talks over TalkBack and never stays silent without it.
         await initScreenReaderState();
         // Probe the TTS engine up front: the first utterance is otherwise
         // delayed (or dropped) while the engine initialises.
         warmUpSpeech();
+        // Clips must play even with the ringer off - a blind user has no
+        // visual cue that a silent phone missed a prompt.
+        await configureVoiceAudioMode();
       } finally {
         setReady(true);
       }
@@ -72,12 +85,16 @@ export default function App() {
           announce(i18n.t('home.greeting'));
           return;
         }
+        // Mark seen unconditionally so the boot welcome never replays after
+        // onboarding: the onboarding state machine owns the first-launch
+        // orientation when it has not completed yet.
+        await AsyncStorage.setItem(WELCOME_SEEN_KEY, 'true');
+        if (!getCachedSettings().onboardingComplete) return;
         // Speak directly: the welcome must be audible before the user has
         // touched anything. With a screen reader running we hand the text over
         // instead, so the two voices never talk over each other.
         if (needsOwnVoice()) sayKey('onboarding.voiceWelcome');
         else announce(i18n.t('onboarding.voiceWelcome'));
-        await AsyncStorage.setItem(WELCOME_SEEN_KEY, 'true');
       } catch {
         // Storage unavailable: skip the one-time welcome.
       }
@@ -102,12 +119,38 @@ export default function App() {
   );
 }
 
-type Screen = 'home' | 'send' | 'statement' | 'airtime' | 'cashout' | 'settings' | 'sms';
+type Screen = 'onboarding' | 'home' | 'send' | 'statement' | 'airtime' | 'cashout' | 'settings' | 'sms';
 
 function RootNavigator() {
   const { palette } = useContrastTheme();
-  const [screen, setScreen] = useState<Screen>('home');
+  // First run starts in the onboarding state machine, not on Home: a blind
+  // user must be oriented and have permissions explained before anything else.
+  const [screen, setScreen] = useState<Screen>(
+    getCachedSettings().onboardingComplete ? 'home' : 'onboarding',
+  );
   const home = () => setScreen('home');
+  /** Visible mirror of the active voice conversation (VoiceFlowHud). */
+  const [flowStatus, setFlowStatus] = useState<VoiceFlowStatus | null>(null);
+  /** Onboarding owns the mic's utterances while it is mounted (Phase 2). */
+  const [onboardingSink, setOnboardingSink] = useState<TranscriptSink | null>(null);
+
+  /**
+   * Conversational flow driver: money features started by voice become a
+   * spoken dialogue (who -> how much -> read-back -> yes/no -> result) instead
+   * of dropping the blind user on a form they cannot see. Created once in a
+   * lazy state initializer, so its identity is stable for the provider.
+   */
+  const [flowController] = useState(
+    () =>
+      new VoiceFlowController({
+        navigate: (next) => setScreen(next),
+        onDone: () => {
+          setFlowStatus(null);
+          setScreen('home');
+        },
+        onStatus: setFlowStatus,
+      }),
+  );
 
   /**
    * Spoken commands, handled where navigation actually lives.
@@ -115,7 +158,8 @@ function RootNavigator() {
    * Every branch confirms out loud before moving, because a user who cannot see
    * the screen must never be left guessing whether their command was heard.
    */
-  const handleVoiceIntent = useCallback((intent: VoiceIntent) => {
+  const handleVoiceIntent = useCallback(
+    (intent: VoiceIntent) => {
     // Feature names are fixed phrases, so they play as native Twi/Ewe clips
     // when one exists and fall back to device TTS otherwise.
     const open = (clipKey: string) => {
@@ -124,48 +168,64 @@ function RootNavigator() {
 
     switch (intent) {
       case 'balance': {
+        flowController.cancel(true);
         setScreen('home');
         void (async () => {
           const balance = await getBalance();
-          announce(`${i18n.t('home.balanceLabel')}: ${formatMoney(balance)}`);
+          // Composed natively: vcmd.balanceIs clip + native number atoms for
+          // the amount - never the English-accented device voice.
+          const plan: SayPlan = [
+            { kind: 'key', key: 'vcmd.balanceIs' },
+            { kind: 'money', amount: balance },
+          ];
+          sayPlan(plan, {
+            fallback: () =>
+              announce(`${i18n.t('vcmd.balanceIs')} ${formatMoney(balance)}`),
+          });
         })();
         return;
       }
       case 'statement':
+        flowController.cancel(true);
         open('home.statement');
         setScreen('statement');
         return;
       case 'send':
-        open('home.sendMoney');
-        setScreen('send');
+        // Voice-initiated: run the full spoken dialogue flow.
+        flowController.start({ kind: 'send' });
         return;
       case 'airtime':
-        open('home.buyAirtime');
-        setScreen('airtime');
+        flowController.start({ kind: 'airtime', self: false });
         return;
       case 'cashout':
-        open('home.cashOut');
-        setScreen('cashout');
+        flowController.start({ kind: 'cashout' });
         return;
       case 'settings':
+        flowController.cancel(true);
         open('settings.title');
         setScreen('settings');
         return;
       case 'home':
+        flowController.cancel(true);
         setScreen('home');
         announce(i18n.t('home.greeting'));
         return;
       case 'help':
+        flowController.cancel(true);
         stopSpeaking();
-        sayKey('voice.help');
+        sayKey('vcmd.helpNative');
         return;
       default:
         return;
     }
-  }, []);
+    },
+    [flowController],
+  );
 
   const content = (() => {
     switch (screen) {
+      case 'onboarding':
+        return <OnboardingScreen onDone={home} onVoiceSink={setOnboardingSink} />;
       case 'send':
         return <SendMoneyScreen onDone={home} />;
       case 'statement':
@@ -175,16 +235,21 @@ function RootNavigator() {
       case 'cashout':
         return <CashOutScreen onDone={home} />;
       case 'settings':
-        return <SettingsScreen onDone={home} />;
+        return (
+          <SettingsScreen
+            onDone={home}
+            onRunSetup={() => setScreen('onboarding')}
+          />
+        );
       case 'sms':
         return <SmsImportScreen onDone={home} onViewStatement={() => setScreen('statement')} />;
       default:
         return (
           <HomeScreen
-            onSendMoney={() => setScreen('send')}
+            onSendMoney={() => flowController.start({ kind: 'send' })}
             onViewStatement={() => setScreen('statement')}
-            onBuyAirtime={() => setScreen('airtime')}
-            onCashOut={() => setScreen('cashout')}
+            onBuyAirtime={() => flowController.start({ kind: 'airtime', self: false })}
+            onCashOut={() => flowController.start({ kind: 'cashout' })}
             onOpenSettings={() => setScreen('settings')}
             onOpenSms={() => setScreen('sms')}
           />
@@ -196,7 +261,22 @@ function RootNavigator() {
     // Keyed by palette so every screen repaints with the new colours, while the
     // navigation state above stays put — changing contrast must not navigate.
     <View key={palette} style={styles.screenBoundary}>
-      <VoiceCommandProvider onIntent={handleVoiceIntent}>{content}</VoiceCommandProvider>
+      {/* Voice-first: the mic opens on launch (autoStart) and stays open
+          between utterances (alwaysOn), so a blind user never has to find
+          the mic button to issue the next command. During onboarding the
+          mic's utterances route to the setup flow instead of commands. */}
+      <VoiceCommandProvider
+        onIntent={handleVoiceIntent}
+        autoStart={getCachedSettings().autoListen}
+        flowController={onboardingSink ?? flowController}
+      >
+        {flowStatus == null ? content : (
+          <VoiceFlowHud
+            status={flowStatus}
+            onCancel={() => flowController.cancel(false)}
+          />
+        )}
+      </VoiceCommandProvider>
     </View>
   );
 }
@@ -212,14 +292,14 @@ function LoadingView() {
         source={require('./assets/safepay-logo-transparent.png')}
         style={styles.loadingLogo}
         resizeMode="contain"
-        accessibilityLabel="SafePay Logo"
+        accessibilityLabel="SafePay logo"
         accessibilityHint="SafePay brand identity logo"
         accessibilityIgnoresInvertColors
       />
       <Text accessibilityRole="header" style={styles.loadingText}>
         SafePay
       </Text>
-      <Text style={styles.loadingSubtext}>MoMo Accessibility Companion</Text>
+      <Text style={styles.loadingSubtext}>MTN MoMo Accessibility Companion</Text>
     </View>
   );
 }
