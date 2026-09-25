@@ -1,0 +1,93 @@
+[
+  {
+    "id": "tw-send-01",
+    "language": "tw",
+    "kind": "command",
+    "reference": "kɔma sika",
+    "expectedIntent": "send"
+  },
+  {
+    "id": "tw-send-drift-01",
+    "language": "tw",
+    "kind": "command",
+    "reference": "koma sika",
+    "expectedIntent": "send"
+  },
+  {
+    "id": "tw-balance-01",
+    "language": "tw",
+    "kind": "command",
+    "reference": "me sika a aka",
+    "expectedIntent": "balance"
+  },
+  {
+    "id": "tw-cancel-01",
+    "language": "tw",
+    "kind": "command",
+    "reference": "gyae",
+    "expectedIntent": "stop"
+  },
+  {
+    "id": "ee-send-01",
+    "language": "ee",
+    "kind": "command",
+    "reference": "ɖo ga",
+    "expectedIntent": "send"
+  },
+  {
+    "id": "ee-cancel-01",
+    "language": "ee",
+    "kind": "command",
+    "reference": "dzo da",
+    "expectedIntent": "stop"
+  },
+  {
+    "id": "ga-balance-01",
+    "language": "ga",
+    "kind": "command",
+    "reference": "mi shika",
+    "expectedIntent": "balance"
+  },
+  {
+    "id": "en-send-01",
+    "language": "en",
+    "kind": "command",
+    "reference": "send money",
+    "expectedIntent": "send"
+  },
+  {
+    "id": "en-amount-01",
+    "language": "en",
+    "kind": "flow-answer",
+    "reference": "fifty cedis",
+    "expectedAmount": 50
+  },
+  {
+    "id": "tw-amount-01",
+    "language": "tw",
+    "kind": "flow-answer",
+    "reference": "aduonum cedis",
+    "expectedAmount": 50
+  },
+  {
+    "id": "en-phone-01",
+    "language": "en",
+    "kind": "flow-answer",
+    "reference": "zero two zero nine eight seven six five four three",
+    "expectedPhone": "0209876543"
+  },
+  {
+    "id": "tw-confirm-01",
+    "language": "tw",
+    "kind": "confirmation",
+    "reference": "aane",
+    "expectedConfirmation": true
+  },
+  {
+    "id": "tw-deny-01",
+    "language": "tw",
+    "kind": "confirmation",
+    "reference": "dabi",
+    "expectedConfirmation": false
+  }
+]
