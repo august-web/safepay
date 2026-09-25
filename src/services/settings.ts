@@ -7,6 +7,10 @@ export interface AppSettings {
   navPreset: NavPreset;
   speechRate: number;
   privacyMode: PrivacyMode;
+  /** Start the voice listener when the app opens (voice-first blind users). */
+  autoListen: boolean;
+  /** Voice-first onboarding walkthrough finished (Phase 2). Non-secret. */
+  onboardingComplete: boolean;
 }
 
 const SETTINGS_KEY = 'sikavoice.settings';
@@ -15,6 +19,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   navPreset: 'linear',
   speechRate: 0.85,
   privacyMode: 'auto',
+  autoListen: true,
+  onboardingComplete: false,
 };
 
 let cachedSettings: AppSettings = { ...DEFAULT_SETTINGS };
@@ -31,6 +37,8 @@ export async function loadSettings(): Promise<AppSettings> {
           parsed.privacyMode === 'voice' || parsed.privacyMode === 'haptic'
             ? parsed.privacyMode
             : 'auto',
+        autoListen: typeof parsed.autoListen === 'boolean' ? parsed.autoListen : true,
+        onboardingComplete: parsed.onboardingComplete === true,
       };
     }
   } catch {
@@ -52,4 +60,3 @@ export async function saveSettings(patch: Partial<AppSettings>): Promise<AppSett
 export function getCachedSettings(): AppSettings {
   return cachedSettings;
 }
-
