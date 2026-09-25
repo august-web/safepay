@@ -17,6 +17,14 @@ type AudioRouteEvents = {
 
 declare class AudioRouteModule extends NativeModule<AudioRouteEvents> {
   getOutputRoute(): AudioRouteSnapshot;
+
+  /**
+   * Keeps loudspeaker playback audible while the speech recogniser's mic is
+   * open (`MODE_IN_COMMUNICATION` + speakerphone). Call again with false when
+   * the session ends. Android otherwise drops media audio to the earpiece
+   * during recognition, silencing every prompt for a blind user.
+   */
+  setClipPlaybackMode(on: boolean): boolean;
 }
 
 let cached: AudioRouteModule | null | undefined;
@@ -52,4 +60,16 @@ export function subscribeToAudioRoute(
   if (module == null) return () => {};
   const subscription = module.addListener('onAudioRouteChanged', listener);
   return () => subscription.remove();
+}
+
+/**
+ * Audio mode for mic-session clip playback. Returns true when the native call
+ * ran; callers treat false as "best effort" and continue.
+ */
+export function setClipPlaybackMode(on: boolean): boolean {
+  try {
+    return getAudioRouteModule()?.setClipPlaybackMode(on) ?? false;
+  } catch {
+    return false;
+  }
 }
