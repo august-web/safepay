@@ -13,6 +13,7 @@ import { hapticAmount, hapticTick } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { speak, stopSpeaking } from '../services/speech';
 import { listTransactions, type Transaction } from '../services/transactions';
+import { canSpeakPlan, playPlan, stopVoiceClip, type SayPlan } from '../voice/say';
 
 const GHS = 'GH₵';
 
@@ -90,11 +91,30 @@ export function StatementScreen({ onDone }: { onDone: () => void }) {
         },
       )}`;
 
+      // Native clip path first: the plan composes the entry from recorded
+      // name/type/amount/status clips, so Twi/Ewe never drops to an English
+      // accent. `playPlan` resolves when the last clip finishes, which is the
+      // completion signal the player advances on.
+      const language = getAppLanguage();
+      const plan: SayPlan = [
+        { kind: 'name', name: txn.recipientName },
+        { kind: 'key', key: `home.type.${txn.type}` },
+        { kind: 'money', amount: txn.amount },
+        { kind: 'key', key: `home.status.${txn.status}` },
+      ];
+      if (canSpeakPlan(plan, language)) {
+        void hapticAmount();
+        stopSpeaking();
+        stopVoiceClip();
+        void playPlan(plan, language).then(() => onFinished?.());
+        return;
+      }
+
       // Speak through the app's own voice whenever the app is the one talking
       // (private route, or no screen reader running) so the player gets a real
       // completion callback. Only hand off to TalkBack when it will speak.
       if (isPrivateAudio || needsOwnVoice()) {
-        speak(text, getAppLanguage(), undefined, {
+        speak(text, language, undefined, {
           onDone: onFinished,
           onStopped: onFinished,
           onError: () => onFinished?.(),
@@ -269,13 +289,15 @@ export function StatementScreen({ onDone }: { onDone: () => void }) {
 
           <View style={styles.playerControls}>
             <AccessibleButton
-              label="⏮️"
-              hint={t('statement.prev', 'Previous transaction')}
+              label={t('statement.prev', 'Previous transaction')}
+              hint={t('statement.prevHint', 'Double-tap to step back one transaction in the narration')}
               variant="outline"
               onPress={handlePrevious}
               style={styles.controlBtn}
               textStyle={styles.controlBtnText}
-            />
+            >
+              <Text style={styles.controlBtnText}>⏮️</Text>
+            </AccessibleButton>
 
             <AccessibleButton
               label={isPlaying ? `⏸️ ${t('statement.pause', 'Pause')}` : `▶️ ${t('statement.playAll', 'Play All')}`}
@@ -286,13 +308,15 @@ export function StatementScreen({ onDone }: { onDone: () => void }) {
             />
 
             <AccessibleButton
-              label="⏭️"
-              hint={t('statement.next', 'Next transaction')}
+              label={t('statement.next', 'Next transaction')}
+              hint={t('statement.nextHint', 'Double-tap to step forward one transaction in the narration')}
               variant="outline"
               onPress={handleNext}
               style={styles.controlBtn}
               textStyle={styles.controlBtnText}
-            />
+            >
+              <Text style={styles.controlBtnText}>⏭️</Text>
+            </AccessibleButton>
           </View>
         </View>
 
@@ -318,7 +342,7 @@ export function StatementScreen({ onDone }: { onDone: () => void }) {
             return (
               <AccessibleButton
                 key={filterKey}
-                label={filterLabel}
+                label={isSelected ? `✓ ${filterLabel}` : filterLabel}
                 hint={`Filter by ${filterLabel}`}
                 accessibilityState={isSelected ? { selected: true } : { selected: false }}
                 variant={isSelected ? 'momo' : 'outline'}
@@ -394,13 +418,15 @@ export function StatementScreen({ onDone }: { onDone: () => void }) {
                     </Text>
 
                     <AccessibleButton
-                      label="🔊"
-                      hint={`${t('home.listen')}: ${txn.recipientName} ${formatMoney(txn.amount)}`}
+                      label={`${t('home.listen', 'Listen')}: ${txn.recipientName}`}
+                      hint={`${t('home.listenHint', 'Double-tap to hear this transaction read aloud')}: ${formatMoney(txn.amount)}`}
                       variant="ghost"
                       onPress={() => speakTransactionItem(txn, index, filteredTransactions.length)}
                       style={styles.singleListenBtn}
                       textStyle={styles.singleListenText}
-                    />
+                    >
+                      <Text style={styles.singleListenText}>🔊</Text>
+                    </AccessibleButton>
                   </View>
                 </View>
               );
@@ -537,7 +563,7 @@ const styles = themedStyles((colors) => ({
   },
   filterChipSelected: {
     borderColor: colors.navyMidnight,
-    borderWidth: 1.5,
+    borderWidth: 2.5,
   },
   transactionsSection: {
     gap: theme.spacing.xs,
