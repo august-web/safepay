@@ -6,14 +6,19 @@ import { announce, announceError, announceSuccess } from '../a11y/announcer';
 import { AccessibleButton } from '../components/AccessibleButton';
 import { AccessibleField } from '../components/AccessibleField';
 import { HeaderBar } from '../components/HeaderBar';
+import { PrivateBalance } from '../components/PrivateBalance';
 import { theme, themedStyles } from '../constants/theme';
 import { getAppLanguage } from '../i18n';
 import { localizedFailureReason } from '../i18n/failureReason';
 import { authenticateWithBiometrics, getBiometricCapability } from '../services/biometrics';
-import { hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
+import { hapticAmount, hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { speak, stopSpeaking } from '../services/speech';
 import { calculateFee, cashOut, getBalance, type SendResult } from '../services/transactions';
+import { sayPlan } from '../voice/say';
+import { parseCashoutUtterance } from '../voice/dictation';
+import { useScreenDictation } from '../voice/useScreenDictation';
+import { VoiceDictationCard } from '../components/VoiceDictationCard';
 
 const GHS = 'GH₵';
 
@@ -49,6 +54,48 @@ export function CashOutScreen({ onDone }: { onDone: () => void }) {
   const total = Number.isFinite(amount) && amount > 0 ? amount + fee : 0;
   const displayAgentName = agentName.trim() || `MoMo Agent ${agentCode}`;
 
+  /** Example utterance for this screen's dictation. */
+  const voiceExample = t('cashout.voiceExample', 'Withdraw 200 cedis from agent 123456');
+
+  /**
+   * Applies one spoken sentence to the withdrawal form (P2). Fields fill
+   * from whatever was understood; the read-back says what was heard so a
+   * partial parse is audible, never silent.
+   */
+  const applyVoiceForm = useCallback(
+    (transcript: string) => {
+      const fields = parseCashoutUtterance(transcript);
+      if (fields.amount != null) setAmountText(String(fields.amount));
+      if (fields.agentCode != null) setAgentCode(fields.agentCode);
+
+      void hapticAmount();
+      const spoken = t('cashout.voiceReadBack', {
+        amount: fields.amount != null ? formatMoney(fields.amount) : '—',
+        agentCode: fields.agentCode ?? '—',
+      });
+      const parts: Parameters<typeof sayPlan>[0] = [
+        { kind: 'key', key: 'vcmd.withdrawing' },
+        ...(fields.amount != null ? [{ kind: 'money' as const, amount: fields.amount }] : []),
+        ...(fields.agentCode != null
+          ? [{ kind: 'phone' as const, phone: fields.agentCode }]
+          : []),
+        { kind: 'key', key: 'vcmd.confirmWithFingerprint' },
+      ];
+      sayPlan(parts, {
+        fallback: () => {
+          if (isPrivateAudio) {
+            speak(spoken, getAppLanguage());
+          } else {
+            announce(spoken);
+          }
+        },
+      });
+    },
+    [isPrivateAudio, t],
+  );
+
+  const { dictationActive, preview, startDictation, stopDictation } = useScreenDictation(applyVoiceForm);
+
   useEffect(() => {
     void getBalance().then(setBalance);
     return () => {
@@ -68,13 +115,30 @@ export function CashOutScreen({ onDone }: { onDone: () => void }) {
 
   const playReadBack = useCallback(() => {
     void hapticTick();
-    if (isPrivateAudio) {
-      speak(readBackMessage, getAppLanguage());
-    } else {
-      void hapticConfirm();
-      announce(readBackMessage);
-    }
-  }, [isPrivateAudio, readBackMessage]);
+    void hapticConfirm();
+    // Native composition for Twi/Ewe: vcmd clips + number atoms.
+    sayPlan(
+      [
+        { kind: 'key', key: 'vcmd.withdrawing' },
+        { kind: 'money', amount: amount || 0 },
+        { kind: 'name', name: displayAgentName },
+        { kind: 'key', key: 'vcmd.feeIs' },
+        { kind: 'money', amount: fee },
+        { kind: 'key', key: 'vcmd.totalIs' },
+        { kind: 'money', amount: total },
+        { kind: 'key', key: 'vcmd.confirmWithFingerprint' },
+      ],
+      {
+        fallback: () => {
+          if (isPrivateAudio) {
+            speak(readBackMessage, getAppLanguage());
+          } else {
+            announce(readBackMessage);
+          }
+        },
+      },
+    );
+  }, [isPrivateAudio, readBackMessage, amount, fee, total, displayAgentName]);
 
   const validate = (): boolean => {
     if (!Number.isFinite(amount) || amount <= 0) {
@@ -204,9 +268,10 @@ export function CashOutScreen({ onDone }: { onDone: () => void }) {
       <View style={styles.screen}>
         <HeaderBar
           title={t('cashout.title')}
-          subtitle={formatMoney(balance)}
+          subtitle={undefined}
           showBack
           onBack={onDone}
+          rightAction={<PrivateBalance amount={balance} />}
         />
 
         <ScrollView
@@ -215,6 +280,18 @@ export function CashOutScreen({ onDone }: { onDone: () => void }) {
           accessibilityLabel={t('cashout.title')}
           accessibilityHint="Form to enter agent code and withdrawal amount"
         >
+          {/* Voice dictation: say the whole withdrawal in one sentence (P2) */}
+          <VoiceDictationCard
+            active={dictationActive}
+            preview={preview}
+            onStart={() => {
+              void hapticTick();
+              startDictation();
+            }}
+            onStop={stopDictation}
+            screenHint={voiceExample}
+          />
+
           <View style={styles.noticeCard}>
             <Text style={styles.noticeEmoji}>🛡️</Text>
             <View style={styles.noticeMeta}>
