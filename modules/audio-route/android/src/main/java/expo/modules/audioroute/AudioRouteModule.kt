@@ -44,6 +44,33 @@ class AudioRouteModule : Module() {
       describeRoute()
     }
 
+    /**
+     * Enables loudspeaker playback while the speech recogniser's microphone is
+     * open. Android routes media audio to the earpiece during an active
+     * recognition session, which would make every spoken prompt inaudible for
+     * a blind user.
+     *
+     * Only the speakerphone flag is touched here - never `MODE_IN_COMMUNICATION`.
+     * Holding the communication audio mode for the whole always-on session makes
+     * the audio HAL switch the modem/VoIP capture path (observed on the Tecno
+     * Pop 7: `adev_set_mode mode=3` + `at_cmd_volume ... android vol:0.2`), so
+     * the recognizer receives near-silence and returns empty results forever.
+     * Speakerphone keeps clips audible without touching the input path.
+     */
+    Function("setClipPlaybackMode") { on: Boolean ->
+      val manager = audioManager ?: return@Function false
+      try {
+        if (on) {
+          manager.isSpeakerphoneOn = true
+        } else {
+          manager.isSpeakerphoneOn = false
+        }
+        true
+      } catch (error: Throwable) {
+        false
+      }
+    }
+
     OnStartObserving("onAudioRouteChanged") {
       register()
     }
