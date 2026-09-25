@@ -7,7 +7,7 @@ import {
 } from '../constants/theme';
 import { storage } from '../i18n/storage';
 
-const STORAGE_KEY = 'safepay.contrastTheme';
+const STORAGE_KEY = 'sikavoice.contrastTheme';
 
 interface ContrastThemeValue {
   palette: ThemePaletteName;
