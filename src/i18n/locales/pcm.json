@@ -355,6 +355,8 @@
     "notAvailable": "Voice commands no dey this phone.",
     "notAvailableShort": "Voice commands no dey this phone",
     "failed": "Voice commands no dey work now.",
+    "quota": "Today voice allowance don finish. Voice commands go work again tomorrow.",
+    "network": "I no fit reach network. Check your connection and try again.",
     "dictationCard": "Voice input",
     "dictationStart": "Talk the transaction",
     "dictationStop": "Stop voice input",

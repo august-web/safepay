@@ -355,6 +355,8 @@
     "notAvailable": "Voice commands are not available on this phone.",
     "notAvailableShort": "Voice commands are not available on this phone",
     "failed": "Voice commands are not available right now.",
+    "quota": "Today's voice allowance has finished. Voice commands will work again tomorrow.",
+    "network": "I cannot reach the network. Please check your connection and try again.",
     "dictationCard": "Voice input",
     "dictationStart": "Speak the transaction",
     "dictationStop": "Stop voice input",

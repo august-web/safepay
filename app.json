@@ -22,6 +22,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
+        "RECORD_AUDIO",
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
         "VIBRATE"
@@ -39,8 +40,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#F5F0E6"
         }
-      ],
-      "expo-speech-recognition"
+      ]
     ]
   }
 }

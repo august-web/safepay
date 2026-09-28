@@ -62,7 +62,15 @@ try {
   process.exit(1);
 }
 const apiKey = env.EXPO_PUBLIC_SPEECH_API_KEY;
-const baseUrl = (env.EXPO_PUBLIC_SPEECH_API_BASE_URL || 'https://lab-subscription-platform.vercel.app').replace(/\/+$/, '');
+const DEFAULT_BASE_URL = 'https://lab-subscription-platform.vercel.app';
+
+/** The .env.example placeholder is not a URL; treat any non-URL value as unset. */
+function resolveBaseUrl(raw) {
+  const value = (raw ?? '').trim().replace(/\/+$/, '');
+  return /^https?:\/\/.+/.test(value) ? value : DEFAULT_BASE_URL;
+}
+const baseUrl = resolveBaseUrl(env.EXPO_PUBLIC_SPEECH_API_BASE_URL);
+if (baseUrl !== DEFAULT_BASE_URL) console.log(`Base URL overridden: ${baseUrl}`);
 
 if (apiKey == null || apiKey === '' || apiKey.includes('your_hci_lab')) {
   console.error('EXPO_PUBLIC_SPEECH_API_KEY is not set in .env.');

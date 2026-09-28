@@ -79,6 +79,35 @@ export type SpeakHandlers = {
   onError?: (error: Error) => void;
 };
 
+/**
+ * Synchronous snapshot of "the app is speaking right now", for the capture
+ * loop's VAD - `isSpeakingAsync()` asks the engine, which is too slow to call
+ * between sample windows. Set when the utterance is handed to the engine and
+ * cleared by its callbacks; the blanket cap clears it even if the engine never
+ * reports back, so a TTS failure can never leave the microphone deaf.
+ */
+let speakingSync = false;
+let speakingCapTimer: ReturnType<typeof setTimeout> | null = null;
+const SPEAKING_CAP_MS = 15_000;
+
+export function isSpeakingSync(): boolean {
+  return speakingSync;
+}
+
+function clearSpeakingSync(): void {
+  speakingSync = false;
+  if (speakingCapTimer != null) {
+    clearTimeout(speakingCapTimer);
+    speakingCapTimer = null;
+  }
+}
+
+function markSpeakingSync(): void {
+  clearSpeakingSync();
+  speakingSync = true;
+  speakingCapTimer = setTimeout(clearSpeakingSync, SPEAKING_CAP_MS);
+}
+
 export function speak(
   text: string,
   language: AppLanguage = 'tw',
@@ -103,17 +132,28 @@ export function speak(
     } catch {
       // Nothing was speaking.
     }
+    markSpeakingSync();
     Speech.speak(trimmed, {
       language: locale,
       ...(voice != null ? { voice } : {}),
       rate,
       pitch: 1.0,
       volume: 1.0,
-      onStart: handlers?.onStart,
-      onDone: handlers?.onDone,
-      onStopped: handlers?.onStopped,
+      onStart: () => {
+        markSpeakingSync();
+        handlers?.onStart?.();
+      },
+      onDone: () => {
+        clearSpeakingSync();
+        handlers?.onDone?.();
+      },
+      onStopped: () => {
+        clearSpeakingSync();
+        handlers?.onStopped?.();
+      },
       onError: (error: Error) => {
         // Surface engine failures instead of failing silently.
+        clearSpeakingSync();
         console.warn('[SikaVoice speech] utterance failed', error?.message ?? error);
         handlers?.onError?.(error);
       },
@@ -122,6 +162,7 @@ export function speak(
 }
 
 export function stopSpeaking(): void {
+  clearSpeakingSync();
   try {
     void Speech.stop();
   } catch {

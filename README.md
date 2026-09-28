@@ -13,7 +13,7 @@ confirm — the "privacy tax" is the thing this app removes.
 - `expo-local-authentication` — biometric auth (`biometricsSecurityLevel: 'strong'`)
 - `expo-speech` — TTS read-back (`ak-GH` / `ee-GH` / `en-GH`)
 - `expo-haptics` — haptic fallback patterns (confirm / cancel / error)
-- `expo-audio` — private-audio (headphone) detection
+- `expo-audio` — private-audio (headphone) detection and bounded recording windows for voice commands
 - `i18next` + `react-i18next` — Akan (Twi), Ewe, English
 - `eslint-plugin-react-native-a11y` — accessibility linting in CI
 
@@ -25,10 +25,11 @@ npx expo run:android    # build/install the native app (required for voice comma
 # npx expo start         # use Metro after the native app is installed
 ```
 
-Voice commands cannot run in Expo Go because `expo-speech-recognition` is a
-native module. Use the Android development build above, grant microphone and
-speech-recognition permission on first launch, then leave "Listen when the app
-opens" enabled in Settings.
+Voice commands cannot run in Expo Go: they record through `expo-audio` and
+upload to the University of Ghana HCI Lab speech service, so a native build is
+required. Use the Android development build above and grant the microphone
+permission on first launch, then leave "Listen when the app opens" enabled in
+Settings.
 
 ```bash
 npm run typecheck       # tsc --noEmit
@@ -114,26 +115,30 @@ mystery during a demo.
 
 ### Spoken commands (always-on, voice-first)
 
-`expo-speech-recognition` (from the brief's App Track package list) is wired to
-`src/voice/commands.ts`. The listener is **on from app launch** (Settings →
-"Listen when the app opens", default on) and restarts itself between utterances,
-so a blind user never has to find the mic button: they open the app and speak.
-The mic button remains as an explicit override.
+Voice commands run on the **University of Ghana HCI Lab** speech APIs (ASR and
+TTS), as required by the hackathon's Phase II rules. A bounded capture loop in
+`src/voice/captureLoop.ts` opens short recording windows with `expo-audio`,
+drops silent ones locally (the ASR quota is small), and uploads only speech to
+`POST /api/v1/asr`; the transcript then flows through the same matcher as ever
+(`src/voice/commands.ts`). The listener is **on from app launch** (Settings →
+"Listen when the app opens", default on) and re-opens windows between
+utterances, so a blind user never has to find the mic button: they open the app
+and speak. The mic button remains as an explicit override.
 
 The grammar covers English plus Twi/Ewe/Gã phrases — "me sika", "ga",
 "kɔma sika", "ɖo ga", "xe ga", "yi sika", "fie", "ŋkɔkɔ", "help", "repeat",
-"gyae", "dzo ɖa". Because Android has no Twi/Ewe recogniser model, the engine
-transcribes native words with English spelling drift ("koma sika"); matching
-therefore folds diacritics and tolerates edit distance, and prefers the most
-specific reading when a drifted multi-word utterance contains a shorter generic
-word. The app confirms every command out loud before acting, because a user who
+"gyae", "dzo ɖa". The lab's ASR is strongest on Twi/Akan, and transcripts can
+still carry spelling drift ("koma sika" for "kɔma sika"); matching therefore
+folds diacritics and tolerates edit distance, and prefers the most specific
+reading when a drifted multi-word utterance contains a shorter generic word.
+The app confirms every command out loud before acting, because a user who
 cannot see the screen must never be left guessing whether they were heard.
 Amount extraction reads spoken Twi/Ewe/English numbers ("kɔma sika cedi
 aduonu" → 20) so flows can move at voice speed.
 
-While the mic is open the app holds `MODE_IN_COMMUNICATION` + speakerphone via
-`modules/audio-route`, so prompts stay audible on the loudspeaker instead of
-Android dropping media into the earpiece during recognition.
+While a recording window is open the app holds `MODE_IN_COMMUNICATION` +
+speakerphone via `modules/audio-route`, so prompts stay audible on the
+loudspeaker instead of Android dropping media into the earpiece.
 
 ## Colour & contrast
 

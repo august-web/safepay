@@ -21,12 +21,13 @@ Current stack:
 - React Native 0.86 / React 19.2
 - Expo SDK 57
 - TypeScript strict mode
-- `expo-speech-recognition` for native speech recognition
+- University of Ghana HCI Lab speech APIs (ASR + TTS) — mandated by the hackathon for Phase II
+- `expo-audio` for recording windows feeding `POST /api/v1/asr` (see `src/voice/captureLoop.ts`) and private-audio (headphone) detection
 - `expo-speech` and bundled Ghanaian voice clips for speech output
 - `expo-local-authentication` for biometrics
-- `expo-audio` and a local `audio-route` Expo module for audio privacy
+- a local `audio-route` Expo module for mic-open audio routing
 - `i18next` for Twi, Ewe, Ga, Pidgin, and English
-- Native Android build required for speech recognition
+- Native Android build required for voice capture
 - Mock transaction service currently exists and must remain clearly mock until an official provider sandbox is integrated
 
 Important files and ownership:
@@ -91,42 +92,21 @@ These rules cannot be relaxed for convenience or a demo:
 
 ## Ghanaian Speech Recognition Rules
 
-The demo Android phone currently has an English recognition pack and does not have a native Akan, Ewe, or Ga ASR model installed.
+The hackathon's Phase II screening requires speech to use the University of Ghana HCI Lab APIs; alternative ASR/TTS APIs or models may make the solution ineligible. The app therefore records bounded windows with `expo-audio` and uploads them to `POST /api/v1/asr` (see `src/voice/captureLoop.ts` + `src/voice/labSpeech.ts`), never a device recognizer or third-party model.
 
-Do not claim that the phone understands Twi or Ewe natively if it is actually transcribing through English. The current fallback may:
+The lab's ASR is strongest on Twi/Akan; transcripts can still carry spelling drift such as `koma sika` for `kɔma sika`. The matching layer may:
 
-- Request `en-GH` for Ghanaian app languages when supported
-- Fall back to `en-US` when the device rejects `en-GH`
-- Send Ghanaian command phrases as contextual vocabulary
-- Normalize English spelling drift such as `koma sika` for `kɔma sika`
-- Match commands locally with fuzzy folding
+- Fold diacritics and tolerate edit distance against the command vocabulary
+- Prefer the most specific reading when a drifted multi-word utterance contains a shorter generic word
+- Normalize English spelling drift before matching commands locally
 - Use bundled Twi/Ewe voice clips for speech output
 
-The next ASR feature must be evaluated, not assumed. Candidates may include:
+Honesty rules:
 
-- Whisper or faster-whisper
-- Meta MMS ASR checkpoints
-- XLS-R or wav2vec 2.0 fine-tuned for Ghanaian languages
-- GhanaNLP or university research models
-- Mozilla Common Voice Ghanaian-language data
-- Official speech APIs with verified Ghanaian locale support
-
-Any ASR candidate must be tested for:
-
-- Command accuracy
-- Names
-- Phone digits
-- Amounts
-- Confirmations
-- Cancellations
-- Background noise
-- Different speakers and accents
-- Latency
-- Offline behavior
-- Battery use
-- Privacy and data retention
-
-Reject any model that silently changes a phone number, recipient, amount, or confirmation.
+- Do not claim the app understands a language or phrase it has not been tested on with the lab ASR
+- Any ASR behavior change must be measured against: command accuracy, names, phone digits, amounts, confirmations, cancellations, background noise, different speakers and accents, latency, offline behavior, battery use, privacy and data retention
+- Reject any model or configuration that silently changes a phone number, recipient, amount, or confirmation
+- The ASR quota is small (10 requests/day, 50/week on the free tier) — silent windows must be discarded locally, never uploaded
 
 ## Required Development Method
 
@@ -183,7 +163,7 @@ Exit gate: baseline commands pass and a short test report is written.
 
 ### Feature 1: Ghanaian ASR Evaluation
 
-Build a small evaluation harness before replacing the current recognizer.
+The ASR question is settled by the hackathon rules: speech must use the University of Ghana HCI Lab APIs. What remains is measuring how well that ASR performs in practice.
 
 Requirements:
 
@@ -191,10 +171,10 @@ Requirements:
 - Include Twi, Ewe, Ga, Pidgin, and English core commands
 - Include contact names, phone digits, amounts, yes/no, and cancel
 - Produce accuracy and latency results
-- Compare at least two practical candidates if available
-- Decide whether the model belongs on-device, behind a private backend, or through an approved API
+- Note per-language status honestly (Twi/Akan verified in the lab's docs; Ewe/Ga unverified until measured)
+- Keep request counts inside the free quota (discard silent windows locally; batch where possible)
 
-Exit gate: model choice and limitations are documented with measured results.
+Exit gate: lab-ASR accuracy and limitations are documented with measured results.
 
 ### Feature 2: Voice Onboarding
 
@@ -344,8 +324,8 @@ Do not begin by implementing provider APIs or storing credentials.
 Start with Feature 0, then Feature 1:
 
 1. Verify the current native baseline.
-2. Build the Ghanaian ASR evaluation harness.
-3. Measure recognition accuracy before selecting or replacing an ASR model.
-4. Only after the ASR decision is documented, begin voice onboarding.
+2. Measure lab-ASR recognition accuracy on the connected phone.
+3. Document language coverage and limitations honestly.
+4. Once the lab-ASR results are documented, continue with voice onboarding.
 
 Ask for clarification only when a requirement is genuinely ambiguous or a security decision requires user/business approval. Otherwise, proceed with the smallest safe implementation and keep the user informed.

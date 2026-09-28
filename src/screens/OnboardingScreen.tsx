@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ExpoSpeechRecognitionModule } from 'expo-speech-recognition';
+import { getRecordingPermissionsAsync, requestRecordingPermissionsAsync } from 'expo-audio';
 import { Image, ScrollView, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -226,7 +226,7 @@ export function OnboardingScreen({
 
   const requestMic = useCallback(async () => {
     try {
-      const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      const result = await requestRecordingPermissionsAsync();
       if (result.granted) {
         setMicState('granted');
         pushTranscript('app', i18n.t('onboarding.micGranted'));
@@ -346,7 +346,7 @@ export function OnboardingScreen({
     let ignore = false;
     void (async () => {
       try {
-        const status = await ExpoSpeechRecognitionModule.getPermissionsAsync();
+        const status = await getRecordingPermissionsAsync();
         if (ignore) return;
         if (status.granted) {
           setMicState('granted');
