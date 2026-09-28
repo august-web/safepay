@@ -3,6 +3,7 @@ import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-spe
 import { Platform } from 'react-native';
 
 import { repeatLastAnnouncement } from '../a11y/announcer';
+import { lastSpoken } from '../a11y/spokenHistory';
 import { getAppLanguage, type AppLanguage } from '../i18n';
 import { stopSpeaking, isSpeaking } from '../services/speech';
 import { hapticError, hapticTick } from '../services/haptics';
@@ -112,6 +113,34 @@ function startWhenQuiet(deadline: number, go: () => void): void {
 /** Letters only, lower-cased, keeping Ghanaian orthography ranges. */
 function normalizeTranscript(text: string): string {
   return text.toLowerCase().replace(/[^a-z\u0100-\u036f]/g, '');
+}
+
+/** Word tokens for the content-based own-voice test (Ghanaian ranges kept). */
+function wordsOf(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z\u0100-\u036f ]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+/**
+ * Echo guard 3: decides whether a transcript is recogniser drift of a sentence
+ * we just spoke. The session-based echo memory is wiped whenever the mic
+ * session restarts (startListening clears it), so a clip that finished just
+ * before a restart can come back seconds later as a "user answer" inside a
+ * flow. This guard matches against the spoken history instead, which survives
+ * restarts. Conservative on purpose: at least five shared words AND most of
+ * the utterance overlapping, so a user repeating a short command ("me sika a
+ * aka") right after we taught it is never swallowed.
+ */
+function isOwnVoiceDrift(transcript: string, spoken: string | null): boolean {
+  if (spoken == null) return false;
+  const heard = wordsOf(transcript);
+  if (heard.length < 5) return false;
+  const spokenWords = new Set(wordsOf(spoken));
+  const overlap = heard.filter((word) => spokenWords.has(word)).length;
+  return overlap >= 5 && overlap / heard.length >= 0.6;
 }
 
 /** Duplicate/echo test: equal, or one contains the other when long enough. */
@@ -386,6 +415,7 @@ export function VoiceCommandProvider({
   );
 
   useSpeechRecognitionEvent('start', () => {
+    console.log('[SikaVoice session] start');
     setListening(true);
     // A session opened, so the last start attempt worked.
     failureCountRef.current = 0;
@@ -393,6 +423,7 @@ export function VoiceCommandProvider({
   });
 
   useSpeechRecognitionEvent('end', () => {
+    console.log('[SikaVoice session] end');
     // Android 12 ends its recognizer session after each utterance even though
     // the app is still in always-on mode. Keep the control visibly active while
     // the short replacement session is being opened.
@@ -436,6 +467,11 @@ export function VoiceCommandProvider({
       );
       if (heardFromUs) return;
 
+      // Echo guard 3: a final for a sentence spoken before the mic session
+      // restarted - matched against the spoken history, which survives
+      // restarts (unlike the per-session echo memory above).
+      if (isOwnVoiceDrift(transcript, lastSpoken())) return;
+
       // Duplicate guard: the recogniser can emit the same final twice; only
       // the first may act. Time-based, because with one permanent session
       // there is no "new session" moment to reset a per-session flag.
@@ -455,6 +491,7 @@ export function VoiceCommandProvider({
       }
 
       lastAcceptedRef.current = { text: transcript, at: now };
+      console.log(`[SikaVoice heard] "${transcript}"`);
       onTranscript?.(transcript);
 
       // Conversational flow first: when a flow is active it owns every
@@ -467,6 +504,7 @@ export function VoiceCommandProvider({
       }
 
       const intent = matchVoiceIntent(transcript);
+      console.log(`[SikaVoice intent] "${transcript}" -> ${intent ?? 'none'}`);
       if (intent == null) {
         // Stay in the loop; a correction must not close the microphone.
         void hapticError();
@@ -495,6 +533,9 @@ export function VoiceCommandProvider({
   );
 
   useSpeechRecognitionEvent('speechend', () => {
+    console.log(
+      `[SikaVoice speechend] partial=${partialTranscriptRef.current == null ? 'none' : `"${partialTranscriptRef.current}"`}`,
+    );
     // Android 12's recogniser may emit the useful transcript as partial and
     // then skip the final callback. Give a real final result time to arrive,
     // then promote the last partial exactly once.
@@ -509,6 +550,7 @@ export function VoiceCommandProvider({
 
   useSpeechRecognitionEvent('result', (event) => {
     const transcript = event.results?.[0]?.transcript ?? '';
+    console.log(`[SikaVoice result] final=${event.isFinal === true} "${transcript}"`);
     if (event.isFinal === true) {
       partialTranscriptRef.current = null;
       if (partialResultTimerRef.current != null) {
