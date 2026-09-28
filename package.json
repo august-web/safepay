@@ -12,6 +12,7 @@
     "a11y:contrast": "node scripts/wcag-audit.mjs",
     "icons": "python3 scripts/generate-icons.py",
     "voice-clips": ".tools/tts-venv/bin/python scripts/generate-voice-clips.py",
+    "speech:smoke": "node scripts/hci-lab-smoke.mjs",
     "icons:preview": "python3 scripts/generate-icons.py --preview",
     "typecheck": "tsc --noEmit"
   },

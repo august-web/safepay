@@ -148,8 +148,8 @@ Access granted 2026-09-28; API docs captured the same day from the lab console. 
 - Supported languages are not documented; the doc examples are Twi/Akan ("Akwaaba, wo ho te sɛn?", `akan_audio.mp3`). Verify Ewe/Ga empirically with a test call before promising them on a screening slide.
 
 1. ~~Obtain lab API documentation~~ — done (above).
-2. Verify language coverage empirically (Twi/Akan via docs; Ewe/Ga unconfirmed) with one TTS + one ASR round-trip call.
-3. Re-render the Twi/Ewe voice pack through the lab TTS API (swap the source in `scripts/generate-voice-clips.py`; the manifest and resume support stay).
+2. Verify language coverage empirically (Twi/Akan via docs; Ewe/Ga unconfirmed) with one TTS + one ASR round-trip call. Tooling ready: `npm run speech:smoke` round-trips Twi/Ewe/Ga (English is an opt-in probe, `node scripts/hci-lab-smoke.mjs en`, since English support is undocumented), paces itself under 5 req/min, and prints where the WAVs landed for an ear check. Blocked until the lab key is placed in `.env` (see `.env.example`); the script refuses to run on the placeholder.
+3. Re-render the Twi/Ewe voice pack through the lab TTS API (swap the source in `scripts/generate-voice-clips.py`; the manifest and resume support stay). Sized 2026-09-28: 181 clips / ~4.5k speakable chars per language, so one request per clip is impossible (181 requests against a 70/week quota). Plan: ~21–23 batched requests per language — phrases joined with ". " in ≤250-char requests, then split back apart on the silences between them — which fits one language inside a single weekly char window. `npm run speech:smoke -- --batch tw` rehearses exactly that split (one TTS + three ASR requests) and reports the measured gaps before the re-render spends quota.
 4. Replace the always-on Android recognizer with lab-ASR transcription behind the existing `matchVoiceIntent` layer; keep honest fallback messaging when the network path is unavailable.
 5. Update the demo script so the screening demo runs entirely on lab-provided speech.
 
