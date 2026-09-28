@@ -12,6 +12,7 @@ confirm — the "privacy tax" is the thing this app removes.
 - **React Native + Expo SDK 57** (TypeScript, strict)
 - `expo-local-authentication` — biometric auth (`biometricsSecurityLevel: 'strong'`)
 - `expo-speech` — TTS read-back (`ak-GH` / `ee-GH` / `en-GH`)
+- `expo-file-system` — writes the HCI Lab TTS WAVE buffers to cache before playback
 - `expo-haptics` — haptic fallback patterns (confirm / cancel / error)
 - `expo-audio` — private-audio (headphone) detection and bounded recording windows for voice commands
 - `i18next` + `react-i18next` — Akan (Twi), Ewe, English
@@ -108,10 +109,18 @@ npm run voice-clips                                   # regenerate every clip
   from native clips, with an explicit fallback chain for English/Pidgin
   and falls back to device TTS otherwise, so dynamic sentences (amounts,
   recipients) still speak.
+- `src/services/labTts.ts` - `speak()` routes Ghanaian languages (Twi/Ewe/Gã) to
+  the HCI Lab TTS gateway first (native voice, no English accent), caching the
+  returned WAVE via `expo-file-system` and playing it with `expo-audio`. It is
+  gated by a 15/day local meter (`safepay.ttsUsage`, mirroring the ASR meter) and
+  falls back to device `expo-speech` on any Lab failure, so a quota/network
+  problem never silences the app. English and Pidgin use device TTS directly.
+  The Lab returns `pcm`→`en` (no Pidgin model) and maps Gã to `gaa`.
 
-Settings → **Voice Output Check** reports the voice the engine picked and how
-many native clips are installed, so the state of the voice pipeline is never a
-mystery during a demo.
+Settings → **Voice Output Check** reports the voice the engine picked, how many
+native clips are installed, and the live TTS channel (SikaVoice Lab voice vs.
+device) with remaining daily head-room, so the state of the voice pipeline is
+never a mystery during a demo.
 
 ### Spoken commands (always-on, voice-first)
 

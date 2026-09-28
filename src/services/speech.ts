@@ -1,8 +1,12 @@
+import * as FileSystem from 'expo-file-system/legacy';
+import { createAudioPlayer, type AudioPlayer } from 'expo-audio';
 import * as Speech from 'expo-speech';
 
 import type { AppLanguage } from '../i18n';
 import { rememberSpoken } from '../a11y/spokenHistory';
 import { getCachedSettings } from './settings';
+import { labAltApiKey, labSpeechConfigured } from './labSpeech';
+import { TTS_DAILY_LIMIT, synthesizeTts, synthesizeTtsPublic, ttsRemaining } from './labTts';
 
 /**
  * Maps app languages to BCP-47 voice locales available on device.
@@ -132,6 +136,29 @@ export function speak(
     } catch {
       // Nothing was speaking.
     }
+
+    // Hold the mic-VAD flag through the Lab network round-trip (and through
+    // the device fallback) so the capture loop's quiet gate keeps the mic shut
+    // while we are still deciding how to speak.
+    markSpeakingSync();
+
+    // Lab TTS first for Ghanaian languages: native voice where device TTS
+    // would read Twi/Ewe/Ga orthography with an English accent. On any Lab
+    // failure the call falls through to device TTS below, so a quota/network
+    // problem never silences the app - the previous device-only behaviour is
+    // preserved. The capture loop's quiet gate already waits on
+    // `isSpeakingSync()` (which Lab playback sets), so the mic never hears us.
+    if (LAB_TTS_LANGUAGES.has(language)) {
+      const played = await speakViaLab(trimmed, language, handlers);
+      if (played) return;
+      // Lab unavailable / quota used / no key: native voice via the public
+      // GhanaNLP endpoint (unauthenticated, audio/wav). We try it before device
+      // TTS so a Ghanaian language never degrades to an English accent until
+      // both native paths have failed; device TTS remains the last resort.
+      const playedPub = await speakViaPublic(trimmed, language, handlers);
+      if (playedPub) return;
+    }
+
     markSpeakingSync();
     Speech.speak(trimmed, {
       language: locale,
@@ -161,13 +188,208 @@ export function speak(
   })();
 }
 
+/** Languages the HCI Lab can speak natively; device TTS reads them with an English accent. */
+const LAB_TTS_LANGUAGES: ReadonlySet<AppLanguage> = new Set<AppLanguage>(['tw', 'ee', 'ga']);
+
 export function stopSpeaking(): void {
   clearSpeakingSync();
+  stopLabPlayer();
   try {
     void Speech.stop();
   } catch {
     // Engine not initialised yet.
   }
+}
+
+/** State for a Lab-synthesised WAV played through expo-audio. */
+let labPlayer: AudioPlayer | null = null;
+let labCapTimer: ReturnType<typeof setTimeout> | null = null;
+
+function stopLabPlayer(): void {
+  if (labCapTimer != null) {
+    clearTimeout(labCapTimer);
+    labCapTimer = null;
+  }
+  const player = labPlayer;
+  labPlayer = null;
+  if (player == null) return;
+  try {
+    player.pause();
+    player.remove();
+  } catch {
+    // Already released.
+  }
+}
+
+/** Uint8Array -> base64 via the global `btoa` (always present on RN/Hermes). */
+function bytesToBase64(bytes: Uint8Array): string {
+  const g = globalThis as unknown as { btoa?: (input: string) => string };
+  const encode = g.btoa;
+  if (typeof encode !== 'function') {
+    throw new Error('btoa is not available in this runtime');
+  }
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return encode(binary);
+}
+
+/**
+ * Plays a Lab-synthesised WAV from the given bytes, mapping completion onto the
+ * `SpeakHandlers` contract so callers sequence the same as device TTS. Returns
+ * true only when playback was handed off (and `onDone`/`onStopped` will fire);
+ * false when the Lab path could not start, so the caller falls back.
+ */
+async function playLabWav(
+  wav: Uint8Array,
+  handlers?: SpeakHandlers,
+): Promise<boolean> {
+  const cacheDir = FileSystem.cacheDirectory;
+  if (cacheDir == null) {
+    console.warn('[SikaVoice tts] no cache directory, falling back to device');
+    return false;
+  }
+  // cacheDirectory is already a file:// URI; prefixing it again makes the
+  // native writer reject the path ("...isn't writable") and silently fall back.
+  const fileUri = `${cacheDir}tts-${Date.now()}.wav`;
+  try {
+    await FileSystem.writeAsStringAsync(fileUri, bytesToBase64(wav), {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+  } catch (error) {
+    console.warn('[SikaVoice tts] cache write failed, falling back to device:', error);
+    return false;
+  }
+
+  stopLabPlayer();
+  const player = createAudioPlayer({ uri: fileUri });
+  labPlayer = player;
+  markSpeakingSync();
+
+  return new Promise<boolean>((resolve) => {
+    let settled = false;
+    const finish = (done: boolean) => {
+      if (settled) return;
+      settled = true;
+      if (labCapTimer != null) {
+        clearTimeout(labCapTimer);
+        labCapTimer = null;
+      }
+      try {
+        player.remove();
+      } catch {
+        // Already released.
+      }
+      if (labPlayer === player) labPlayer = null;
+      clearSpeakingSync();
+      void FileSystem.deleteAsync(fileUri, { idempotent: true }).catch(() => {});
+      resolve(done);
+      if (done) handlers?.onDone?.();
+      else handlers?.onStopped?.();
+    };
+
+    player.addListener('playbackStatusUpdate', (status) => {
+      if (status.didJustFinish) finish(true);
+    });
+
+    player.play();
+    // Safety net: never hold the mic-VAD flag on a stuck Lab playback - same
+    // 15s cap as the clip player.
+    labCapTimer = setTimeout(() => finish(false), SPEAKING_CAP_MS);
+  });
+}
+
+/**
+ * Tries the HCI Lab TTS gateway for `language` (native voice for Ghanaian
+ * languages). Returns true if a WAV was played; false to let the caller fall
+ * back to device TTS. Any failure is logged and swallowed as a fallback.
+ */
+async function speakViaLab(
+  text: string,
+  language: AppLanguage,
+  handlers?: SpeakHandlers,
+): Promise<boolean> {
+  try {
+    const result = await synthesizeTts({ text, language });
+    if (!result.ok) {
+      console.log(
+        `[SikaVoice tts] lab unavailable (${result.reason}); device fallback for ${language}`,
+      );
+      return false;
+    }
+    return playLabWav(result.wav, handlers);
+  } catch (error) {
+    console.log('[SikaVoice tts] lab attempt threw, falling back to device:', error);
+    return false;
+  }
+}
+
+/**
+ * Tier-3 native fallback: the public GhanaNLP Translator TTS endpoint
+ * (translate.ghananlp.org/api/tts). Shares the WAV playback contract with the
+ * Lab path via `playLabWav`; returns false when this also fails (network off,
+ * 429, malformed response) so device TTS is the never-break last resort.
+ */
+async function speakViaPublic(
+  text: string,
+  language: AppLanguage,
+  handlers?: SpeakHandlers,
+): Promise<boolean> {
+  try {
+    const result = await synthesizeTtsPublic({ text, language });
+    if (!result.ok) {
+      console.log(
+        `[SikaVoice tts] public unavailable (${result.reason}); device fallback for ${language}`,
+      );
+      return false;
+    }
+    return playLabWav(result.wav, handlers);
+  } catch (error) {
+    console.log('[SikaVoice tts] public attempt threw, falling back to device:', error);
+    return false;
+  }
+}
+
+export type TtsVoiceStatus = {
+  /**
+   * Which native-accent path handles this language: the Lab gateway (keyed +
+   * quota-metered), the public GhanaNLP endpoint (unauthenticated fallback), or
+   * the device engine (no native model exists, or all native paths unreachable).
+   */
+  channel: 'lab' | 'public' | 'device';
+  keyPresent: boolean;
+  used: number;
+  limit: number;
+  remaining: number;
+};
+
+/**
+ * Reports which TTS path Settings should show for `language`:
+ *  - 'lab'    : native Lab voice (key configured + daily quota remaining)
+ *  - 'public' : native voice via the public GhanaNLP endpoint (Lab key absent
+ *               or quota spent) - English-accented device TTS is avoided
+ *  - 'device' : no native model exists for this language (e.g. en/pcm)
+ */
+export async function ttsVoiceStatusFor(
+  language: AppLanguage,
+): Promise<TtsVoiceStatus> {
+  const keyPresent = labSpeechConfigured() || labAltApiKey() != null;
+  const remaining = await ttsRemaining();
+  const used = Math.max(0, TTS_DAILY_LIMIT - remaining);
+  const nativeCapable = LAB_TTS_LANGUAGES.has(language);
+  let channel: TtsVoiceStatus['channel'];
+  if (keyPresent && remaining > 0 && nativeCapable) channel = 'lab';
+  else if (nativeCapable) channel = 'public';
+  else channel = 'device';
+  return {
+    channel,
+    keyPresent,
+    used,
+    limit: TTS_DAILY_LIMIT,
+    remaining,
+  };
 }
 
 export type VoiceStatus = {

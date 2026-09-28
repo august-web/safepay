@@ -32,11 +32,32 @@ export function labBaseUrl(): string {
   return resolveBaseUrl(process.env.EXPO_PUBLIC_SPEECH_API_BASE_URL);
 }
 
-function apiKey(): string | null {
-  const value = process.env.EXPO_PUBLIC_SPEECH_API_KEY?.trim();
-  if (value == null || value.length === 0) return null;
-  if (value.startsWith('your_')) return null;
+/** The `.env.example` placeholder is not a real key - treat it as unset. */
+function resolveApiKey(raw: string | undefined): string | null {
+  const value = (raw ?? '').trim();
+  if (value.length === 0 || value.startsWith('your_')) return null;
   return value;
+}
+
+/** The primary HCI Lab bearer key, or null when unconfigured / placeholder. */
+export function labApiKey(): string | null {
+  return resolveApiKey(process.env.EXPO_PUBLIC_SPEECH_API_KEY);
+}
+
+function apiKey(): string | null {
+  return labApiKey();
+}
+
+/** Alternate HCI Lab base URL from `.env`, or null when absent/placeholder. */
+export function labAltBaseUrl(): string | null {
+  const raw = process.env.EXPO_PUBLIC_SPEECH_API_BASE_URL_ALT?.trim();
+  if (raw == null || raw.length === 0 || raw.startsWith('your_')) return null;
+  return /^https?:\/\/.+/.test(raw) ? raw.replace(/\/+$/, '') : null;
+}
+
+/** Alternate HCI Lab bearer key, or null when unconfigured / placeholder. */
+export function labAltApiKey(): string | null {
+  return resolveApiKey(process.env.EXPO_PUBLIC_SPEECH_API_KEY_ALT);
 }
 
 export function labSpeechConfigured(): boolean {
@@ -127,19 +148,22 @@ async function recordUsage(): Promise<void> {
 
 const UPLOAD_TIMEOUT_MS = 45_000;
 
+/** Recoverable server-side failures that may differ between Lab subscriptions. */
+const RETRYABLE_REASONS: ReadonlySet<TranscribeFailure> =
+  new Set<TranscribeFailure>(['quota', 'auth', 'server', 'timeout']);
+
 /**
- * Uploads a recorded utterance and returns its transcript.
+ * Uploads one utterance to a single gateway URL and returns its transcript.
  *
  * Every request that got an HTTP response is counted against the daily ledger,
  * including 429s and 5xx - only a request that never reached the server
  * (offline, DNS failure) is free, because the quota was not consumed.
  */
-export async function transcribeFile(uri: string): Promise<TranscribeResult> {
-  const key = apiKey();
-  if (key == null) return { ok: false, reason: 'no-key' };
-
-  if ((await asrRemaining()) <= 0) return { ok: false, reason: 'quota' };
-
+async function transcribeOnce(
+  uri: string,
+  baseUrl: string,
+  key: string,
+): Promise<TranscribeResult> {
   const form = new FormData();
 
   const controller = new AbortController();
@@ -154,7 +178,7 @@ export async function transcribeFile(uri: string): Promise<TranscribeResult> {
     if (!recording.ok) return { ok: false, reason: 'empty' };
     form.append('file', await recording.blob(), 'utterance.m4a');
 
-    const response = await fetch(`${labBaseUrl()}/api/v1/asr`, {
+    const response = await fetch(`${baseUrl}/api/v1/asr`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}` },
       body: form,
@@ -197,4 +221,37 @@ export async function transcribeFile(uri: string): Promise<TranscribeResult> {
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * Uploads a recorded utterance and returns its transcript.
+ *
+ * Lab gateway first, alternate Lab subscription second: if the primary
+ * endpoint returns a recoverable failure (quota/auth/server/timeout) and an
+ * `EXPO_PUBLIC_SPEECH_API_KEY_ALT` + `_BASE_URL_ALT` pair is configured, one
+ * retry is attempted on the alternate endpoint - no new dependency required.
+ */
+export async function transcribeFile(uri: string): Promise<TranscribeResult> {
+  const key = apiKey();
+  if (key == null) {
+    const altKey = labAltApiKey();
+    const altBase = labAltBaseUrl();
+    if (altKey == null || altBase == null) return { ok: false, reason: 'no-key' };
+    if ((await asrRemaining()) <= 0) return { ok: false, reason: 'quota' };
+    return transcribeOnce(uri, altBase, altKey);
+  }
+
+  if ((await asrRemaining()) <= 0) return { ok: false, reason: 'quota' };
+
+  const primary = await transcribeOnce(uri, labBaseUrl(), key);
+  if (primary.ok) return primary;
+  if (RETRYABLE_REASONS.has(primary.reason)) {
+    const altBase = labAltBaseUrl();
+    const altKey = labAltApiKey();
+    if (altBase != null && altKey != null) {
+      const alt = await transcribeOnce(uri, altBase, altKey);
+      if (alt.ok) return alt;
+    }
+  }
+  return primary;
 }

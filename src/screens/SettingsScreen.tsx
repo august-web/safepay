@@ -13,7 +13,7 @@ import { getAppLanguage } from '../i18n';
 import { hapticTick } from '../services/haptics';
 import { useAudioRoute } from '../services/headphones';
 import { getCachedSettings, loadSettings, saveSettings, type NavPreset, type PrivacyMode } from '../services/settings';
-import { speak, stopSpeaking, voiceStatusFor, warmUpSpeech } from '../services/speech';
+import { speak, stopSpeaking, voiceStatusFor, warmUpSpeech, ttsVoiceStatusFor, type TtsVoiceStatus } from '../services/speech';
 import { sayKey } from '../voice/say';
 import { voiceClipCount } from '../voice/voicePack';
 
@@ -37,6 +37,11 @@ export function SettingsScreen({
   const channel = voiceChannel();
   const voice = voiceStatusFor(getAppLanguage());
   const clipCount = voiceClipCount(getAppLanguage());
+
+  const [tts, setTts] = useState<TtsVoiceStatus | null>(null);
+  useEffect(() => {
+    void ttsVoiceStatusFor(getAppLanguage()).then(setTts);
+  }, []);
 
   const testVoice = () => {
     void hapticTick();
@@ -227,6 +232,26 @@ export function SettingsScreen({
               {t('settings.voiceClipLine', { count: clipCount })}
             </Text>
           ) : null}
+
+                    <Text style={styles.optionDesc}>
+            {tts == null
+              ? t('settings.voiceTtsLoading', { defaultValue: 'Checking voice channel…' })
+              : tts.channel === 'lab'
+                ? t('settings.voiceTtsChannelLab', {
+                    defaultValue:
+                      'Native voice: SikaVoice Lab TTS ({{remaining}} of {{limit}} left today)',
+                    remaining: tts.remaining,
+                    limit: tts.limit,
+                  })
+                : tts.channel === 'public'
+                  ? t('settings.voiceTtsChannelPublic', {
+                      defaultValue:
+                        'Native voice: GhanaNLP public endpoint (device fallback when offline)',
+                    })
+                  : t('settings.voiceTtsChannelDevice', {
+                      defaultValue: 'Device voice only (no native model for this language)',
+                    })}
+          </Text>
 
           <AccessibleButton
             label={t('settings.testVoice', 'Test voice output')}
