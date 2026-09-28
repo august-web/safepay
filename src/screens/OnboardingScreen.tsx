@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ExpoSpeechRecognitionModule } from 'expo-speech-recognition';
-import { ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { announce } from '../a11y/announcer';
@@ -81,6 +81,22 @@ const STEP_PROMPT_KEY: Record<OnboardingStepName, string> = {
   done: 'onboarding.doneBody',
 };
 
+/**
+ * Short card heading per step. Steps whose prompt key is already the question
+ * (language, talkback) render the prompt alone instead of heading + body.
+ */
+const STEP_TITLE_KEY: Partial<Record<OnboardingStepName, string>> = {
+  welcome: 'onboarding.welcomeTitle',
+  mic: 'onboarding.micTitle',
+  listening: 'onboarding.listeningTitle',
+  contacts: 'onboarding.contactsTitle',
+  micTest: 'onboarding.micTestTitle',
+  voiceTest: 'onboarding.voiceTestTitle',
+  biometrics: 'onboarding.bioTitle',
+  teach: 'onboarding.teachTitle',
+  done: 'onboarding.doneTitle',
+};
+
 const NEXT_STEP: Record<OnboardingStepName, OnboardingStepName> = {
   welcome: 'mic',
   mic: 'listening',
@@ -108,6 +124,32 @@ const LANGUAGE_WORDS: Record<AppLanguage, RegExp> = {
 };
 
 type TranscriptEntry = { speaker: 'app' | 'user'; text: string };
+
+/**
+ * Decorative step bar. The spoken/screen-reader source of truth stays the
+ * "Setup step X of Y" text line; the bar itself is hidden from accessibility,
+ * per the brief's rule for non-informational decoration.
+ */
+function StepProgress({ total, current }: { total: number; current: number }) {
+  return (
+    <View
+      style={styles.progressRow}
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+    >
+      {Array.from({ length: total }, (_, index) => (
+        <View
+          key={index}
+          style={[
+            styles.progressSegment,
+            index < current - 1 ? styles.progressDone : null,
+            index === current - 1 ? styles.progressActive : null,
+          ]}
+        />
+      ))}
+    </View>
+  );
+}
 
 export function OnboardingScreen({
   onDone,
@@ -601,13 +643,23 @@ export function OnboardingScreen({
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <Text accessibilityRole="header" style={styles.title}>
-          {t('onboarding.screenTitle')}
-        </Text>
-        <Text style={styles.stepLine}>
-          {t('onboarding.stepOf', { x: stepIndex, y: STEP_ORDER.length })}
-        </Text>
+        <Image
+          source={require('../../assets/safepay-symbol.png')}
+          style={styles.brandMark}
+          resizeMode="contain"
+          accessible={false}
+          accessibilityIgnoresInvertColors
+        />
+        <View style={styles.headerText}>
+          <Text accessibilityRole="header" style={styles.title}>
+            {t('onboarding.screenTitle')}
+          </Text>
+          <Text style={styles.stepLine}>
+            {t('onboarding.stepOf', { x: stepIndex, y: STEP_ORDER.length })}
+          </Text>
+        </View>
       </View>
+      <StepProgress total={STEP_ORDER.length} current={stepIndex} />
 
       <ScrollView
         style={styles.transcript}
@@ -618,7 +670,9 @@ export function OnboardingScreen({
         {transcript.map((entry, index) => (
           <View key={`${entry.speaker}-${index}`} style={styles.entry}>
             <Text style={entry.speaker === 'app' ? styles.appLabel : styles.userLabel}>
-              {entry.speaker === 'app' ? t('app.name') : t('vcmd.heard')}
+              {entry.speaker === 'app'
+                ? t('voice.safePay', 'SafePay')
+                : t('voice.you', 'You')}
             </Text>
             <Text style={styles.entryText}>{entry.text}</Text>
           </View>
@@ -628,6 +682,11 @@ export function OnboardingScreen({
       {/* The live region re-announces the question when the step changes, so
           TalkBack users hear the new step without hunting for it. */}
       <View style={styles.currentPrompt} accessibilityLiveRegion="polite">
+        {STEP_TITLE_KEY[step] != null ? (
+          <Text accessibilityRole="header" style={styles.cardTitle}>
+            {t(STEP_TITLE_KEY[step] as string)}
+          </Text>
+        ) : null}
         <Text style={styles.prompt}>{promptText}</Text>
         {step === 'micTest' && (dictationActive || preview != null) ? (
           <Text style={styles.previewLine}>
@@ -771,22 +830,45 @@ const styles = themedStyles((colors) => ({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
     paddingBottom: theme.spacing.sm,
     borderBottomWidth: 2,
     borderBottomColor: colors.border,
+  },
+  headerText: {
+    flex: 1,
+  },
+  brandMark: {
+    width: 40,
+    height: 40,
   },
   title: {
     fontSize: theme.typography.heading,
     fontWeight: '900',
     color: colors.navyMidnight,
-    flex: 1,
   },
   stepLine: {
     fontSize: theme.typography.small,
     fontWeight: '900',
     color: colors.goldInk,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    gap: 4,
+    marginTop: -theme.spacing.xs,
+  },
+  progressSegment: {
+    flex: 1,
+    height: 5,
+    borderRadius: theme.radii.full,
+    backgroundColor: colors.border,
+  },
+  progressDone: {
+    backgroundColor: colors.safepayBlue,
+  },
+  progressActive: {
+    backgroundColor: colors.momoYellow,
   },
   transcript: {
     flex: 1,
@@ -825,6 +907,11 @@ const styles = themedStyles((colors) => ({
     borderColor: colors.safepayBlue,
     padding: theme.spacing.md,
     gap: theme.spacing.xs,
+  },
+  cardTitle: {
+    fontSize: theme.typography.small,
+    fontWeight: '900',
+    color: colors.goldInk,
   },
   prompt: {
     fontSize: theme.typography.subheading,

@@ -360,7 +360,9 @@
     "dictationStop": "Ɖu gbe",
     "dictationListening": "Mese… gblɔ nya vovo",
     "dictationIdle": "Da mic la dzi gbe",
-    "dictationPreview": "Mese be:"
+    "dictationPreview": "Mese be:",
+    "safePay": "SafePay",
+    "you": "Wò"
   },
   "num": {
     "0": "aeke",

@@ -41,6 +41,21 @@ export function VoiceFlowHud({
         <Text style={styles.step}>{t('vcmd.stepOf', { x: status.step, y: status.of })}</Text>
       </View>
 
+      {/* Decorative mirror of the spoken "step x of y" line — hidden from
+          accessibility so TalkBack never reads the bar instead of the words. */}
+      <View
+        style={styles.progressTrack}
+        accessible={false}
+        importantForAccessibility="no-hide-descendants"
+      >
+        <View
+          style={[
+            styles.progressFill,
+            { width: `${Math.round((status.step / Math.max(status.of, 1)) * 100)}%` },
+          ]}
+        />
+      </View>
+
       <ScrollView
         style={styles.transcript}
         contentContainerStyle={styles.transcriptContent}
@@ -153,6 +168,17 @@ const styles = themedStyles((colors) => ({
     fontWeight: '900',
     color: colors.navyMidnight,
     paddingTop: theme.spacing.xs,
+  },
+  progressTrack: {
+    height: 5,
+    borderRadius: theme.radii.full,
+    backgroundColor: colors.border,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: theme.radii.full,
+    backgroundColor: colors.safepayBlue,
   },
   prompt: {
     fontSize: theme.typography.heading,

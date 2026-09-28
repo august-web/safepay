@@ -360,7 +360,9 @@
     "dictationStop": "Kpɔ gbe",
     "dictationListening": "Mese… shɔ jwɛɛ",
     "dictationIdle": "Da mic lɛ na shɔ jwen",
-    "dictationPreview": "Mese akɛ:"
+    "dictationPreview": "Mese akɛ:",
+    "safePay": "SafePay",
+    "you": "Wɔ"
   },
   "vcmd": {
     "contactNumber": "What is their mobile money number? Say it digit by digit.",

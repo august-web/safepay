@@ -360,7 +360,9 @@
     "dictationStop": "Gyae kasa",
     "dictationListening": "Metie… ka adey no nyinaa",
     "dictationIdle": "Bɔ mic no na ka bi koraa",
-    "dictationPreview": "Metee wo so:"
+    "dictationPreview": "Metee wo so:",
+    "safePay": "SafePay",
+    "you": "Wò"
   },
   "num": {
     "0": "hwee",

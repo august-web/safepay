@@ -360,7 +360,9 @@
     "dictationStop": "Stop voice input",
     "dictationListening": "Listening… say the whole transaction",
     "dictationIdle": "Tap the mic and say it in one sentence",
-    "dictationPreview": "I heard:"
+    "dictationPreview": "I heard:",
+    "safePay": "SafePay",
+    "you": "You"
   },
   "vcmd": {
     "helpNative": "You can say: my balance, statement, send money, airtime, cash out, home, repeat, or stop.",

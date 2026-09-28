@@ -360,7 +360,9 @@
     "dictationStop": "Stop voice input",
     "dictationListening": "I dey hear… talk the whole thing",
     "dictationIdle": "Press the mic make you talk am once",
-    "dictationPreview": "I hear say:"
+    "dictationPreview": "I hear say:",
+    "safePay": "SafePay",
+    "you": "You"
   },
   "vcmd": {
     "contactNumber": "What is {{name}}'s mobile money number? Say it digit by digit.",
