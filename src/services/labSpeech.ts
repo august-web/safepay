@@ -57,13 +57,14 @@ export type TranscribeResult =
   | { ok: true; transcript: string }
   | { ok: false; reason: TranscribeFailure; status?: number };
 
-/** Parses whichever envelope the gateway uses; the docs do not pin one shape. */
+/** Parses whichever envelope the gateway uses; the live API uses `transcription`. */
 function parseTranscript(body: unknown): string | null {
   if (typeof body === 'string') return body.trim().length > 0 ? body : null;
   if (body == null || typeof body !== 'object') return null;
   const record = body as Record<string, unknown>;
   const nested = record.result ?? record.data;
   const candidates = [
+    record.transcription,
     record.transcript,
     record.text,
     typeof nested === 'object' && nested != null

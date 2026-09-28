@@ -179,7 +179,7 @@ async function asr(wavPath) {
   let transcript = null;
   try {
     const json = JSON.parse(body);
-    transcript = json.transcript ?? json.text ?? json.result?.transcript ?? json.data?.transcript ?? null;
+    transcript = json.transcription ?? json.transcript ?? json.text ?? json.result?.transcript ?? json.data?.transcript ?? null;
     if (transcript == null) transcript = `(unrecognised response shape: ${body.slice(0, 200)})`;
   } catch {
     transcript = body;
