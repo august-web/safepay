@@ -166,6 +166,13 @@ Access granted 2026-09-28; API docs captured the same day from the lab console. 
 - The first real ASR success body shows the transcript sits in `transcription` (`{"request_id":"…","status":"success","transcription":"…","audio_format":{…}}`) — not `transcript`/`text`, which both parsers looked for first. The smoke output rendered successes as "(unrecognised response shape: …)".
 - `parseTranscript` in `src/services/labSpeech.ts` and the smoke script's decoder now read `transcription` first. The app had never received a successful ASR body before this (the dummy-key pass only ever saw 401), so without this fix every real success would have been reported to the user as `empty`. Required before the real-key on-device pass.
 
+**Real-key rebuild, first on-device success, and the quota lesson (2026-09-28)**
+
+- The APK installed at 13:16 still carried the placeholder key and predated the parser fix; every utterance died as a 401 and the listener stops on such failures by design — the cause of the "app doesn't respond" report. Rebuilt at 13:49 with the key from `.env` (inlined at build time) via `npm run apk`, installed and launched on the TECNO.
+- First real on-device ASR result 13:52:41: `[SikaVoice window] speech heard (peak -2 dB) - uploading` → `[SikaVoice heard]` with a real Twi-script transcript → intent `none` (the utterance did not match a command). The recognizer swap now works end-to-end on the phone; the parser fix is proven on-device.
+- The next window at 13:52:56 hit the gateway quota, and a host probe (`node scripts/hci-lab-smoke.mjs tw`) returned `429 daily_quota_exceeded: Daily ASR request limit has been reached`. So the remaining blocker is the lab's 10 ASR/day allowance, and it resets daily.
+- **Quota lesson (new, affects rehearsal planning)**: the gateway counts every request that reaches it, 401s included. Today's 10 ASR calls are fully explained only if the dummy-key 401 calls counted: 6 smoke-suite calls + 1 on-device success + ~3 rejected-401 calls from the stale build. A wrong key burns real quota, and a rehearsal day can leave the demo day dry — budget the 10/day deliberately, and ask dcshcilab@ug.edu.gh for a screening quota bump (also worth confirming Ewe ASR support and the daily reset time).
+
 **Phase 3: Contact Lookup and Recipient Disambiguation** remains second in line, per `BUILD-PLAN.md`: least-privilege contacts read, spoken disambiguation of multiple matches, read-back before the amount, manual entry fallback. Exit gate: ambiguous names never silently select a recipient; all permission cases pass; contacts never leave the device.
 
 ## Handoff Instructions

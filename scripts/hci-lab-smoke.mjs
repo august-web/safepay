@@ -30,6 +30,9 @@
  * Quota note (free plan): TTS 15/day, ASR 10/day, and 5 requests/minute.
  * A full language round-trip run costs 3 TTS + 3 ASR; one --batch run costs
  * 1 TTS + 3 ASR. The script paces itself under the per-minute limit.
+ * The gateway counts every request that reaches it, 401s included - a probe
+ * run against a wrong or placeholder key still burns the day's ASR quota
+ * (observed 2026-09-28), so check the key shape before spending calls.
  *
  * Rendered WAVs land in a temp directory (path printed at the end) so they
  * can be listened to with human ears too.
