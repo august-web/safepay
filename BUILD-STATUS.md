@@ -1,6 +1,6 @@
 # SafePay Build Status
 
-Last updated: 2026-09-28
+Last updated: 2026-10-02 (evening)
 
 ## Current Checkpoint
 
@@ -124,6 +124,152 @@ Validation: `npm run typecheck`, `npm run lint`, `npm run a11y:contrast` — all
 - `"speak balance"` matched the `balance` intent twice (11:14:50, 11:15:04); `"send money"` matched `send` and the flow opened; recipient name capture then took `"augustine"` outside the intent matcher, as designed. Stray utterances (`"okay"`, `"thank you"`) correctly matched nothing.
 - Echo guard 3 rejected the app's own "Who are you sending…" prompt when it came back through the mic mid-flow.
 - Ear-confirmation of the spoken response (HUD + loudspeaker) is still a rehearsal item: the logs prove the handler ran, not that the room heard it.
+
+## Phase II Prep — Speech Inclusion & Fallback Documentation (2026-10-02)
+
+Focus decision (agreed with the team): **Akan (Twi) is the one native language we get exactly right** — voice, pronunciation, and stutter-inclusive handling. It is the lab's best-supported language (smoke test passed, their doc examples are Twi), the app's default language, and the largest speaker base. Ewe and Ga remain in the app at best-effort; the Ewe ASR miss stops being a screening blocker.
+
+**Improvement: stutter-tolerant transcript matching**
+
+- `destutter` (`src/voice/flowParse.ts`), applied once in `VoiceCommandProvider.handleTranscript`, collapses immediately repeated words — the fingerprint a stutter leaves in an ASR transcript ("me me me sika a aka" → "me sika a aka") — before dictation, flows, intent matching and the visible transcript read it.
+- Two deliberate limits: only adjacent duplicates collapse, and **digit tokens never collapse** — a stuttered "zero zero" and a genuine "zero zero" inside a phone number are indistinguishable, and a phone number must never be silently altered. Ambiguity resolves through the spoken read-back instead.
+- The evaluation harness mirrors the collapse (as `asr-evaluation.mjs` already mirrors the parsers) and four cases were added: stuttered balance ("me me me sika a aka"), stuttered send ("kɔma kɔma sika"), stuttered amount ("fifty fifty cedis"), and a repeated-digit phone ("zero zero two four …" → `0024123456`, proving digits survive verbatim).
+- Capture-window patience was reviewed rather than changed: `TRAILING_SILENCE_MS = 1_300` in `captureLoop.ts` already lets a stutter's within-utterance pause finish without slicing the utterance.
+- Validation: `node scripts/asr-evaluation.mjs` → **17/17 cases pass**; `npm run typecheck`, `npm run lint`, `npm run a11y:contrast` all PASS.
+- Still owed (rehearsal): recordings from 2–3 Twi speakers who actually stutter, added as consented evaluation cases, so the inclusion claim has measured evidence.
+
+**Improvement: fallback stack documented (`FALLBACKS.md`)**
+
+- The team's rules are now written down where the next agent and the screeners can read them: HCI Lab API is primary and used sparingly (bounded windows, on-device silence discard, meters that count every response); on quota exhaustion the app falls back rather than going silent; every fallback is open-source with a named license.
+- TTS fallback is already active and shipped: the bundled Meta MMS clip pack (CC-BY-NC 4.0, non-commercial — stated plainly). ASR fallback is designed with its seam in place (alternate base URL/key in `.env.example`, same client shape, `speech:smoke` runs against either endpoint) using a self-hosted Meta MMS Akan checkpoint; the server itself is the first stretch item if a live no-quota demo is needed.
+- LLM policy recorded: allowed, but off the per-utterance path; nothing ships without a row in `FALLBACKS.md` naming model, version, license, hosting and trigger.
+
+**Zero-quota pipeline test + self-hosted ASR fallback (2026-10-02, evening)**
+
+- **Installed on the TECNO**: the stutter-tolerant build (destutter + evaluation cases) and a new zero-quota rehearsal control. Rebuilds and installs never touch the lab quota — only gateway uploads do.
+- **Zero-quota pipeline test**: Settings → Voice Output Check now has "Test the voice pipeline" — type a phrase (e.g. "me me me sika a aka") and it is pushed through the exact production path (`injectTranscript` → destutter → flow/matching → HUD → spoken reply) with no microphone and no gateway request. Voice-pipeline wiring can now be rehearsed endlessly at zero ASR cost; live microphone tests are reserved for the deliberate daily budget.
+- **Self-hosted ASR fallback built** (`tools/asr-fallback/server.py`): serves the lab's exact `POST /api/v1/asr` shape from this laptop with Meta MMS `facebook/mms-1b-all` (Akan adapter, CC-BY-NC 4.0 documented in `FALLBACKS.md`). `.m4a` uploads decode via macOS's built-in `afconvert`; stdlib HTTP only; success body mirrors `{"transcription": ...}` so the client swaps endpoints, never code. When the lab returns `quota`, the existing `labSpeech.ts` retry against `EXPO_PUBLIC_SPEECH_API_BASE_URL_ALT` picks this server up.
+- Fallback status: server code done and syntax-checked; the one-time ~4 GB checkpoint download is running (≈2 h); a live round-trip test with a bundled Twi clip (`assets/voice/tw/*.wav` → expect send/balance text) is the next action once it lands.
+- Validation: `npm run typecheck`, `npm run lint` PASS; evaluator still 17/17.
+
+## Phase 3 Progress
+
+**Contact Lookup and Recipient Disambiguation — implemented (2026-10-02), on-device verification in progress**
+
+How it works: in the send-money voice flow, a spoken name is looked up in the device's own address book — entirely on-device, never uploaded to the speech gateway, never logged. The OS permission is requested at the moment the flow first needs it (or during onboarding's contacts step, which now performs the real ask with a skip). Then:
+
+- **One match** → the chosen name and phone number are read back natively and a yes is required before any amount is asked (build-plan rule: read-back before amount).
+- **Two or more** → the flow never picks silently: it says it found several people, then reads each candidate as "number 1… 2…" followed by that candidate's phone digits composed from native number atoms (quota-free, and the number is the truth that receives the money — the name is mirrored on the HUD). The user answers "1 / 2 / first / second / mmienu / eve…"; an unparseable answer re-asks.
+- **No match or denied permission** → spoken honestly ("I don't know that name / contacts are not allowed"), and the flow takes the phone number the old way — manual entry fallback, never a dead end.
+
+Added:
+
+- `expo-contacts@57` (SDK 57 modern API: top-level permission functions, `Contact.getAllDetails([FULL_NAME, PHONES], { name })`); `READ_CONTACTS` in `app.json`; prebuild regenerated `android/`.
+- `src/services/contactMatch.ts` — pure, testable matching: Ghana phone normalization (+233 → 0…), name scoring (exact full name > first/surname token > prefix > substring), dedupe per name+number pair, spoken cap of 4 candidates, and `parseSpokenChoice` for the disambiguation answer (numerals, ordinals, Twi/Ewe digit words).
+- `src/services/contacts.ts` — permission wrappers and the bounded lookup (native name filter, broad on-device scan fallback, both local-only).
+- `VoiceFlowController` — new `lookup → disambiguate → recipientConfirm` states for send flows; step HUD now 6 steps for send; a session-level tri-state (`contactsEnabled`) means a refused permission is respected for the session; stop/cancel during the lookup window is still honored.
+- Onboarding contacts step: real permission ask (voice "yes" or the Allow button), granted/denied spoken lines, skippable as before.
+- 8 new fixed phrases rendered as Twi/Ewe clips via the local MMS pipeline (378 clips total, none silent) — the look-up prompts stay native and quota-free.
+
+Validation: `npm run typecheck`, `npm run lint` (zero problems), `npm run a11y:contrast` PASS; evaluator 17/17. APK with the contacts module built and installed on the TECNO; the full disambiguation path (two same-named contacts → spoken choice → confirm) is the live test, driven quota-free through Settings → "Test the voice pipeline".
+
+**On-device verification PASSED (2026-10-02, full disambiguation path, zero ASR quota)**
+
+Driven entirely through the typed-answer paths (Settings injection + the HUD's new "Or type your answer" row), against the phone's real address book, in Twi:
+
+1. "send money" → HUD opened at the new 6-step send flow ("Nkyɛmu 1 wɔ 6 mu").
+2. "ama" → the flow spoke the new clip ("Merehwɛ wo contacts mu."), the OS READ_CONTACTS dialog appeared, Allow was tapped, and the lookup found **multiple** Ama contacts → "Ahu nnipa pii a wɔ din no." with numbered candidates read by phone digits.
+3. Choice "1" → read-back of the real contact ("Sis Ama 0248020386") with the new confirm prompt ("Ka aane gye nipa no to mu, anaagyɛ dabi san paw bio.").
+4. "aane" → amount "fifty cedis" (parsed 50) → reference "skip" → money confirm read-back → "aane" → transaction completed.
+5. Home ledger shows the confirmed entry: **Sis Ama · −GH₵ 50.00 · Adi mu** — the whole journey cost zero lab requests.
+
+Also shipped in this pass: the HUD gained the brief's touch/text fallback — an "Or type your answer" row that drives the identical flow state machine, so a user who cannot speak (and any rehearsal) never needs the microphone.
+
+Privacy notes: least-privilege read access only (no write), lookups are local-only, and contact data never reaches any network service.
+
+**Self-hosted ASR fallback: live round-trip PASSED (2026-10-02, evening)**
+
+- The one-time ~4 GB `facebook/mms-1b-all` download completed; `tools/asr-fallback/server.py` now runs the full tier for real. Two fixes landed during bring-up: the loader no longer passes `target_lang` to `from_pretrained` (that transformers build sizes the LM head from the wrong vocabulary and the load throws; the base weights load first and `model.load_adapter('aka')` attaches the Akan head correctly), and a failed model load is now surfaced through `/health` (`error` field) instead of dying silently in the loader thread.
+- Live test (server on :8700, no lab quota spent): bundled Twi clips transcribed to recognisable Twi text — "kɔma sika" → `ɔma si`, the balance label → `mo mu seka a ɛwɔ mu`, "yi sika" → `yisi`. Honest quality note: the fallback is *degraded but working* — short single-phrase clips come back drifted (the same weak spot the lab batch rehearsal saw), so some commands will need a retry while the tier is active; real user utterances (longer audio) should fare better. Inference is CPU-bound: expect tens of seconds per utterance — acceptable for a keep-it-alive fallback, not for the primary demo path.
+- Wiring when needed: `EXPO_PUBLIC_SPEECH_API_BASE_URL_ALT=http://<mac-ip>:8700` (+ any `EXPO_PUBLIC_SPEECH_API_KEY_ALT`) at build time; the client's existing alternate-endpoint retry does the rest. `curl http://<mac-ip>:8700/health` reports readiness (`ready`, `error`).
+
+**Live voice path — verified alive, quota discipline working as designed (2026-10-02, late evening)**
+
+- The capture loop is confirmed running on the current build: system mic-audio events (`audio_record_start/done`) and app logs show a window hearing speech, uploading, and the lab answering. The "never silent → honest failure" chain fired exactly as designed when the lab's **daily quota came back exhausted** (almost certainly teammates testing the shared APK — every device draws the same 10/day): the app spoke the quota message and stopped listening rather than spinning. On the morning of the screening demo this is the behavior we want; during the day it means voice testing is a shared budget.
+- Two fallback-ladder fixes landed (typecheck/lint PASS): (1) with an alternate endpoint configured, a lab 429 now falls through to the fallback instead of being short-circuited by the local meter (correct: a dry lab must push the utterance to the open-source fallback; without an alt the meter stays authoritative); (2) documented and worked around a build trap — the JS bundle task does not watch `.env`, so an `.env` edit alone never reaches the app (a source-content change is needed to force re-bundling).
+- The installed TECNO build now carries `EXPO_PUBLIC_SPEECH_API_BASE_URL_ALT=http://192.168.1.175:8700` (the self-hosted MMS Akan fallback on this Mac, still serving). Until the lab quota resets, spoken commands on this phone land on the fallback tier: heard and transcribed, with the degraded quality already documented.
+- The graded over-the-air voice test (play the Twi prompt out loud → lab hears → transcribes → intent matches → flow opens) is scheduled to run automatically just after the midnight quota reset; its result will be appended here.
+
+**Why the fallback wasn't working — four stacked causes, all fixed (2026-10-03, ~00:05)**
+
+The seamless lab→fallback handover failed in layers; each layer only revealed the next once the one above was fixed. All are now fixed, with the final proof arriving server-side:
+
+1. **Android cleartext policy** (the big one): the platform silently refused the HTTP POST to the LAN fallback — `CLEARTEXT communication to 192.168.1.175 not permitted`. No request ever left the phone. Fixed with `expo-build-properties` → `usesCleartextTraffic: true` (documented tradeoff: demo/LAN device).
+2. **Client-side meter short-circuit**: a locally-dry quota day returned `quota` before the alternate endpoint was ever tried. Fixed: with a fallback configured, the attempt always goes out and the ladder runs.
+3. **`.env` not watched by the bundle task**: the fallback URL was appended to `.env` but the rebuild reused the cached JS bundle, so the app never had the value. Fixed by a source-content change forcing re-bundle; documented in `labSpeech.ts`.
+4. **Server multipart parser**: rejected the phone's uploads (`multipart part 'file' not found`) — header matching was case-sensitive and the phone's serializer differs from curl. Fixed with case-insensitive matching plus a body-snippet in the error.
+5. **Client timeout too short for CPU inference**: the phone's upload reached the fallback, but the 45s/90s fetch timeout aborted while the MMS model was still inferring a 15s window. Fixed: 45s for the lab attempt (fast handover), 240s for the fallback attempt.
+
+Proof the chain now works end-to-end: the phone's own recording was POSTed to the fallback and the server answered **200 with a transcription** (`'pe paep'` on a short over-the-air window — degraded, as expected for room-noise recordings; the direct-file tests earlier transcribed clean Twi). Remaining honesty: CPU inference takes tens of seconds to a few minutes per utterance, so the fallback answers slowly — it keeps the conversation alive on a dry-quota day, while the lab (reset at midnight, graded OTA test scheduled for 00:20) remains the primary experience.
+
+**"Kɔma sika" heard as "ɔma si" — understanding layer fixed (2026-10-03, team-reported)**
+
+The team correctly flagged the top issue: degraded ASR transcriptions ("ɔma si", and the fully fused "oamase") were not understood — "heard but not understood" is the worst failure for a blind user. Root cause: the command matcher's second pass only tolerated edits when the transcript and phrase had the SAME word count, so a fused one-word transcript could never reach a two-word command phrase.
+
+- **Pass 3 added** (`matchVoiceIntent` in `src/voice/commands.ts`): when exact and same-shape passes find nothing (utterances ≤3 words), space-stripped forms are compared by **longest common subsequence** with a ≥60%-of-shorter-side and ≥4-character bar — order preserved, while dropped phonemes, extra characters and fused words all forgive. Ties prefer the phrase covering more of its own length, so "komasika" resolves to send (8/8) rather than the longer balance phrase it overlaps. Stop/cancel deliberately stays exact-only (a misheard "skip"/"nope" must never cancel money), and a false match here can only OPEN a flow, which then read-backs and demands an explicit yes — it can never move money.
+- The evaluation harness mirrors the new pass and gained the team's failing cases: "ɔma si" → send and "oamase" → send.
+- Validation: evaluator **19/19** (all previous cases unregressed); typecheck and lint clean; the drift build is installed on the TECNO, and the on-device injection test confirmed "oamase" opens the send flow with the Twi prompt ("Hwan na worekɔma no sika?").
+
+**"Kɔma Sika" response audio — the render was the defect; lab-voice clip shipped (2026-10-04)**
+
+The team's report ("SafePay's response says ɔma si") pointed at the real defect: the **response clip itself**. `home.sendMoney.wav` was a local MMS render whose audio genuinely says ~"ɔma si" — corroborated independently by round-tripping it through the fallback ASR ("ɔma si"/"omasi") and by the team's ears. MMS TTS truncates short phrases (the same weak spot the batch rehearsal saw); re-rendering locally is deterministic, so it would garble identically.
+
+- The phrase was re-rendered through the **Lab TTS** and shipped in its place; the new clip round-trips through the fallback ASR as "oma si ka" (the fallback always drops that initial consonant — through the *lab* ASR the earlier identical render transcribed as "kɔma sika" exactly), and the live over-the-air test on Oct 4 19:05 proved the whole chain with the corrected audio: `speech heard (peak -2 dB)` → `[SikaVoice heard] "kɔma sika"` → `[SikaVoice intent] "kɔma sika" -> send` — heard, understood (right words), carried out (send flow opened).
+- **Batched re-render of the remaining phrases is designed but paused**: `scripts/rerender-clips-lab.py` batches phrases into ≤250-char TTS requests and splits the reply on between-phrase silences. Two splitter failure modes surfaced (absolute quiet threshold read the quiet lab renders as silence; a relative threshold over-splits long sentences at their own internal pauses), and a variable-shadowing bug briefly used a phrase key as the API key (fixed). Single-phrase requests need no splitting and are the reliable path — 24 phrases at 15 TTS/day spans ~2 days, so the remaining corrections should run per-phrase (`--only key1,key2`) over the coming days, with every result verified by human ears before it ships.
+- Three clips this run temporarily overwrote were reverted to their committed MMS renders; only `home.sendMoney.wav` carries the lab voice. Clip provenance (lab vs MMS) is tracked here and in FALLBACKS.md until the re-render completes.
+
+**Lab-voice re-render status (2026-10-05, ~01:15)**
+
+- The corrected "Kɔma Sika" response (lab female voice, ≈242 Hz — consistent with the pack's female character per pitch analysis) is installed and verified live: the lab heard "kɔma sika" exactly, matched send, and the flow opened.
+- The remaining flow-response phrases still carry MMS renders (the low/garbled voice the team flagged). Their re-render is quota-blocked: the day's 15 TTS requests were exhausted — partly by my own 401-retry storms, the exact mistake the Sep 28 quota lesson documented for ASR. The script now **stops immediately on HTTP 429** (a dry day is never retried) and caps flap retries at 3.
+- The reliable re-render path is one phrase per request (`--per-phrase`, no silence splitting — the batched splitter over-splits long Twi sentences at their internal pauses). Resume command when the quota resets:
+  `.tools/tts-venv/bin/python scripts/rerender-clips-lab.py --lang tw --per-phrase --only vcmd.whoToPay,vcmd.askAmount,vcmd.confirmSend,vcmd.confirmTo,vcmd.sayYesNo,vcmd.contactNumber,vcmd.askReference,vcmd.contactLooking,vcmd.contactNotFoundFixed,vcmd.contactMany,vcmd.contactPick,vcmd.recipientCheck,vcmd.flowCancelled,vcmd.balanceIs`
+  (14 requests of the day's 15; QA runs on the local fallback ASR only; every clip needs human-ear confirmation before the screening demo.)
+- Open questions for `dcshcilab@ug.edu.gh`: the daily reset hour (quota was still dry at 00:45 and again in the afternoon), whether 401/429 attempts count against the day, and the available TTS speaker voices.
+
+**Full-pack lab-voice re-render — queued and ready (2026-10-05)**
+
+Per the team's direction, the ENTIRE Twi pack (184 clips) moves to the lab's female voice, replacing the local MMS renders. `scripts/rerender-clips-lab.py --lang tw --full --per-phrase` now:
+
+- builds the complete key list (manifest keys present in the locale + number atoms + currency + every vcmd line — 184 total),
+- orders it by conversation priority (the 14 flow prompts first, then other vcmd lines, then home/*, then the rest, number/name atoms last),
+- renders ONE phrase per request (no silence splitting — the reliable path; "Kɔma Sika" proved it),
+- keeps resume state in `assets/voice/tw/.lab-rendered.json` so interrupted runs continue,
+- caps each run at 14 successes (the plan is 15/day) and QA-checks every clip through the local fallback ASR (advisory only — human ears confirm before the demo).
+
+Timeline at 14/day: ~13-14 days, landing ≈Oct 17-18 before the screening — IF the command runs daily. Faster options: a quota bump from the lab (collapses to 2-3 days), or re-designing batched splitting. Daily command (after the quota resets — the reset hour is still unconfirmed; a 429 means try later, it costs nothing):
+
+```bash
+.tools/tts-venv/bin/python scripts/rerender-clips-lab.py --lang tw --full --per-phrase
+npm run apk   # ship the day's corrected clips (or batch every few days)
+```
+
+The fallback QA server must be running for the QA signal (`tools/asr-fallback/server.py --lang aka --port 8700`). Ewe follows the same path after Twi if the team wants it (another ~week of quota), else Ewe keeps MMS renders — documented in FALLBACKS.md.
+
+**Local render fix — the fallback stack now covers the whole voice (2026-10-05)**
+
+The team asked whether the fallback could replace the lab for the voice work. It now can, at the rendering layer too: the local MMS TTS's short-phrase garble ("Kɔma Sika" audible as "ɔma si") was traced to two synthesis parameters, and both fixes are free and offline:
+
+- **Period padding** — render each phrase as `. kɔma sika .` — restores the dropped initial consonant;
+- **`model.noise_scale = 0.5`** (default 0.667) — tightens the synthesis.
+
+Round-trip through the fallback ASR went from "omosi" to "komasi" (understood as send by the matcher). The **entire Twi pack (189 clips) was re-rendered locally** with these settings — zero lab requests — and QA'd by round-tripping every clip through the fallback ASR: **172 pass, 16 flagged for human ears** (mostly the very short number/name atoms where the fallback ASR itself is weakest — listen to `dist/tw-clip-qa.json`'s flagged list before the demo), 1 transient error. The Ewe pack keeps its old renders until re-rendered with the same command.
+
+This unblocks the voice from the lab's TTS quota entirely: renders are local and unlimited; the lab TTS remains the premium option (its female voice for home.sendMoney shipped Oct 4 — note the full re-render has since replaced it with the corrected local render for one-voice consistency; restore it per-clip via the lab TTS if preferred after an ear check).
+
+**HUD header overlap fix (2026-10-11)**
+
+Team-reported from screening-prep screenshots (Oct 2): the Voice conversation HUD's step counter ran into the right screen edge and was clipped ("Step 1 of" with the tail cut off; Ga/Twi "Nkyemu 1 wɔ …" the same). Root cause: the header was one `flexDirection: 'row'` with default `flexShrink: 0` on both children — the 28px title's max-content width plus the step label exceeded the ~312dp content width on the TECNO (360dp), so the trailing label overflowed past the right padding and the screen clipped it. Layout now puts the two small labels (brand + step) on one row — step pinned with `flexShrink: 0` / `numberOfLines: 1`, brand shrinkable — and gives the big title its own full-width row below. Validation: typecheck / lint / a11y:contrast PASS; rebuilt and installed on the TECNO over wireless ADB; on-device screenshot shows "Nkyɛmu 1 wɔ 6 mu" fully visible with a proper right margin and the title on one line. The video-call window overlapping the header in one team screenshot was an external WhatsApp PiP overlay, not an app defect.
 
 ## Next Stage: Phase II Screening (20–23 October 2026)
 
