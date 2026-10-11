@@ -1,2254 +1,1332 @@
 {
   "generatedBy": "scripts/generate-voice-clips.py",
   "models": {
-    "tw": "facebook/mms-tts-aka",
-    "ee": "facebook/mms-tts-ewe"
+    "tw": "facebook/mms-tts-aka"
   },
   "clips": {
     "tw": {
       "onboarding.voiceWelcome": {
-        "seconds": 12.19,
-        "rms": 0.02,
-        "bytes": 390188,
-        "text": "(resumed)"
+        "seconds": 11.056,
+        "peak": 0.8078,
+        "rms": 0.14941,
+        "bytes": 353836,
+        "text": ". akwaaba wɔ safepay wowɔ fie krataafa so pia speak balance mpɛn mmienu na wote w akaunt mu sika anaa fa momo adwuma no di dwuma ."
       },
       "voice.listen": {
-        "seconds": 1.38,
-        "rms": 0.02,
-        "bytes": 44076,
-        "text": "(resumed)"
+        "seconds": 1.36,
+        "peak": 0.7146,
+        "rms": 0.11673,
+        "bytes": 43564,
+        "text": ". nne ahyɛde ."
       },
       "voice.listening": {
-        "seconds": 1.07,
-        "rms": 0.02,
-        "bytes": 34348,
-        "text": "(resumed)"
-      },
-      "voice.help": {
-        "seconds": 6.74,
-        "rms": 0.02,
-        "bytes": 215596,
-        "text": "(resumed)"
-      },
-      "voice.notHeard": {
-        "seconds": 3.58,
-        "rms": 0.02,
-        "bytes": 114732,
-        "text": "(resumed)"
-      },
-      "voice.stopped": {
-        "seconds": 1.76,
-        "rms": 0.02,
-        "bytes": 56364,
-        "text": "(resumed)"
-      },
-      "voice.nothingToRepeat": {
-        "seconds": 2.37,
-        "rms": 0.02,
-        "bytes": 75820,
-        "text": "(resumed)"
-      },
-      "voice.noSpeech": {
-        "seconds": 3.5,
-        "rms": 0.02,
-        "bytes": 112172,
-        "text": "(resumed)"
-      },
-      "voice.permissionDenied": {
-        "seconds": 6.78,
-        "rms": 0.02,
-        "bytes": 217132,
-        "text": "(resumed)"
-      },
-      "voice.notAvailable": {
-        "seconds": 2.08,
-        "rms": 0.02,
-        "bytes": 66604,
-        "text": "(resumed)"
-      },
-      "voice.failed": {
-        "seconds": 2.45,
-        "rms": 0.02,
-        "bytes": 78380,
-        "text": "(resumed)"
-      },
-      "voice.stopListening": {
-        "seconds": 1.26,
-        "rms": 0.02,
-        "bytes": 40492,
-        "text": "(resumed)"
-      },
-      "home.balanceLabel": {
-        "seconds": 1.57,
-        "rms": 0.02,
-        "bytes": 50220,
-        "text": "(resumed)"
-      },
-      "home.balanceHiddenLabel": {
-        "seconds": 2.18,
-        "rms": 0.02,
-        "bytes": 69676,
-        "text": "(resumed)"
-      },
-      "home.sendMoney": {
-        "seconds": 1.25,
-        "rms": 0.02,
-        "bytes": 39980,
-        "text": "(resumed)"
-      },
-      "home.statement": {
-        "seconds": 1.23,
-        "rms": 0.02,
-        "bytes": 39468,
-        "text": "(resumed)"
-      },
-      "home.buyAirtime": {
-        "seconds": 1.25,
-        "rms": 0.02,
-        "bytes": 39980,
-        "text": "(resumed)"
-      },
-      "home.cashOut": {
-        "seconds": 1.17,
-        "rms": 0.02,
-        "bytes": 37420,
-        "text": "(resumed)"
-      },
-      "home.quickActions": {
-        "seconds": 1.34,
-        "rms": 0.02,
-        "bytes": 43052,
-        "text": "(resumed)"
-      },
-      "home.recentTransactions": {
-        "seconds": 1.95,
-        "rms": 0.02,
-        "bytes": 62508,
-        "text": "(resumed)"
-      },
-      "home.listenBalance": {
-        "seconds": 1.23,
-        "rms": 0.02,
-        "bytes": 39468,
-        "text": "(resumed)"
-      },
-      "home.smsTool": {
-        "seconds": 1.79,
-        "rms": 0.02,
-        "bytes": 57388,
-        "text": "(resumed)"
-      },
-      "settings.title": {
-        "seconds": 1.34,
-        "rms": 0.02,
-        "bytes": 43052,
-        "text": "(resumed)"
-      },
-      "settings.voiceCheckSection": {
-        "seconds": 1.28,
-        "rms": 0.02,
-        "bytes": 41004,
-        "text": "(resumed)"
-      },
-      "settings.testVoice": {
-        "seconds": 1.22,
-        "rms": 0.02,
-        "bytes": 38956,
-        "text": "(resumed)"
-      },
-      "settings.voiceSample": {
-        "seconds": 6.13,
-        "rms": 0.02,
-        "bytes": 196140,
-        "text": "(resumed)"
-      },
-      "settings.contrastSection": {
-        "seconds": 1.3,
-        "rms": 0.02,
-        "bytes": 41516,
-        "text": "(resumed)"
-      },
-      "settings.privacySection": {
-        "seconds": 1.81,
-        "rms": 0.02,
-        "bytes": 57900,
-        "text": "(resumed)"
-      },
-      "settings.navSection": {
-        "seconds": 2.42,
-        "rms": 0.02,
-        "bytes": 77356,
-        "text": "(resumed)"
-      },
-      "common.language": {
-        "seconds": 0.67,
-        "rms": 0.02,
-        "bytes": 21548,
-        "text": "(resumed)"
-      },
-      "common.back": {
-        "seconds": 1.04,
-        "rms": 0.02,
-        "bytes": 33324,
-        "text": "(resumed)"
-      },
-      "statement.title": {
-        "seconds": 1.49,
-        "rms": 0.02,
-        "bytes": 47660,
-        "text": "(resumed)"
-      },
-      "statement.subtitle": {
-        "seconds": 2.51,
-        "rms": 0.02,
-        "bytes": 80428,
-        "text": "(resumed)"
-      },
-      "statement.playAll": {
-        "seconds": 1.25,
-        "rms": 0.02,
-        "bytes": 39980,
-        "text": "(resumed)"
-      },
-      "statement.pause": {
-        "seconds": 1.1,
-        "rms": 0.02,
-        "bytes": 35372,
-        "text": "(resumed)"
-      },
-      "statement.allCompleted": {
-        "seconds": 3.02,
-        "rms": 0.02,
-        "bytes": 96812,
-        "text": "(resumed)"
-      },
-      "privacy.privateTitle": {
-        "seconds": 1.23,
-        "rms": 0.02,
-        "bytes": 39468,
-        "text": "(resumed)"
-      },
-      "privacy.publicTitle": {
-        "seconds": 2.21,
-        "rms": 0.02,
-        "bytes": 70700,
-        "text": "(resumed)"
-      },
-      "privacy.privateDesc": {
-        "seconds": 2.37,
-        "rms": 0.02,
-        "bytes": 75820,
-        "text": "(resumed)"
-      },
-      "privacy.publicDesc": {
-        "seconds": 2.51,
-        "rms": 0.02,
-        "bytes": 80428,
-        "text": "(resumed)"
-      },
-      "home.type.send": {
-        "seconds": 1.66,
-        "rms": 0.02,
-        "bytes": 53292,
-        "text": "(resumed)"
-      },
-      "home.type.receive": {
-        "seconds": 1.65,
-        "rms": 0.02,
-        "bytes": 52780,
-        "text": "(resumed)"
-      },
-      "home.type.airtime": {
-        "seconds": 1.97,
-        "rms": 0.02,
-        "bytes": 63020,
-        "text": "(resumed)"
-      },
-      "home.type.withdraw": {
-        "seconds": 2.11,
-        "rms": 0.02,
-        "bytes": 67628,
-        "text": "(resumed)"
-      },
-      "home.status.pending": {
-        "seconds": 1.09,
-        "rms": 0.02,
-        "bytes": 34860,
-        "text": "(resumed)"
-      },
-      "home.status.confirmed": {
-        "seconds": 0.86,
-        "rms": 0.02,
-        "bytes": 27692,
-        "text": "(resumed)"
-      },
-      "home.status.failed": {
-        "seconds": 1.2,
-        "rms": 0.02,
-        "bytes": 38444,
-        "text": "(resumed)"
-      },
-      "airtime.credit": {
-        "seconds": 1.38,
-        "rms": 0.02,
-        "bytes": 44076,
-        "text": "(resumed)"
-      },
-      "airtime.data": {
-        "seconds": 1.44,
-        "rms": 0.02,
-        "bytes": 46124,
-        "text": "(resumed)"
-      },
-      "airtime.self": {
-        "seconds": 1.12,
-        "rms": 0.02,
-        "bytes": 35884,
-        "text": "(resumed)"
-      },
-      "airtime.other": {
-        "seconds": 1.39,
-        "rms": 0.02,
-        "bytes": 44588,
-        "text": "(resumed)"
-      },
-      "send.processing": {
-        "seconds": 1.34,
-        "rms": 0.02,
-        "bytes": 43052,
-        "text": "(resumed)"
-      },
-      "send.confirmed": {
-        "seconds": 1.49,
-        "rms": 0.02,
-        "bytes": 47660,
-        "text": "(resumed)"
-      },
-      "send.failed": {
-        "seconds": 1.81,
-        "rms": 0.02,
-        "bytes": 57900,
-        "text": "(resumed)"
-      },
-      "send.cancelledBeforeSend": {
-        "seconds": 2.69,
-        "rms": 0.02,
-        "bytes": 86060,
-        "text": "(resumed)"
-      },
-      "cashout.confirmed": {
-        "seconds": 1.76,
-        "rms": 0.02,
-        "bytes": 56364,
-        "text": "(resumed)"
-      },
-      "common.confirm": {
-        "seconds": 1.26,
-        "rms": 0.02,
-        "bytes": 40492,
-        "text": "(resumed)"
-      },
-      "common.cancel": {
-        "seconds": 0.72,
-        "rms": 0.02,
-        "bytes": 23084,
-        "text": "(resumed)"
-      },
-      "common.retry": {
-        "seconds": 1.17,
-        "rms": 0.02,
-        "bytes": 37420,
-        "text": "(resumed)"
-      },
-      "home.unknownRecipient": {
-        "seconds": 1.68,
-        "rms": 0.02,
-        "bytes": 53804,
-        "text": "(resumed)"
-      },
-      "home.balanceShown": {
-        "seconds": 1.92,
-        "rms": 0.02,
-        "bytes": 61484,
-        "text": "(resumed)"
-      },
-      "home.balanceHidden": {
-        "seconds": 1.5,
-        "rms": 0.02,
-        "bytes": 48172,
-        "text": "(resumed)"
-      },
-      "home.noTransactions": {
-        "seconds": 1.58,
-        "rms": 0.02,
-        "bytes": 50732,
-        "text": "(resumed)"
-      },
-      "send.errors.amount": {
-        "seconds": 2.56,
-        "rms": 0.02,
-        "bytes": 81964,
-        "text": "(resumed)"
-      },
-      "send.errors.phone": {
-        "seconds": 2.78,
-        "rms": 0.02,
-        "bytes": 89132,
-        "text": "(resumed)"
-      },
-      "send.errors.name": {
-        "seconds": 1.63,
-        "rms": 0.02,
-        "bytes": 52268,
-        "text": "(resumed)"
-      },
-      "send.authFailed": {
-        "seconds": 3.15,
-        "rms": 0.02,
-        "bytes": 100908,
-        "text": "(resumed)"
-      },
-      "send.authCancelled": {
-        "seconds": 3.23,
-        "rms": 0.02,
-        "bytes": 103468,
-        "text": "(resumed)"
-      },
-      "send.authLocked": {
-        "seconds": 3.68,
-        "rms": 0.02,
-        "bytes": 117804,
-        "text": "(resumed)"
-      },
-      "send.failureGeneric": {
-        "seconds": 1.78,
-        "rms": 0.02,
-        "bytes": 56876,
-        "text": "(resumed)"
-      },
-      "send.failureNetwork": {
-        "seconds": 2.19,
-        "rms": 0.02,
-        "bytes": 70188,
-        "text": "(resumed)"
-      },
-      "send.failureFunds": {
-        "seconds": 3.15,
-        "rms": 0.02,
-        "bytes": 100908,
-        "text": "(resumed)"
-      },
-      "airtime.errorAmount": {
-        "seconds": 2.59,
-        "rms": 0.02,
-        "bytes": 82988,
-        "text": "(resumed)"
-      },
-      "airtime.errorPhone": {
-        "seconds": 2.32,
-        "rms": 0.02,
-        "bytes": 74284,
-        "text": "(resumed)"
-      },
-      "cashout.errorAmount": {
-        "seconds": 2.19,
-        "rms": 0.02,
-        "bytes": 70188,
-        "text": "(resumed)"
-      },
-      "cashout.errorAgentCode": {
-        "seconds": 2.29,
-        "rms": 0.02,
-        "bytes": 73260,
-        "text": "(resumed)"
-      },
-      "statement.empty": {
-        "seconds": 1.54,
-        "rms": 0.02,
-        "bytes": 49196,
-        "text": "(resumed)"
-      },
-      "settings.savedNote": {
-        "seconds": 1.71,
-        "rms": 0.02,
-        "bytes": 54828,
-        "text": "(resumed)"
-      },
-      "vcmd.whoToPay": {
-        "seconds": 1.87,
-        "rms": 0.02,
-        "bytes": 59948,
-        "text": "(resumed)"
-      },
-      "vcmd.askAmount": {
-        "seconds": 2.05,
-        "rms": 0.02,
-        "bytes": 65580,
-        "text": "(resumed)"
-      },
-      "vcmd.askPhone": {
-        "seconds": 1.76,
-        "rms": 0.02,
-        "bytes": 56364,
-        "text": "(resumed)"
-      },
-      "vcmd.selfOrOther": {
-        "seconds": 1.78,
-        "rms": 0.02,
-        "bytes": 56876,
-        "text": "(resumed)"
-      },
-      "vcmd.heardAmount": {
-        "seconds": 1.04,
-        "rms": 0.02,
-        "bytes": 33324,
-        "text": "(resumed)"
-      },
-      "vcmd.flowNotUnderstood": {
-        "seconds": 3.33,
-        "rms": 0.02,
-        "bytes": 106540,
-        "text": "(resumed)"
-      },
-      "vcmd.flowCancelled": {
-        "seconds": 0.98,
-        "rms": 0.02,
-        "bytes": 31276,
-        "text": "(resumed)"
-      },
-      "vcmd.sayYesNo": {
-        "seconds": 3.18,
-        "rms": 0.02,
-        "bytes": 101932,
-        "text": "(resumed)"
-      },
-      "vcmd.noFingerprint": {
-        "seconds": 4.82,
-        "rms": 0.02,
-        "bytes": 154156,
-        "text": "(resumed)"
-      },
-      "vcmd.confirmSend": {
-        "seconds": 1.2,
-        "rms": 0.02,
-        "bytes": 38444,
-        "text": "(resumed)"
-      },
-      "vcmd.confirmTo": {
-        "seconds": 0.4,
-        "rms": 0.02,
-        "bytes": 12844,
-        "text": "(resumed)"
-      },
-      "vcmd.agentQuestion": {
-        "seconds": 1.92,
-        "rms": 0.02,
-        "bytes": 61484,
-        "text": "(resumed)"
-      },
-      "vcmd.noBiometrics": {
-        "seconds": 2.08,
-        "rms": 0.02,
-        "bytes": 66604,
-        "text": "(resumed)"
-      },
-      "vcmd.contactNumber": {
-        "seconds": 3.14,
-        "rms": 0.02,
-        "bytes": 100396,
-        "text": "(resumed)"
-      },
-      "vcmd.askReference": {
-        "seconds": 4.56,
-        "rms": 0.02,
-        "bytes": 145964,
-        "text": "(resumed)"
-      },
-      "onboarding.welcomeBody": {
-        "seconds": 8.32,
-        "peak": 0.7463,
-        "rms": 0.1259,
-        "bytes": 266284,
-        "text": "akwaaba safepay ma wote wo sika na wo pin rennsɛ da nhyehyɛeɛ yi ti kakra fa wo nne anaa wo nsa yɛ"
-      },
-      "onboarding.micBody": {
-        "seconds": 7.424,
-        "peak": 0.858,
-        "rms": 0.14826,
-        "bytes": 237612,
-        "text": "microphone no ho akwannya safepay te nne bere a app no rebue enti wobɛtumi aka wo ahyɛdeɛ"
-      },
-      "onboarding.micGranted": {
-        "seconds": 3.6,
-        "peak": 0.7867,
-        "rms": 0.09459,
-        "bytes": 115244,
-        "text": "microphone no agye tom safepay betumi ate wo nne"
-      },
-      "onboarding.micDenied": {
-        "seconds": 4.032,
-        "peak": 0.7666,
-        "rms": 0.17733,
-        "bytes": 129068,
-        "text": "ɛnnɛ nnyɛ hwee akyire yi wubɛtumi agye tom wɔ settings mu"
-      },
-      "onboarding.micPermanent": {
-        "seconds": 6.736,
-        "peak": 0.6638,
-        "rms": 0.10514,
-        "bytes": 215596,
-        "text": "wɔatow microphone no agu safepay bu no mu wɔ wo fono settings mu na san bue safepay"
-      },
-      "onboarding.listeningBody": {
-        "seconds": 8.848,
-        "peak": 0.8079,
-        "rms": 0.15209,
-        "bytes": 283180,
-        "text": "bere a safepay rebue no microphone no da so ɛnsɛ sɛ wuhu bɔtɔn bi ka gyae anaagyɛ stop na safepay abu so"
-      },
-      "onboarding.contactsBody": {
-        "seconds": 9.248,
-        "peak": 0.7847,
-        "rms": 0.13693,
-        "bytes": 295980,
-        "text": "akyire yi sɛ woka din te sɛ ama a safepay betumi ahunu ne fono nomba nea edi kan no ɛbɛbisa wo kwan wo contacts da wo fono mu pɛpɛɛpɛ"
-      },
-      "onboarding.languageTitle": {
-        "seconds": 1.44,
-        "peak": 0.6625,
-        "rms": 0.11387,
-        "bytes": 46124,
-        "text": "kasa bɛn na wopɛ"
-      },
-      "onboarding.languageChanged": {
-        "seconds": 1.296,
+        "seconds": 0.976,
         "peak": 0.665,
-        "rms": 0.0958,
-        "bytes": 41516,
-        "text": "kasa no asesa"
-      },
-      "onboarding.talkbackBody": {
-        "seconds": 3.312,
-        "peak": 0.7774,
-        "rms": 0.14373,
-        "bytes": 106028,
-        "text": "sɛn na wupɛ sɛ wodwo krataafa no so"
-      },
-      "onboarding.srOn": {
-        "seconds": 2.416,
-        "peak": 0.6822,
-        "rms": 0.14981,
-        "bytes": 77356,
-        "text": "wo screen reader no resi so"
-      },
-      "onboarding.srOff": {
-        "seconds": 2.912,
-        "peak": 0.7497,
-        "rms": 0.13346,
-        "bytes": 93228,
-        "text": "wo screen reader no aso safepay bɛka ne ho"
-      },
-      "onboarding.navSaved": {
-        "seconds": 1.296,
-        "peak": 0.696,
-        "rms": 0.14636,
-        "bytes": 41516,
-        "text": "wɔasie no yie"
-      },
-      "onboarding.micTestBody": {
-        "seconds": 3.68,
-        "peak": 0.7411,
-        "rms": 0.13305,
-        "bytes": 117804,
-        "text": "sɛ wo nne sɛ nhwɛso safepay ɛte sɛn"
-      },
-      "onboarding.micTestOk": {
-        "seconds": 2.24,
-        "peak": 0.8048,
-        "rms": 0.19035,
-        "bytes": 71724,
-        "text": "microphone no yɛ adwuma"
-      },
-      "onboarding.micTestRetry": {
-        "seconds": 2.784,
-        "peak": 0.824,
-        "rms": 0.1714,
-        "bytes": 89132,
-        "text": "mantie hwee ka bio yɛ den kakra"
-      },
-      "onboarding.voiceTestBody": {
-        "seconds": 1.392,
-        "peak": 0.7427,
-        "rms": 0.09635,
-        "bytes": 44588,
-        "text": "te safepay nne"
-      },
-      "onboarding.voiceTestAsk": {
-        "seconds": 1.344,
-        "peak": 0.7446,
-        "rms": 0.12488,
-        "bytes": 43052,
-        "text": "wote nhwɛso no"
-      },
-      "onboarding.voiceTestOk": {
-        "seconds": 3.328,
-        "peak": 0.7728,
-        "rms": 0.13421,
-        "bytes": 106540,
-        "text": "ɛyɛ wobɛtumi asesa nne so bere biara"
-      },
-      "onboarding.voiceTestNo": {
-        "seconds": 2.16,
-        "peak": 0.8236,
-        "rms": 0.16329,
-        "bytes": 69164,
-        "text": "yɛ nne no den na tie bio"
-      },
-      "onboarding.bioBody": {
-        "seconds": 5.312,
-        "peak": 0.7659,
-        "rms": 0.14062,
-        "bytes": 170028,
-        "text": "safepay gye dwuma biara to mu de wo nsa nkyerɛwde wo pin rennsɛ da"
-      },
-      "onboarding.bioReady": {
-        "seconds": 2.432,
-        "peak": 0.7189,
-        "rms": 0.12214,
-        "bytes": 77868,
-        "text": "wo nsa nkyerɛwde asiesie"
-      },
-      "onboarding.bioNone": {
-        "seconds": 4.896,
-        "peak": 0.8002,
-        "rms": 0.13197,
-        "bytes": 156716,
-        "text": "wo fono yi nnisa nkyerɛwde nnihɔ safepay de wo nne bɛgye to mu"
-      },
-      "onboarding.bioNotEnrolled": {
-        "seconds": 8.752,
-        "peak": 0.6791,
-        "rms": 0.12801,
-        "bytes": 280108,
-        "text": "wonsa nkyerɛwde nnsi hɔ dada fa ka ho wɔ wo fono settings security ase safepay bɛde wo nne agye tomu kɔsi ɛno"
-      },
-      "onboarding.bioSuccess": {
-        "seconds": 3.616,
-        "peak": 0.6452,
-        "rms": 0.08356,
-        "bytes": 115756,
-        "text": "nsa nkyerɛwde no agye to mu wo sika ho ban yɛ den"
-      },
-      "onboarding.bioFailed": {
-        "seconds": 4.256,
-        "peak": 0.7901,
-        "rms": 0.15633,
-        "bytes": 136236,
-        "text": "nsa nkyerɛwde no annye to mu bɔ mmɔden bio bere biara"
-      },
-      "onboarding.bioCancelled": {
-        "seconds": 2.048,
-        "peak": 0.82,
-        "rms": 0.13328,
-        "bytes": 65580,
-        "text": "wogyaee ɛnsesa biribi"
-      },
-      "onboarding.bioLockout": {
-        "seconds": 2.272,
-        "peak": 0.7593,
-        "rms": 0.15684,
-        "bytes": 72748,
-        "text": "mbɔden bebree dodo twɛn kakra"
-      },
-      "onboarding.teachBody": {
-        "seconds": 7.984,
-        "peak": 0.7588,
-        "rms": 0.11846,
-        "bytes": 255532,
-        "text": "ahyɛdeɛ mmiɛnsa ka me sika a aka na wote wo sika ka kɔma sika na wokɔma sika ka gyae na safepay abu so"
-      },
-      "onboarding.teachBalance": {
-        "seconds": 3.712,
-        "peak": 0.8197,
-        "rms": 0.14354,
-        "bytes": 118828,
-        "text": "ɛyɛ me sika a aka ne sika a ɛwɔ mu ahyɛdeɛ"
-      },
-      "onboarding.teachSend": {
-        "seconds": 3.648,
-        "peak": 0.7512,
-        "rms": 0.12557,
-        "bytes": 116780,
-        "text": "ɛyɛ kɔma sika ne sika a wokɔma no ahyɛdeɛ"
-      },
-      "onboarding.teachStop": {
-        "seconds": 2.144,
-        "peak": 0.7598,
-        "rms": 0.14841,
-        "bytes": 68652,
-        "text": "ɛyɛ gyae tu safepay so"
-      },
-      "onboarding.teachAgain": {
-        "seconds": 4.384,
-        "peak": 0.741,
-        "rms": 0.11849,
-        "bytes": 140332,
-        "text": "bɔ mmɔden bio ahyɛdeɛ no ne me sika a aka kɔma sika gyae"
-      },
-      "onboarding.doneBody": {
-        "seconds": 10.16,
-        "peak": 0.8378,
-        "rms": 0.12958,
-        "bytes": 325164,
-        "text": "safepay asiesie wobɛtumi ate wo sika ne wo dwuma nyinaa na wo pin rennsɛ da ka me sika a aka na wote wo sika"
-      },
-      "onboarding.exited": {
-        "seconds": 3.632,
-        "peak": 0.6544,
-        "rms": 0.11785,
-        "bytes": 116268,
-        "text": "nhyehyɛeɛ no agyae san fi aseɛ wɔ settings mu"
-      },
-      "num.0": {
-        "seconds": 0.67,
-        "rms": 0.02,
-        "bytes": 21548,
-        "text": "(resumed)"
-      },
-      "num.1": {
-        "seconds": 0.74,
-        "rms": 0.02,
-        "bytes": 23596,
-        "text": "(resumed)"
-      },
-      "num.2": {
-        "seconds": 0.74,
-        "rms": 0.02,
-        "bytes": 23596,
-        "text": "(resumed)"
-      },
-      "num.3": {
-        "seconds": 0.83,
-        "rms": 0.02,
-        "bytes": 26668,
-        "text": "(resumed)"
-      },
-      "num.4": {
-        "seconds": 0.69,
-        "rms": 0.02,
-        "bytes": 22060,
-        "text": "(resumed)"
-      },
-      "num.5": {
-        "seconds": 0.74,
-        "rms": 0.02,
-        "bytes": 23596,
-        "text": "(resumed)"
-      },
-      "num.6": {
-        "seconds": 0.88,
-        "rms": 0.02,
-        "bytes": 28204,
-        "text": "(resumed)"
-      },
-      "num.7": {
-        "seconds": 0.91,
-        "rms": 0.02,
-        "bytes": 29228,
-        "text": "(resumed)"
-      },
-      "num.8": {
-        "seconds": 1.12,
-        "rms": 0.02,
-        "bytes": 35884,
-        "text": "(resumed)"
-      },
-      "num.9": {
-        "seconds": 0.96,
-        "rms": 0.02,
-        "bytes": 30764,
-        "text": "(resumed)"
-      },
-      "num.10": {
-        "seconds": 0.35,
-        "rms": 0.02,
-        "bytes": 11308,
-        "text": "(resumed)"
-      },
-      "num.11": {
-        "seconds": 1.07,
-        "rms": 0.02,
-        "bytes": 34348,
-        "text": "(resumed)"
-      },
-      "num.12": {
-        "seconds": 1.09,
-        "rms": 0.02,
-        "bytes": 34860,
-        "text": "(resumed)"
-      },
-      "num.13": {
-        "seconds": 1.09,
-        "rms": 0.02,
-        "bytes": 34860,
-        "text": "(resumed)"
-      },
-      "num.14": {
-        "seconds": 1.18,
-        "rms": 0.02,
-        "bytes": 37932,
-        "text": "(resumed)"
-      },
-      "num.15": {
-        "seconds": 1.17,
-        "rms": 0.02,
-        "bytes": 37420,
-        "text": "(resumed)"
-      },
-      "num.16": {
-        "seconds": 1.25,
-        "rms": 0.02,
-        "bytes": 39980,
-        "text": "(resumed)"
-      },
-      "num.17": {
-        "seconds": 1.2,
-        "rms": 0.02,
-        "bytes": 38444,
-        "text": "(resumed)"
-      },
-      "num.18": {
-        "seconds": 1.2,
-        "rms": 0.02,
-        "bytes": 38444,
-        "text": "(resumed)"
-      },
-      "num.19": {
-        "seconds": 1.02,
-        "rms": 0.02,
-        "bytes": 32812,
-        "text": "(resumed)"
-      },
-      "num.20": {
-        "seconds": 0.86,
-        "rms": 0.02,
-        "bytes": 27692,
-        "text": "(resumed)"
-      },
-      "num.30": {
-        "seconds": 0.88,
-        "rms": 0.02,
-        "bytes": 28204,
-        "text": "(resumed)"
-      },
-      "num.40": {
-        "seconds": 1.02,
-        "rms": 0.02,
-        "bytes": 32812,
-        "text": "(resumed)"
-      },
-      "num.50": {
-        "seconds": 0.88,
-        "rms": 0.02,
-        "bytes": 28204,
-        "text": "(resumed)"
-      },
-      "num.60": {
-        "seconds": 1.01,
-        "rms": 0.02,
-        "bytes": 32300,
-        "text": "(resumed)"
-      },
-      "num.70": {
-        "seconds": 0.96,
-        "rms": 0.02,
-        "bytes": 30764,
-        "text": "(resumed)"
-      },
-      "num.80": {
-        "seconds": 1.06,
-        "rms": 0.02,
-        "bytes": 33836,
-        "text": "(resumed)"
-      },
-      "num.90": {
-        "seconds": 1.02,
-        "rms": 0.02,
-        "bytes": 32812,
-        "text": "(resumed)"
-      },
-      "num.100": {
-        "seconds": 0.48,
-        "rms": 0.02,
-        "bytes": 15404,
-        "text": "(resumed)"
-      },
-      "num.1000": {
-        "seconds": 0.69,
-        "rms": 0.02,
-        "bytes": 22060,
-        "text": "(resumed)"
-      },
-      "money.cedis": {
-        "seconds": 1.06,
-        "rms": 0.02,
-        "bytes": 33836,
-        "text": "(resumed)"
-      },
-      "money.pesewas": {
-        "seconds": 0.91,
-        "rms": 0.02,
-        "bytes": 29228,
-        "text": "(resumed)"
-      },
-      "vcmd.amountToPay": {
-        "seconds": 1.65,
-        "rms": 0.02,
-        "bytes": 52780,
-        "text": "(resumed)"
-      },
-      "vcmd.balanceIs": {
-        "seconds": 1.68,
-        "rms": 0.02,
-        "bytes": 53804,
-        "text": "(resumed)"
-      },
-      "vcmd.callingPhone": {
-        "seconds": 1.39,
-        "rms": 0.02,
-        "bytes": 44588,
-        "text": "(resumed)"
-      },
-      "vcmd.confirmWithFingerprint": {
-        "seconds": 2.96,
-        "rms": 0.02,
-        "bytes": 94764,
-        "text": "(resumed)"
-      },
-      "vcmd.feeIs": {
-        "seconds": 1.36,
-        "rms": 0.02,
-        "bytes": 43564,
-        "text": "(resumed)"
-      },
-      "vcmd.heard": {
-        "seconds": 1.06,
-        "rms": 0.02,
-        "bytes": 33836,
-        "text": "(resumed)"
-      },
-      "vcmd.helpNative": {
-        "seconds": 8.94,
-        "rms": 0.02,
-        "bytes": 286252,
-        "text": "(resumed)"
-      },
-      "vcmd.notCommandNative": {
-        "seconds": 3.52,
-        "rms": 0.02,
-        "bytes": 112684,
-        "text": "(resumed)"
-      },
-      "vcmd.reference": {
-        "seconds": 1.09,
-        "rms": 0.02,
-        "bytes": 34860,
-        "text": "(resumed)"
-      },
-      "vcmd.sendTo": {
-        "seconds": 1.07,
-        "rms": 0.02,
-        "bytes": 34348,
-        "text": "(resumed)"
-      },
-      "vcmd.stepOf": {
-        "seconds": 1.54,
-        "rms": 0.02,
-        "bytes": 49196,
-        "text": "(resumed)"
-      },
-      "vcmd.topUpFor": {
-        "seconds": 1.65,
-        "rms": 0.02,
-        "bytes": 52780,
-        "text": "(resumed)"
-      },
-      "vcmd.totalIs": {
-        "seconds": 1.31,
-        "rms": 0.02,
-        "bytes": 42028,
-        "text": "(resumed)"
-      },
-      "vcmd.transactionComplete": {
-        "seconds": 2.27,
-        "rms": 0.02,
-        "bytes": 72748,
-        "text": "(resumed)"
-      },
-      "vcmd.withdrawing": {
-        "seconds": 1.22,
-        "rms": 0.02,
-        "bytes": 38956,
-        "text": "(resumed)"
-      },
-      "name.kwame": {
-        "seconds": 0.8,
-        "rms": 0.02,
-        "bytes": 25644,
-        "text": "(resumed)"
-      },
-      "name.ama": {
-        "seconds": 0.42,
-        "rms": 0.02,
-        "bytes": 13356,
-        "text": "(resumed)"
-      },
-      "name.kofi": {
-        "seconds": 0.72,
-        "rms": 0.02,
-        "bytes": 23084,
-        "text": "(resumed)"
-      },
-      "name.abena": {
-        "seconds": 0.8,
-        "rms": 0.02,
-        "bytes": 25644,
-        "text": "(resumed)"
-      },
-      "name.ama_serwaa": {
-        "seconds": 1.23,
-        "rms": 0.02,
-        "bytes": 39468,
-        "text": "(resumed)"
-      },
-      "name.kwame_mensah": {
-        "seconds": 1.62,
-        "rms": 0.02,
-        "bytes": 51756,
-        "text": "(resumed)"
-      }
-    },
-    "ee": {
-      "onboarding.voiceWelcome": {
-        "seconds": 11.41,
-        "rms": 0.02,
-        "bytes": 365100,
-        "text": "(resumed)"
-      },
-      "voice.listen": {
-        "seconds": 1.63,
-        "rms": 0.02,
-        "bytes": 52268,
-        "text": "(resumed)"
-      },
-      "voice.listening": {
-        "seconds": 1.66,
-        "rms": 0.02,
-        "bytes": 53292,
-        "text": "(resumed)"
+        "rms": 0.1001,
+        "bytes": 31276,
+        "text": ". mere tie ."
       },
       "voice.help": {
-        "seconds": 8.8,
-        "rms": 0.02,
-        "bytes": 281644,
-        "text": "(resumed)"
+        "seconds": 6.928,
+        "peak": 0.8304,
+        "rms": 0.1416,
+        "bytes": 221740,
+        "text": ". wobɛtumi aka balance statement send money airtime cash out settings repeat anaa stop ."
       },
       "voice.notHeard": {
-        "seconds": 4.53,
-        "rms": 0.02,
-        "bytes": 144940,
-        "text": "(resumed)"
+        "seconds": 3.52,
+        "peak": 0.7472,
+        "rms": 0.12119,
+        "bytes": 112684,
+        "text": ". mante hwee pia microphone no na kasa ."
       },
       "voice.stopped": {
-        "seconds": 2.1,
-        "rms": 0.02,
-        "bytes": 67116,
-        "text": "(resumed)"
+        "seconds": 1.536,
+        "peak": 0.7005,
+        "rms": 0.15178,
+        "bytes": 49196,
+        "text": ". nne ahyɛde agyae ."
       },
       "voice.nothingToRepeat": {
-        "seconds": 3.09,
-        "rms": 0.02,
-        "bytes": 98860,
-        "text": "(resumed)"
+        "seconds": 2.368,
+        "peak": 0.8365,
+        "rms": 0.15895,
+        "bytes": 75820,
+        "text": ". hwee nni hɔ a mɛbɛka bio ."
       },
       "voice.noSpeech": {
-        "seconds": 4.51,
-        "rms": 0.02,
-        "bytes": 144428,
-        "text": "(resumed)"
+        "seconds": 3.744,
+        "peak": 0.7511,
+        "rms": 0.1147,
+        "bytes": 119852,
+        "text": ". mante hwee pia microphone no na kasa ."
       },
       "voice.permissionDenied": {
-        "seconds": 6.4,
-        "rms": 0.02,
-        "bytes": 204844,
-        "text": "(resumed)"
+        "seconds": 6.624,
+        "peak": 0.7527,
+        "rms": 0.15059,
+        "bytes": 212012,
+        "text": ". wɔhia microphone kwan ma nne ahyɛde wobɛtumi ama kwan wɔ wo fon setting mu ."
       },
       "voice.notAvailable": {
-        "seconds": 3.87,
-        "rms": 0.02,
-        "bytes": 123948,
-        "text": "(resumed)"
+        "seconds": 2.448,
+        "peak": 0.7448,
+        "rms": 0.13849,
+        "bytes": 78380,
+        "text": ". nne ahyɛde nni saa fon yi so ."
       },
       "voice.failed": {
-        "seconds": 3.18,
-        "rms": 0.02,
-        "bytes": 101932,
-        "text": "(resumed)"
+        "seconds": 1.968,
+        "peak": 0.7054,
+        "rms": 0.14146,
+        "bytes": 63020,
+        "text": ". nne ahyɛde nni hɔ seesei ."
       },
       "voice.stopListening": {
-        "seconds": 1.47,
-        "rms": 0.02,
-        "bytes": 47148,
-        "text": "(resumed)"
+        "seconds": 1.248,
+        "peak": 0.7336,
+        "rms": 0.1436,
+        "bytes": 39980,
+        "text": ". gyae tie ."
       },
       "home.balanceLabel": {
-        "seconds": 2.37,
-        "rms": 0.02,
-        "bytes": 75820,
-        "text": "(resumed)"
+        "seconds": 1.664,
+        "peak": 0.8037,
+        "rms": 0.14884,
+        "bytes": 53292,
+        "text": ". momo sika a ɛwɔ mu ."
       },
       "home.balanceHiddenLabel": {
-        "seconds": 2.51,
-        "rms": 0.02,
-        "bytes": 80428,
-        "text": "(resumed)"
+        "seconds": 1.968,
+        "peak": 0.7784,
+        "rms": 0.10533,
+        "bytes": 63020,
+        "text": ". sika a ɛwɔ mu no asuma ."
       },
       "home.sendMoney": {
-        "seconds": 1.23,
-        "rms": 0.02,
+        "seconds": 1.232,
+        "peak": 0.6846,
+        "rms": 0.08989,
         "bytes": 39468,
-        "text": "(resumed)"
+        "text": ". kɔma sika ."
       },
       "home.statement": {
-        "seconds": 1.25,
-        "rms": 0.02,
-        "bytes": 39980,
-        "text": "(resumed)"
+        "seconds": 1.376,
+        "peak": 0.6053,
+        "rms": 0.05249,
+        "bytes": 44076,
+        "text": ". sika krataa ."
       },
       "home.buyAirtime": {
-        "seconds": 1.47,
-        "rms": 0.02,
-        "bytes": 47148,
-        "text": "(resumed)"
+        "seconds": 1.232,
+        "peak": 0.6377,
+        "rms": 0.09347,
+        "bytes": 39468,
+        "text": ". airtime data ."
       },
       "home.cashOut": {
-        "seconds": 0.53,
-        "rms": 0.02,
-        "bytes": 16940,
-        "text": "(resumed)"
+        "seconds": 1.184,
+        "peak": 0.489,
+        "rms": 0.07714,
+        "bytes": 37932,
+        "text": ". yi sika ."
       },
       "home.quickActions": {
-        "seconds": 1.82,
-        "rms": 0.02,
-        "bytes": 58412,
-        "text": "(resumed)"
+        "seconds": 1.2,
+        "peak": 0.6833,
+        "rms": 0.13571,
+        "bytes": 38444,
+        "text": ". momo ndwuma ."
       },
       "home.recentTransactions": {
-        "seconds": 2.58,
-        "rms": 0.02,
-        "bytes": 82476,
-        "text": "(resumed)"
+        "seconds": 2.08,
+        "peak": 0.7592,
+        "rms": 0.14778,
+        "bytes": 66604,
+        "text": ". ndwuma a esii nkyɛe ."
       },
       "home.listenBalance": {
-        "seconds": 0.74,
-        "rms": 0.02,
-        "bytes": 23596,
-        "text": "(resumed)"
+        "seconds": 1.2,
+        "peak": 0.6,
+        "rms": 0.08392,
+        "bytes": 38444,
+        "text": ". kenkan sika ."
       },
       "home.smsTool": {
-        "seconds": 1.71,
-        "rms": 0.02,
-        "bytes": 54828,
-        "text": "(resumed)"
+        "seconds": 1.616,
+        "peak": 0.7127,
+        "rms": 0.12797,
+        "bytes": 51756,
+        "text": ". momo sms nhyehyɛeɛ ."
       },
       "settings.title": {
-        "seconds": 1.81,
-        "rms": 0.02,
-        "bytes": 57900,
-        "text": "(resumed)"
+        "seconds": 1.392,
+        "peak": 0.8192,
+        "rms": 0.17082,
+        "bytes": 44588,
+        "text": ". ahobammbɔ nhyehyɛeɛ ."
       },
       "settings.voiceCheckSection": {
-        "seconds": 1.23,
-        "rms": 0.02,
-        "bytes": 39468,
-        "text": "(resumed)"
+        "seconds": 1.312,
+        "peak": 0.5939,
+        "rms": 0.10298,
+        "bytes": 42028,
+        "text": ". nne nhwehwɛmu ."
       },
       "settings.testVoice": {
-        "seconds": 1.23,
-        "rms": 0.02,
-        "bytes": 39468,
-        "text": "(resumed)"
+        "seconds": 1.2,
+        "peak": 0.6525,
+        "rms": 0.11745,
+        "bytes": 38444,
+        "text": ". sɔ nne no hwɛ ."
       },
       "settings.voiceSample": {
-        "seconds": 6.13,
-        "rms": 0.02,
-        "bytes": 196140,
-        "text": "(resumed)"
+        "seconds": 6.576,
+        "peak": 0.7578,
+        "rms": 0.10984,
+        "bytes": 210476,
+        "text": ". safepay nne nhwɛsodeɛ wobɛtumi ate w akaunt mu sika ne nsɛm bere biara ."
       },
       "settings.contrastSection": {
-        "seconds": 1.84,
-        "rms": 0.02,
-        "bytes": 58924,
-        "text": "(resumed)"
+        "seconds": 1.312,
+        "peak": 0.8293,
+        "rms": 0.11227,
+        "bytes": 42028,
+        "text": ". kɔla ne hwɛbea ."
       },
       "settings.privacySection": {
-        "seconds": 1.06,
-        "rms": 0.02,
-        "bytes": 33836,
-        "text": "(resumed)"
+        "seconds": 1.824,
+        "peak": 0.8366,
+        "rms": 0.13313,
+        "bytes": 58412,
+        "text": ". kokoam ahobammbɔ ."
       },
       "settings.navSection": {
-        "seconds": 1.78,
-        "rms": 0.02,
-        "bytes": 56876,
-        "text": "(resumed)"
+        "seconds": 2.608,
+        "peak": 0.7014,
+        "rms": 0.08915,
+        "bytes": 83500,
+        "text": ". kwan a yɛfa so kɔ ne ba wcag ."
       },
       "common.language": {
-        "seconds": 0.5,
-        "rms": 0.02,
-        "bytes": 15916,
-        "text": "(resumed)"
+        "seconds": 0.72,
+        "peak": 0.5689,
+        "rms": 0.06801,
+        "bytes": 23084,
+        "text": ". kasa ."
       },
       "common.back": {
-        "seconds": 0.96,
-        "rms": 0.02,
-        "bytes": 30764,
-        "text": "(resumed)"
+        "seconds": 1.088,
+        "peak": 0.3784,
+        "rms": 0.05082,
+        "bytes": 34860,
+        "text": ". san kɔ ."
       },
       "statement.title": {
-        "seconds": 1.94,
-        "rms": 0.02,
-        "bytes": 61996,
-        "text": "(resumed)"
+        "seconds": 1.664,
+        "peak": 0.6961,
+        "rms": 0.09836,
+        "bytes": 53292,
+        "text": ". momo sika krataa ."
       },
       "statement.subtitle": {
-        "seconds": 1.87,
-        "rms": 0.02,
-        "bytes": 59948,
-        "text": "(resumed)"
+        "seconds": 2.432,
+        "peak": 0.8035,
+        "rms": 0.14446,
+        "bytes": 77868,
+        "text": ". kratafa a ɛkenkan ndwuma nyinaa ."
       },
       "statement.playAll": {
-        "seconds": 0.7,
-        "rms": 0.02,
-        "bytes": 22572,
-        "text": "(resumed)"
+        "seconds": 1.28,
+        "peak": 0.7192,
+        "rms": 0.11071,
+        "bytes": 41004,
+        "text": ". kenkan nyinaa ."
       },
       "statement.pause": {
-        "seconds": 0.78,
-        "rms": 0.02,
-        "bytes": 25132,
-        "text": "(resumed)"
+        "seconds": 1.12,
+        "peak": 0.7719,
+        "rms": 0.12316,
+        "bytes": 35884,
+        "text": ". gyae kakra ."
       },
       "statement.allCompleted": {
-        "seconds": 2.35,
-        "rms": 0.02,
-        "bytes": 75308,
-        "text": "(resumed)"
+        "seconds": 3.168,
+        "peak": 0.7679,
+        "rms": 0.1286,
+        "bytes": 101420,
+        "text": ". sika krataa kenkan no awie pɛpɛɛpɛ ."
       },
       "privacy.privateTitle": {
-        "seconds": 1.84,
-        "rms": 0.02,
-        "bytes": 58924,
-        "text": "(resumed)"
+        "seconds": 1.424,
+        "peak": 0.5769,
+        "rms": 0.10585,
+        "bytes": 45612,
+        "text": ". asotwe mu kasa ."
       },
       "privacy.publicTitle": {
-        "seconds": 1.49,
-        "rms": 0.02,
-        "bytes": 47660,
-        "text": "(resumed)"
+        "seconds": 2.032,
+        "peak": 0.6823,
+        "rms": 0.09362,
+        "bytes": 65068,
+        "text": ". ahobammbɔ nsa wosowoso ."
       },
       "privacy.privateDesc": {
-        "seconds": 2.18,
-        "rms": 0.02,
-        "bytes": 69676,
-        "text": "(resumed)"
+        "seconds": 2.448,
+        "peak": 0.7468,
+        "rms": 0.10817,
+        "bytes": 78380,
+        "text": ". kasa bɛba asotwe mu nko ara ."
       },
       "privacy.publicDesc": {
-        "seconds": 3.17,
-        "rms": 0.02,
-        "bytes": 101420,
-        "text": "(resumed)"
+        "seconds": 2.512,
+        "peak": 0.8252,
+        "rms": 0.16401,
+        "bytes": 80428,
+        "text": ". wosowoso bɛyɛ adwuma wɔ bagua mu ."
       },
       "home.type.send": {
-        "seconds": 1.74,
-        "rms": 0.02,
-        "bytes": 55852,
-        "text": "(resumed)"
+        "seconds": 1.488,
+        "peak": 0.7333,
+        "rms": 0.12258,
+        "bytes": 47660,
+        "text": ". sika a wɔsomaa ."
       },
       "home.type.receive": {
-        "seconds": 1.58,
-        "rms": 0.02,
-        "bytes": 50732,
-        "text": "(resumed)"
+        "seconds": 1.568,
+        "peak": 0.8084,
+        "rms": 0.1328,
+        "bytes": 50220,
+        "text": ". sika a wɔnyae ."
       },
       "home.type.airtime": {
-        "seconds": 1.76,
-        "rms": 0.02,
-        "bytes": 56364,
-        "text": "(resumed)"
+        "seconds": 1.92,
+        "peak": 0.6915,
+        "rms": 0.13729,
+        "bytes": 61484,
+        "text": ". airtime a wɔtɔe ."
       },
       "home.type.withdraw": {
-        "seconds": 1.94,
-        "rms": 0.02,
-        "bytes": 61996,
-        "text": "(resumed)"
+        "seconds": 1.904,
+        "peak": 0.769,
+        "rms": 0.13928,
+        "bytes": 60972,
+        "text": ". sika a wɔyii fii mu ."
       },
       "home.status.pending": {
-        "seconds": 0.8,
-        "rms": 0.02,
-        "bytes": 25644,
-        "text": "(resumed)"
+        "seconds": 1.088,
+        "peak": 0.6591,
+        "rms": 0.07337,
+        "bytes": 34860,
+        "text": ". ɛrekɔ so ."
       },
       "home.status.confirmed": {
-        "seconds": 1.31,
-        "rms": 0.02,
-        "bytes": 42028,
-        "text": "(resumed)"
+        "seconds": 0.832,
+        "peak": 0.4497,
+        "rms": 0.08326,
+        "bytes": 26668,
+        "text": ". adi mu ."
       },
       "home.status.failed": {
-        "seconds": 1.63,
-        "rms": 0.02,
-        "bytes": 52268,
-        "text": "(resumed)"
+        "seconds": 1.2,
+        "peak": 0.7508,
+        "rms": 0.1276,
+        "bytes": 38444,
+        "text": ". anyɛ yie ."
       },
       "airtime.credit": {
-        "seconds": 1.36,
-        "rms": 0.02,
-        "bytes": 43564,
-        "text": "(resumed)"
+        "seconds": 1.392,
+        "peak": 0.4265,
+        "rms": 0.06889,
+        "bytes": 44588,
+        "text": ". fon so sika ."
       },
       "airtime.data": {
-        "seconds": 1.52,
-        "rms": 0.02,
-        "bytes": 48684,
-        "text": "(resumed)"
+        "seconds": 1.44,
+        "peak": 0.6932,
+        "rms": 0.08593,
+        "bytes": 46124,
+        "text": ". intanɛt data ."
       },
       "airtime.self": {
-        "seconds": 1.63,
-        "rms": 0.02,
-        "bytes": 52268,
-        "text": "(resumed)"
+        "seconds": 1.2,
+        "peak": 0.5754,
+        "rms": 0.09469,
+        "bytes": 38444,
+        "text": ". me fono nɔma ."
       },
       "airtime.other": {
-        "seconds": 1.76,
-        "rms": 0.02,
-        "bytes": 56364,
-        "text": "(resumed)"
+        "seconds": 1.376,
+        "peak": 0.7529,
+        "rms": 0.10802,
+        "bytes": 44076,
+        "text": ". obi foforɔ nɔma ."
       },
       "send.processing": {
-        "seconds": 2.03,
-        "rms": 0.02,
-        "bytes": 65068,
-        "text": "(resumed)"
+        "seconds": 1.312,
+        "peak": 0.7544,
+        "rms": 0.14861,
+        "bytes": 42028,
+        "text": ". ɛyɛ wo dwuma no ."
       },
       "send.confirmed": {
-        "seconds": 1.52,
-        "rms": 0.02,
-        "bytes": 48684,
-        "text": "(resumed)"
+        "seconds": 1.504,
+        "peak": 0.6886,
+        "rms": 0.1394,
+        "bytes": 48172,
+        "text": ". dwuma no adi mu ."
       },
       "send.failed": {
-        "seconds": 1.87,
-        "rms": 0.02,
-        "bytes": 59948,
-        "text": "(resumed)"
+        "seconds": 1.824,
+        "peak": 0.7779,
+        "rms": 0.177,
+        "bytes": 58412,
+        "text": ". dwuma no anyɛ yie ."
       },
       "send.cancelledBeforeSend": {
-        "seconds": 2.03,
-        "rms": 0.02,
-        "bytes": 65068,
-        "text": "(resumed)"
+        "seconds": 2.464,
+        "peak": 0.8094,
+        "rms": 0.14828,
+        "bytes": 78892,
+        "text": ". wogyae dwuma no sika nnsɔree ."
       },
       "cashout.confirmed": {
-        "seconds": 2.18,
-        "rms": 0.02,
-        "bytes": 69676,
-        "text": "(resumed)"
+        "seconds": 1.824,
+        "peak": 0.6783,
+        "rms": 0.10344,
+        "bytes": 58412,
+        "text": ". sika yi no adi mu ."
       },
       "common.confirm": {
-        "seconds": 0.66,
-        "rms": 0.02,
-        "bytes": 21036,
-        "text": "(resumed)"
+        "seconds": 1.216,
+        "peak": 0.5395,
+        "rms": 0.09312,
+        "bytes": 38956,
+        "text": ". gye to mu ."
       },
       "common.cancel": {
-        "seconds": 0.96,
-        "rms": 0.02,
-        "bytes": 30764,
-        "text": "(resumed)"
+        "seconds": 0.8,
+        "peak": 0.6862,
+        "rms": 0.14024,
+        "bytes": 25644,
+        "text": ". gyae ."
       },
       "common.retry": {
-        "seconds": 1.06,
-        "rms": 0.02,
-        "bytes": 33836,
-        "text": "(resumed)"
+        "seconds": 1.12,
+        "peak": 0.7123,
+        "rms": 0.1413,
+        "bytes": 35884,
+        "text": ". yɛw bio ."
       },
       "home.unknownRecipient": {
-        "seconds": 2.19,
-        "rms": 0.02,
-        "bytes": 70188,
-        "text": "(resumed)"
+        "seconds": 1.632,
+        "peak": 0.7082,
+        "rms": 0.1599,
+        "bytes": 52268,
+        "text": ". onyani a yɛnnim no ."
       },
       "home.balanceShown": {
-        "seconds": 2.3,
-        "rms": 0.02,
-        "bytes": 73772,
-        "text": "(resumed)"
+        "seconds": 1.872,
+        "peak": 0.733,
+        "rms": 0.12812,
+        "bytes": 59948,
+        "text": ". sika no ano abue ."
       },
       "home.balanceHidden": {
-        "seconds": 2.29,
-        "rms": 0.02,
-        "bytes": 73260,
-        "text": "(resumed)"
+        "seconds": 1.52,
+        "peak": 0.8009,
+        "rms": 0.1147,
+        "bytes": 48684,
+        "text": ". sika no asuma ."
       },
       "home.noTransactions": {
-        "seconds": 2.43,
-        "rms": 0.02,
-        "bytes": 77868,
-        "text": "(resumed)"
+        "seconds": 1.728,
+        "peak": 0.7746,
+        "rms": 0.17246,
+        "bytes": 55340,
+        "text": ". ndwuma biara nni hɔ da ."
       },
       "send.errors.amount": {
-        "seconds": 2.35,
-        "rms": 0.02,
-        "bytes": 75308,
-        "text": "(resumed)"
+        "seconds": 2.432,
+        "peak": 0.7512,
+        "rms": 0.15397,
+        "bytes": 77868,
+        "text": ". hyɛ dodoɔ a ɛsen zero no ma ."
       },
       "send.errors.phone": {
-        "seconds": 2.64,
-        "rms": 0.02,
-        "bytes": 84524,
-        "text": "(resumed)"
+        "seconds": 2.672,
+        "peak": 0.7455,
+        "rms": 0.13157,
+        "bytes": 85548,
+        "text": ". hyɛ ghana fono nɔma pa ma sɛ ."
       },
       "send.errors.name": {
-        "seconds": 2.35,
-        "rms": 0.02,
-        "bytes": 75308,
-        "text": "(resumed)"
+        "seconds": 2.08,
+        "peak": 0.6587,
+        "rms": 0.14956,
+        "bytes": 66604,
+        "text": ". hyɛ onyani no din ma ."
       },
       "send.authFailed": {
-        "seconds": 3.84,
-        "rms": 0.02,
-        "bytes": 122924,
-        "text": "(resumed)"
+        "seconds": 3.408,
+        "peak": 0.7267,
+        "rms": 0.15594,
+        "bytes": 109100,
+        "text": ". nsa nkyerɛwde no nyɛ wo dea yɛw bio ."
       },
       "send.authCancelled": {
-        "seconds": 3.57,
-        "rms": 0.02,
-        "bytes": 114220,
-        "text": "(resumed)"
+        "seconds": 3.312,
+        "peak": 0.7235,
+        "rms": 0.1229,
+        "bytes": 106028,
+        "text": ". wogyaae nsa nkyerɛwde no ahu no sika no nkɔ ."
       },
       "send.authLocked": {
-        "seconds": 4.9,
-        "rms": 0.02,
-        "bytes": 156716,
-        "text": "(resumed)"
+        "seconds": 3.568,
+        "peak": 0.8083,
+        "rms": 0.13444,
+        "bytes": 114220,
+        "text": ". wo yɛ no dodoɔ twɛn kakra na san yɛ bio ."
       },
       "send.failureGeneric": {
-        "seconds": 2.26,
-        "rms": 0.02,
-        "bytes": 72236,
-        "text": "(resumed)"
+        "seconds": 2.0,
+        "peak": 0.8454,
+        "rms": 0.17596,
+        "bytes": 64044,
+        "text": ". mfasoɔ bi bae yɛw bio ."
       },
       "send.failureNetwork": {
-        "seconds": 2.77,
-        "rms": 0.02,
-        "bytes": 88620,
-        "text": "(resumed)"
+        "seconds": 2.368,
+        "peak": 0.7151,
+        "rms": 0.16179,
+        "bytes": 75820,
+        "text": ". ntam a ɛnni ho yɛw bio ."
       },
       "send.failureFunds": {
-        "seconds": 3.26,
-        "rms": 0.02,
-        "bytes": 104492,
-        "text": "(resumed)"
+        "seconds": 2.944,
+        "peak": 0.7415,
+        "rms": 0.13752,
+        "bytes": 94252,
+        "text": ". wo sika nnyi papa mu hwɛ wo balance ."
       },
       "airtime.errorAmount": {
-        "seconds": 2.54,
-        "rms": 0.02,
-        "bytes": 81452,
-        "text": "(resumed)"
+        "seconds": 2.4,
+        "peak": 0.7414,
+        "rms": 0.11229,
+        "bytes": 76844,
+        "text": ". hyɛ sika dodoɔ a ɛsen zero gu mu ."
       },
       "airtime.errorPhone": {
-        "seconds": 3.15,
-        "rms": 0.02,
-        "bytes": 100908,
-        "text": "(resumed)"
+        "seconds": 2.416,
+        "peak": 0.78,
+        "rms": 0.1338,
+        "bytes": 77356,
+        "text": ". hyɛ ghana fono nɔma pa gu mu ."
       },
       "cashout.errorAmount": {
-        "seconds": 1.98,
-        "rms": 0.02,
-        "bytes": 63532,
-        "text": "(resumed)"
+        "seconds": 2.432,
+        "peak": 0.7936,
+        "rms": 0.09934,
+        "bytes": 77868,
+        "text": ". hyɛ sika dodoɔ a ɛfata gu mu ."
       },
       "cashout.errorAgentCode": {
-        "seconds": 2.62,
-        "rms": 0.02,
-        "bytes": 84012,
-        "text": "(resumed)"
+        "seconds": 4.128,
+        "peak": 0.7223,
+        "rms": 0.10017,
+        "bytes": 132140,
+        "text": ". hyɛ wɛnda no nɔma nson gu mu ."
       },
       "statement.empty": {
-        "seconds": 3.02,
-        "rms": 0.02,
-        "bytes": 96812,
-        "text": "(resumed)"
+        "seconds": 1.52,
+        "peak": 0.8621,
+        "rms": 0.19408,
+        "bytes": 48684,
+        "text": ". dwuma biara nni hɔ da ."
       },
       "settings.savedNote": {
-        "seconds": 1.86,
-        "rms": 0.02,
-        "bytes": 59436,
-        "text": "(resumed)"
+        "seconds": 2.064,
+        "peak": 0.7653,
+        "rms": 0.15501,
+        "bytes": 66092,
+        "text": ". nhyehyɛeɛ no asie pɛpɛɛpɛ ."
       },
       "vcmd.whoToPay": {
-        "seconds": 1.95,
-        "rms": 0.02,
-        "bytes": 62508,
-        "text": "(resumed)"
+        "seconds": 1.936,
+        "peak": 0.709,
+        "rms": 0.14662,
+        "bytes": 61996,
+        "text": "hwan na worekɔma no sika"
       },
       "vcmd.askAmount": {
-        "seconds": 1.95,
-        "rms": 0.02,
-        "bytes": 62508,
-        "text": "(resumed)"
+        "seconds": 2.032,
+        "peak": 0.7862,
+        "rms": 0.1429,
+        "bytes": 65068,
+        "text": "dodoɔ bɛn na worekɔma"
       },
       "vcmd.askPhone": {
-        "seconds": 2.78,
-        "rms": 0.02,
-        "bytes": 89132,
-        "text": "(resumed)"
+        "seconds": 1.824,
+        "peak": 0.7458,
+        "rms": 0.13568,
+        "bytes": 58412,
+        "text": "dɛn ne ne fono nomba no"
       },
       "vcmd.selfOrOther": {
-        "seconds": 2.51,
-        "rms": 0.02,
-        "bytes": 80428,
-        "text": "(resumed)"
+        "seconds": 2.4,
+        "peak": 0.8123,
+        "rms": 0.10486,
+        "bytes": 76844,
+        "text": "woara anaagyɛ obi foforɔ"
       },
       "vcmd.heardAmount": {
-        "seconds": 0.8,
-        "rms": 0.02,
-        "bytes": 25644,
-        "text": "(resumed)"
+        "seconds": 1.024,
+        "peak": 0.6849,
+        "rms": 0.0895,
+        "bytes": 32812,
+        "text": "wokae"
       },
       "vcmd.flowNotUnderstood": {
-        "seconds": 2.62,
-        "rms": 0.02,
-        "bytes": 84012,
-        "text": "(resumed)"
+        "seconds": 3.424,
+        "peak": 0.6896,
+        "rms": 0.14017,
+        "bytes": 109612,
+        "text": "mepa kyɛw mantee yɛwɔ mmɔdemmɔ bio"
       },
       "vcmd.flowCancelled": {
-        "seconds": 0.59,
-        "rms": 0.02,
-        "bytes": 18988,
-        "text": "(resumed)"
+        "seconds": 0.96,
+        "peak": 0.7138,
+        "rms": 0.12848,
+        "bytes": 30764,
+        "text": "wogyaee"
       },
       "vcmd.sayYesNo": {
-        "seconds": 3.78,
-        "rms": 0.02,
-        "bytes": 120876,
-        "text": "(resumed)"
+        "seconds": 3.008,
+        "peak": 0.7066,
+        "rms": 0.11978,
+        "bytes": 96300,
+        "text": "ka aane gyee to mu anaagyɛ dabi gya no"
       },
       "vcmd.noFingerprint": {
-        "seconds": 4.46,
-        "rms": 0.02,
-        "bytes": 142892,
-        "text": "(resumed)"
+        "seconds": 4.32,
+        "peak": 0.6683,
+        "rms": 0.10639,
+        "bytes": 138284,
+        "text": "nsa nkyerɛwde nnihɔ enti wo nne na ɛgye to mu"
       },
       "vcmd.confirmSend": {
-        "seconds": 1.12,
-        "rms": 0.02,
-        "bytes": 35884,
-        "text": "(resumed)"
+        "seconds": 1.216,
+        "peak": 0.721,
+        "rms": 0.09327,
+        "bytes": 38956,
+        "text": "worekɔma"
       },
       "vcmd.confirmTo": {
-        "seconds": 0.42,
-        "rms": 0.02,
-        "bytes": 13356,
-        "text": "(resumed)"
+        "seconds": 0.64,
+        "peak": 0.2206,
+        "rms": 0.02895,
+        "bytes": 20524,
+        "text": "ma"
       },
       "vcmd.agentQuestion": {
-        "seconds": 2.3,
-        "rms": 0.02,
-        "bytes": 73772,
-        "text": "(resumed)"
+        "seconds": 1.968,
+        "peak": 0.6273,
+        "rms": 0.08357,
+        "bytes": 63020,
+        "text": "dɛn ne agent koodu no"
       },
       "vcmd.noBiometrics": {
-        "seconds": 2.27,
-        "rms": 0.02,
-        "bytes": 72748,
-        "text": "(resumed)"
+        "seconds": 1.952,
+        "peak": 0.71,
+        "rms": 0.11528,
+        "bytes": 62508,
+        "text": "wo nne na ɛgye to mu"
       },
       "vcmd.contactNumber": {
-        "seconds": 4.13,
-        "rms": 0.02,
-        "bytes": 132140,
-        "text": "(resumed)"
+        "seconds": 2.72,
+        "peak": 0.7087,
+        "rms": 0.13927,
+        "bytes": 87084,
+        "text": "dɛn ne ne fono nomba ka no mmienu mmienu"
       },
       "vcmd.askReference": {
-        "seconds": 4.4,
-        "rms": 0.02,
-        "bytes": 140844,
-        "text": "(resumed)"
+        "seconds": 4.256,
+        "peak": 0.8243,
+        "rms": 0.1741,
+        "bytes": 136236,
+        "text": "nkyerɛkyerɛmu bi wɔ hɔ ama saa som yi ka skip sɛ ɛnnhia"
+      },
+      "vcmd.contactLooking": {
+        "seconds": 1.824,
+        "peak": 0.754,
+        "rms": 0.14023,
+        "bytes": 58412,
+        "text": "merehwɛ wo contacts mu"
+      },
+      "vcmd.contactDenied": {
+        "seconds": 3.584,
+        "peak": 0.6472,
+        "rms": 0.0906,
+        "bytes": 114732,
+        "text": "contacts nni kwan enti ka ne fono nomba"
+      },
+      "vcmd.contactNotFoundFixed": {
+        "seconds": 3.824,
+        "peak": 0.6096,
+        "rms": 0.09861,
+        "bytes": 122412,
+        "text": "menim din no ka ne fono nomba"
+      },
+      "vcmd.contactMany": {
+        "seconds": 2.096,
+        "peak": 0.7277,
+        "rms": 0.16406,
+        "bytes": 67116,
+        "text": "ahu nnipa pii a wɔ din no"
+      },
+      "vcmd.contactPick": {
+        "seconds": 1.504,
+        "peak": 0.7761,
+        "rms": 0.12851,
+        "bytes": 48172,
+        "text": "ka nipa no nomba"
+      },
+      "vcmd.recipientCheck": {
+        "seconds": 4.112,
+        "peak": 0.8587,
+        "rms": 0.14517,
+        "bytes": 131628,
+        "text": "ka aane gye nipa no to mu anaagyɛ dabi san paw bio"
+      },
+      "onboarding.contactsAllowed": {
+        "seconds": 4.368,
+        "peak": 0.7203,
+        "rms": 0.11667,
+        "bytes": 139820,
+        "text": ". contacts agye tom safepay betumi ahu wo nkurɔfoɔ wɔ din mu ."
+      },
+      "onboarding.contactsDenied": {
+        "seconds": 7.376,
+        "peak": 0.7721,
+        "rms": 0.11282,
+        "bytes": 236076,
+        "text": ". ɛnnɛ nnyɛ hwee wobɛtumi aka fono nomba anaagyɛ agye contacts atom akyire wɔ settings mu ."
       },
       "onboarding.welcomeBody": {
-        "seconds": 11.312,
-        "peak": 0.8228,
-        "rms": 0.15776,
-        "bytes": 362028,
-        "text": "woezɔ ɖe safepay safepay gblɔ wo ga na w eye w pin meƒo o ɖoɖo sia didi aɖeke mele o zã w gbe alo w ŋus"
+        "seconds": 8.352,
+        "peak": 0.7543,
+        "rms": 0.12688,
+        "bytes": 267308,
+        "text": ". akwaaba safepay ma wote wo sika na wo pin rennsɛ da nhyehyɛeɛ yi ti kakra fa wo nne anaa wo nsa yɛ ."
       },
       "onboarding.micBody": {
-        "seconds": 8.624,
-        "peak": 0.7823,
-        "rms": 0.14435,
-        "bytes": 276012,
-        "text": "w axɔ microphone ɖe safepay kpɔa nusiwo gblɔm le app la me eye n ade ahyɛde vevewo gblɔ"
+        "seconds": 7.856,
+        "peak": 0.7939,
+        "rms": 0.14453,
+        "bytes": 251436,
+        "text": ". microphone no ho akwannya safepay te nne bere a app no rebue enti wobɛtumi aka wo ahyɛdeɛ ."
       },
       "onboarding.micGranted": {
-        "seconds": 3.856,
-        "peak": 0.7257,
-        "rms": 0.14501,
-        "bytes": 123436,
-        "text": "microphone la xɔ ɖe safepay ate ŋu akpɔ w gbe"
+        "seconds": 3.84,
+        "peak": 0.8249,
+        "rms": 0.08684,
+        "bytes": 122924,
+        "text": ". microphone no agye tom safepay betumi ate wo nne ."
       },
       "onboarding.micDenied": {
-        "seconds": 4.32,
-        "peak": 0.7914,
-        "rms": 0.16538,
-        "bytes": 138284,
-        "text": "mava o emegbe n xoe ɖe le settings me"
+        "seconds": 4.288,
+        "peak": 0.7537,
+        "rms": 0.16691,
+        "bytes": 137260,
+        "text": ". ɛnnɛ nnyɛ hwee akyire yi wubɛtumi agye tom wɔ settings mu ."
       },
       "onboarding.micPermanent": {
-        "seconds": 9.584,
-        "peak": 0.7492,
-        "rms": 0.1493,
-        "bytes": 306732,
-        "text": "microphone la tutu ɖe safepay ta ɖoe le w fono ƒe settings me eye trɔ bu safepay"
+        "seconds": 6.912,
+        "peak": 0.694,
+        "rms": 0.10624,
+        "bytes": 221228,
+        "text": ". wɔatow microphone no agu safepay bu no mu wɔ wo fono settings mu na san bue safepay ."
       },
       "onboarding.listeningBody": {
-        "seconds": 11.456,
-        "peak": 0.8346,
-        "rms": 0.14367,
-        "bytes": 366636,
-        "text": "ne safepay le eme la microphone la li ɖaa mele be n dia bɔtɔn o gblɔ dzo ɖa alo stop be safepay nawɔ kokoko"
+        "seconds": 8.56,
+        "peak": 0.8122,
+        "rms": 0.15322,
+        "bytes": 273964,
+        "text": ". bere a safepay rebue no microphone no da so ɛnsɛ sɛ wuhu bɔtɔn bi ka gyae anaagyɛ stop na safepay abu so ."
       },
       "onboarding.contactsBody": {
-        "seconds": 11.344,
-        "peak": 0.805,
-        "rms": 0.14607,
-        "bytes": 363052,
-        "text": "emegbe ne gblɔ ame ŋkɔ safepay ate ŋu adze eƒe fono nɔmbra gbegbe gbãtɔ si n zãe la abi w ŋus w contacts nɔ wo fono me ko"
+        "seconds": 8.864,
+        "peak": 0.7839,
+        "rms": 0.13644,
+        "bytes": 283692,
+        "text": ". akyire yi sɛ woka din te sɛ ama a safepay betumi ahunu ne fono nomba nea edi kan no ɛbɛbisa wo kwan wo contacts da wo fono mu pɛpɛɛpɛ ."
       },
       "onboarding.languageTitle": {
-        "seconds": 1.584,
-        "peak": 0.8085,
-        "rms": 0.13207,
-        "bytes": 50732,
-        "text": "gbe kae n pɔ"
+        "seconds": 1.488,
+        "peak": 0.6996,
+        "rms": 0.11944,
+        "bytes": 47660,
+        "text": ". kasa bɛn na wopɛ ."
       },
       "onboarding.languageChanged": {
-        "seconds": 0.928,
-        "peak": 0.6382,
-        "rms": 0.13784,
-        "bytes": 29740,
-        "text": "gbe la trɔ"
+        "seconds": 1.344,
+        "peak": 0.7336,
+        "rms": 0.09796,
+        "bytes": 43052,
+        "text": ". kasa no asesa ."
       },
       "onboarding.talkbackBody": {
-        "seconds": 2.912,
-        "peak": 0.836,
-        "rms": 0.1767,
-        "bytes": 93228,
-        "text": "n zɔa ɖe ɖe screen la dzi ɖe"
+        "seconds": 2.864,
+        "peak": 0.797,
+        "rms": 0.1392,
+        "bytes": 91692,
+        "text": ". sɛn na wupɛ sɛ wodwo krataafa no so ."
       },
       "onboarding.srOn": {
-        "seconds": 2.4,
-        "peak": 0.79,
-        "rms": 0.20242,
-        "bytes": 76844,
-        "text": "w screen reader le eme"
+        "seconds": 2.336,
+        "peak": 0.6313,
+        "rms": 0.13594,
+        "bytes": 74796,
+        "text": ". wo screen reader no resi so ."
       },
       "onboarding.srOff": {
-        "seconds": 6.464,
-        "peak": 0.7835,
-        "rms": 0.12709,
-        "bytes": 206892,
-        "text": "w screen reader mele eme o safepay aku eƒe gbe ɖe"
+        "seconds": 3.264,
+        "peak": 0.6794,
+        "rms": 0.13058,
+        "bytes": 104492,
+        "text": ". wo screen reader no aso safepay bɛka ne ho ."
       },
       "onboarding.navSaved": {
-        "seconds": 0.8,
-        "peak": 0.777,
-        "rms": 0.17669,
-        "bytes": 25644,
-        "text": "wosɔe ɖi"
+        "seconds": 1.248,
+        "peak": 0.6782,
+        "rms": 0.14221,
+        "bytes": 39980,
+        "text": ". wɔasie no yie ."
       },
       "onboarding.micTestBody": {
-        "seconds": 3.424,
-        "peak": 0.789,
-        "rms": 0.16018,
-        "bytes": 109612,
-        "text": "gblɔ nu ɖeka ɖe le le safepay n kwɔm"
+        "seconds": 3.296,
+        "peak": 0.7363,
+        "rms": 0.12547,
+        "bytes": 105516,
+        "text": ". sɛ wo nne sɛ nhwɛso safepay ɛte sɛn ."
       },
       "onboarding.micTestOk": {
-        "seconds": 2.384,
-        "peak": 0.721,
-        "rms": 0.16854,
-        "bytes": 76332,
-        "text": "microphone la dɔa dɔ"
+        "seconds": 1.92,
+        "peak": 0.7504,
+        "rms": 0.16758,
+        "bytes": 61484,
+        "text": ". microphone no yɛ adwuma ."
       },
       "onboarding.micTestRetry": {
-        "seconds": 3.232,
-        "peak": 0.772,
-        "rms": 0.16329,
-        "bytes": 103468,
-        "text": "mesese nu o gbugbɔ gblɔ kpe ɖe edzi"
+        "seconds": 3.312,
+        "peak": 0.8119,
+        "rms": 0.1758,
+        "bytes": 106028,
+        "text": ". mantie hwee ka bio yɛ den kakra ."
       },
       "onboarding.voiceTestBody": {
-        "seconds": 2.064,
-        "peak": 0.7472,
-        "rms": 0.13621,
-        "bytes": 66092,
-        "text": "se safepay ƒe gbe"
+        "seconds": 1.504,
+        "peak": 0.7443,
+        "rms": 0.12238,
+        "bytes": 48172,
+        "text": ". te safepay nne ."
       },
       "onboarding.voiceTestAsk": {
-        "seconds": 2.032,
-        "peak": 0.7737,
-        "rms": 0.14339,
-        "bytes": 65068,
-        "text": "n se nususru la ɖe"
+        "seconds": 1.28,
+        "peak": 0.7792,
+        "rms": 0.1308,
+        "bytes": 41004,
+        "text": ". wote nhwɛso no ."
       },
       "onboarding.voiceTestOk": {
-        "seconds": 3.584,
-        "peak": 0.7813,
-        "rms": 0.13339,
-        "bytes": 114732,
-        "text": "ɛyɛ n te ŋu akpɔ akesi ɖa esia i"
+        "seconds": 3.44,
+        "peak": 0.8125,
+        "rms": 0.1419,
+        "bytes": 110124,
+        "text": ". ɛyɛ wobɛtumi asesa nne so bere biara ."
       },
       "onboarding.voiceTestNo": {
-        "seconds": 3.92,
-        "peak": 0.8085,
-        "rms": 0.14929,
-        "bytes": 125484,
-        "text": "kpɔ akesi ƒe lolome ɖe edzi eye n gbugbɔ se"
+        "seconds": 2.496,
+        "peak": 0.6709,
+        "rms": 0.14707,
+        "bytes": 79916,
+        "text": ". yɛ nne no den na tie bio ."
       },
       "onboarding.bioBody": {
-        "seconds": 6.848,
-        "peak": 0.7612,
-        "rms": 0.15116,
-        "bytes": 219180,
-        "text": "safepay ɖe asi na gaɖoɖo bliboe kple w ŋus me ŋkuɖodzi w pin meƒo o"
+        "seconds": 4.864,
+        "peak": 0.7306,
+        "rms": 0.14952,
+        "bytes": 155692,
+        "text": ". safepay gye dwuma biara to mu de wo nsa nkyerɛwde wo pin rennsɛ da ."
       },
       "onboarding.bioReady": {
         "seconds": 2.368,
-        "peak": 0.742,
-        "rms": 0.13764,
+        "peak": 0.7086,
+        "rms": 0.12905,
         "bytes": 75820,
-        "text": "w ŋus me ŋkuɖodzi le dɔm"
+        "text": ". wo nsa nkyerɛwde asiesie ."
       },
       "onboarding.bioNone": {
-        "seconds": 6.8,
-        "peak": 0.8032,
-        "rms": 0.13192,
-        "bytes": 217644,
-        "text": "fono sia mele ŋus me ŋkuɖodzi o safepay azã w gbe ɖe asi"
+        "seconds": 4.928,
+        "peak": 0.787,
+        "rms": 0.13727,
+        "bytes": 157740,
+        "text": ". wo fono yi nnisa nkyerɛwde nnihɔ safepay de wo nne bɛgye to mu ."
       },
       "onboarding.bioNotEnrolled": {
-        "seconds": 12.256,
-        "peak": 0.7738,
-        "rms": 0.14505,
-        "bytes": 392236,
-        "text": "w ŋus me ŋkuɖodzi mele ɖoɖo nu o n de eme le fono ƒe settings security te va se ɖe eme la safepay azã w gbe"
+        "seconds": 7.936,
+        "peak": 0.7699,
+        "rms": 0.12582,
+        "bytes": 253996,
+        "text": ". wonsa nkyerɛwde nnsi hɔ dada fa ka ho wɔ wo fono settings security ase safepay bɛde wo nne agye tomu kɔsi ɛno ."
       },
       "onboarding.bioSuccess": {
-        "seconds": 4.208,
-        "peak": 0.7516,
-        "rms": 0.14189,
-        "bytes": 134700,
-        "text": "ŋus me ŋkuɖodzi la ɖe asi w ga me tsi tre ɖe o"
+        "seconds": 3.952,
+        "peak": 0.688,
+        "rms": 0.08367,
+        "bytes": 126508,
+        "text": ". nsa nkyerɛwde no agye to mu wo sika ho ban yɛ den ."
       },
       "onboarding.bioFailed": {
-        "seconds": 5.392,
-        "peak": 0.7683,
-        "rms": 0.13571,
-        "bytes": 172588,
-        "text": "ŋus me ŋkuɖodzi la meɖe asi o n te ŋu agbugbɔ ɖo esia i"
+        "seconds": 3.776,
+        "peak": 0.7622,
+        "rms": 0.1596,
+        "bytes": 120876,
+        "text": ". nsa nkyerɛwde no annye to mu bɔ mmɔden bio bere biara ."
       },
       "onboarding.bioCancelled": {
-        "seconds": 2.384,
-        "peak": 0.7794,
-        "rms": 0.15354,
-        "bytes": 76332,
-        "text": "wogbe nusi megadze o"
+        "seconds": 2.144,
+        "peak": 0.7835,
+        "rms": 0.12725,
+        "bytes": 68652,
+        "text": ". wogyaee ɛnsesa biribi ."
       },
       "onboarding.bioLockout": {
-        "seconds": 3.04,
-        "peak": 0.8115,
-        "rms": 0.14638,
-        "bytes": 97324,
-        "text": "ɖodze akpaa dodo n nɔ eme kakra"
+        "seconds": 2.544,
+        "peak": 0.7576,
+        "rms": 0.14339,
+        "bytes": 81452,
+        "text": ". mbɔden bebree dodo twɛn kakra ."
       },
       "onboarding.teachBody": {
-        "seconds": 11.184,
-        "peak": 0.8105,
-        "rms": 0.1463,
-        "bytes": 357932,
-        "text": "ahyɛde etɔ̃ gblɔ be nye ga n se w ga gblɔ be ɖo ga n ɖo ga gblɔ be dzo ɖa be safepay nawɔ kokoko"
+        "seconds": 7.792,
+        "peak": 0.7166,
+        "rms": 0.11286,
+        "bytes": 249388,
+        "text": ". ahyɛdeɛ mmiɛnsa ka me sika a aka na wote wo sika ka kɔma sika na wokɔma sika ka gyae na safepay abu so ."
       },
       "onboarding.teachBalance": {
-        "seconds": 2.736,
-        "peak": 0.7779,
-        "rms": 0.15,
-        "bytes": 87596,
-        "text": "ɛ̃ nye ga nye ga ƒe ahyɛde"
+        "seconds": 3.536,
+        "peak": 0.7976,
+        "rms": 0.14404,
+        "bytes": 113196,
+        "text": ". ɛyɛ me sika a aka ne sika a ɛwɔ mu ahyɛdeɛ ."
       },
       "onboarding.teachSend": {
-        "seconds": 3.12,
-        "peak": 0.7524,
-        "rms": 0.16862,
-        "bytes": 99884,
-        "text": "ɛ̃ ɖo ga nye gaɖoɖo ƒe ahyɛde"
+        "seconds": 3.36,
+        "peak": 0.8441,
+        "rms": 0.13565,
+        "bytes": 107564,
+        "text": ". ɛyɛ kɔma sika ne sika a wokɔma no ahyɛdeɛ ."
       },
       "onboarding.teachStop": {
-        "seconds": 3.152,
-        "peak": 0.7683,
-        "rms": 0.16898,
-        "bytes": 100908,
-        "text": "ɛ̃ dzo ɖa na safepay nawɔ kokoko"
+        "seconds": 1.952,
+        "peak": 0.791,
+        "rms": 0.15514,
+        "bytes": 62508,
+        "text": ". ɛyɛ gyae tu safepay so ."
       },
       "onboarding.teachAgain": {
-        "seconds": 3.648,
-        "peak": 0.7523,
-        "rms": 0.17416,
-        "bytes": 116780,
-        "text": "gbugbɔ ɖo ahyɛdeawo nye nye ga ɖo ga dzo ɖa"
+        "seconds": 4.16,
+        "peak": 0.744,
+        "rms": 0.11231,
+        "bytes": 133164,
+        "text": ". bɔ mmɔden bio ahyɛdeɛ no ne me sika a aka kɔma sika gyae ."
       },
       "onboarding.doneBody": {
-        "seconds": 9.36,
-        "peak": 0.7092,
-        "rms": 0.13562,
-        "bytes": 299564,
-        "text": "safepay ƒe ɖoɖo du ɖe n se w ga kple ga ƒe ŋkɔkɔ eye w pin meƒo o gblɔ nye ga n se w ga"
+        "seconds": 9.824,
+        "peak": 0.7611,
+        "rms": 0.12382,
+        "bytes": 314412,
+        "text": ". safepay asiesie wobɛtumi ate wo sika ne wo dwuma nyinaa na wo pin rennsɛ da ka me sika a aka na wote wo sika ."
       },
       "onboarding.exited": {
-        "seconds": 3.536,
-        "peak": 0.8335,
-        "rms": 0.17315,
-        "bytes": 113196,
-        "text": "ɖoɖo la gbe ɖe gagbɔ ɖo le settings me"
+        "seconds": 3.568,
+        "peak": 0.6387,
+        "rms": 0.11182,
+        "bytes": 114220,
+        "text": ". nhyehyɛeɛ no agyae san fi aseɛ wɔ settings mu ."
       },
       "num.0": {
-        "seconds": 1.04,
-        "rms": 0.02,
-        "bytes": 33324,
-        "text": "(resumed)"
+        "seconds": 0.672,
+        "peak": 0.4063,
+        "rms": 0.04198,
+        "bytes": 21548,
+        "text": "hwee"
       },
       "num.1": {
-        "seconds": 1.17,
-        "rms": 0.02,
-        "bytes": 37420,
-        "text": "(resumed)"
+        "seconds": 0.672,
+        "peak": 0.6379,
+        "rms": 0.11037,
+        "bytes": 21548,
+        "text": "koro"
       },
       "num.2": {
-        "seconds": 0.45,
-        "rms": 0.02,
-        "bytes": 14380,
-        "text": "(resumed)"
+        "seconds": 0.784,
+        "peak": 0.5961,
+        "rms": 0.10395,
+        "bytes": 25132,
+        "text": "mmienu"
       },
       "num.3": {
-        "seconds": 0.83,
-        "rms": 0.02,
-        "bytes": 26668,
-        "text": "(resumed)"
+        "seconds": 0.96,
+        "peak": 0.6268,
+        "rms": 0.07812,
+        "bytes": 30764,
+        "text": "mmiɛnsa"
       },
       "num.4": {
-        "seconds": 0.61,
-        "rms": 0.02,
-        "bytes": 19500,
-        "text": "(resumed)"
+        "seconds": 0.592,
+        "peak": 0.4838,
+        "rms": 0.07072,
+        "bytes": 18988,
+        "text": "ɛnan"
       },
       "num.5": {
-        "seconds": 1.15,
-        "rms": 0.02,
-        "bytes": 36908,
-        "text": "(resumed)"
+        "seconds": 0.704,
+        "peak": 0.4353,
+        "rms": 0.09123,
+        "bytes": 22572,
+        "text": "ɛnum"
       },
       "num.6": {
-        "seconds": 0.96,
-        "rms": 0.02,
-        "bytes": 30764,
-        "text": "(resumed)"
+        "seconds": 0.896,
+        "peak": 0.5869,
+        "rms": 0.08636,
+        "bytes": 28716,
+        "text": "ɛnsia"
       },
       "num.7": {
-        "seconds": 1.3,
-        "rms": 0.02,
-        "bytes": 41516,
-        "text": "(resumed)"
+        "seconds": 0.944,
+        "peak": 0.5828,
+        "rms": 0.09578,
+        "bytes": 30252,
+        "text": "ɛnson"
       },
       "num.8": {
-        "seconds": 1.17,
-        "rms": 0.02,
-        "bytes": 37420,
-        "text": "(resumed)"
+        "seconds": 1.056,
+        "peak": 0.5409,
+        "rms": 0.07216,
+        "bytes": 33836,
+        "text": "ɛnwɔtwe"
       },
       "num.9": {
-        "seconds": 1.09,
-        "rms": 0.02,
-        "bytes": 34860,
-        "text": "(resumed)"
+        "seconds": 0.752,
+        "peak": 0.5551,
+        "rms": 0.10809,
+        "bytes": 24108,
+        "text": "ɛnkron"
       },
       "num.10": {
-        "seconds": 0.62,
-        "rms": 0.02,
-        "bytes": 20012,
-        "text": "(resumed)"
+        "seconds": 0.56,
+        "peak": 0.1987,
+        "rms": 0.03714,
+        "bytes": 17964,
+        "text": "du"
       },
       "num.11": {
-        "seconds": 1.09,
-        "rms": 0.02,
-        "bytes": 34860,
-        "text": "(resumed)"
+        "seconds": 1.2,
+        "peak": 0.8832,
+        "rms": 0.09094,
+        "bytes": 38444,
+        "text": "du baako"
       },
       "num.12": {
-        "seconds": 0.7,
-        "rms": 0.02,
-        "bytes": 22572,
-        "text": "(resumed)"
+        "seconds": 0.992,
+        "peak": 0.7452,
+        "rms": 0.15412,
+        "bytes": 31788,
+        "text": "du mmienu"
       },
       "num.13": {
-        "seconds": 0.75,
-        "rms": 0.02,
-        "bytes": 24108,
-        "text": "(resumed)"
+        "seconds": 1.136,
+        "peak": 0.6022,
+        "rms": 0.11765,
+        "bytes": 36396,
+        "text": "du mmiɛnsa"
       },
       "num.14": {
-        "seconds": 0.78,
-        "rms": 0.02,
-        "bytes": 25132,
-        "text": "(resumed)"
+        "seconds": 1.136,
+        "peak": 0.6762,
+        "rms": 0.10303,
+        "bytes": 36396,
+        "text": "du ɛnan"
       },
       "num.15": {
-        "seconds": 1.33,
-        "rms": 0.02,
-        "bytes": 42540,
-        "text": "(resumed)"
+        "seconds": 1.12,
+        "peak": 0.7116,
+        "rms": 0.11643,
+        "bytes": 35884,
+        "text": "du ɛnum"
       },
       "num.16": {
-        "seconds": 1.06,
-        "rms": 0.02,
-        "bytes": 33836,
-        "text": "(resumed)"
+        "seconds": 1.168,
+        "peak": 0.5542,
+        "rms": 0.0874,
+        "bytes": 37420,
+        "text": "du ɛnsia"
       },
       "num.17": {
-        "seconds": 1.46,
-        "rms": 0.02,
-        "bytes": 46636,
-        "text": "(resumed)"
+        "seconds": 1.312,
+        "peak": 0.51,
+        "rms": 0.10525,
+        "bytes": 42028,
+        "text": "du ɛnson"
       },
       "num.18": {
-        "seconds": 0.62,
-        "rms": 0.02,
-        "bytes": 20012,
-        "text": "(resumed)"
+        "seconds": 1.408,
+        "peak": 0.5826,
+        "rms": 0.10786,
+        "bytes": 45100,
+        "text": "du ɛnwɔtwe"
       },
       "num.19": {
-        "seconds": 1.38,
-        "rms": 0.02,
-        "bytes": 44076,
-        "text": "(resumed)"
+        "seconds": 1.168,
+        "peak": 0.7268,
+        "rms": 0.1297,
+        "bytes": 37420,
+        "text": "du ɛnkron"
       },
       "num.20": {
-        "seconds": 1.06,
-        "rms": 0.02,
-        "bytes": 33836,
-        "text": "(resumed)"
+        "seconds": 0.816,
+        "peak": 0.54,
+        "rms": 0.11368,
+        "bytes": 26156,
+        "text": "aduonu"
       },
       "num.30": {
-        "seconds": 1.18,
-        "rms": 0.02,
-        "bytes": 37932,
-        "text": "(resumed)"
+        "seconds": 0.8,
+        "peak": 0.6865,
+        "rms": 0.11684,
+        "bytes": 25644,
+        "text": "aduasa"
       },
       "num.40": {
-        "seconds": 0.77,
-        "rms": 0.02,
-        "bytes": 24620,
-        "text": "(resumed)"
+        "seconds": 0.944,
+        "peak": 0.7555,
+        "rms": 0.12706,
+        "bytes": 30252,
+        "text": "aduanan"
       },
       "num.50": {
-        "seconds": 0.82,
-        "rms": 0.02,
-        "bytes": 26156,
-        "text": "(resumed)"
+        "seconds": 0.944,
+        "peak": 0.5691,
+        "rms": 0.11298,
+        "bytes": 30252,
+        "text": "aduonum"
       },
       "num.60": {
-        "seconds": 0.74,
-        "rms": 0.02,
-        "bytes": 23596,
-        "text": "(resumed)"
+        "seconds": 0.96,
+        "peak": 0.5286,
+        "rms": 0.09424,
+        "bytes": 30764,
+        "text": "aduɔsia"
       },
       "num.70": {
-        "seconds": 1.44,
-        "rms": 0.02,
-        "bytes": 46124,
-        "text": "(resumed)"
+        "seconds": 0.88,
+        "peak": 0.5387,
+        "rms": 0.08494,
+        "bytes": 28204,
+        "text": "aduɔson"
       },
       "num.80": {
-        "seconds": 1.28,
-        "rms": 0.02,
-        "bytes": 41004,
-        "text": "(resumed)"
+        "seconds": 1.216,
+        "peak": 0.5136,
+        "rms": 0.09161,
+        "bytes": 38956,
+        "text": "aduɔwɔtwe"
       },
       "num.90": {
-        "seconds": 1.3,
-        "rms": 0.02,
-        "bytes": 41516,
-        "text": "(resumed)"
+        "seconds": 1.184,
+        "peak": 0.7955,
+        "rms": 0.11344,
+        "bytes": 37932,
+        "text": "aduɔkron"
       },
       "num.100": {
-        "seconds": 1.17,
-        "rms": 0.02,
-        "bytes": 37420,
-        "text": "(resumed)"
+        "seconds": 0.56,
+        "peak": 0.3087,
+        "rms": 0.03929,
+        "bytes": 17964,
+        "text": "ɔha"
       },
       "num.1000": {
-        "seconds": 1.02,
-        "rms": 0.02,
-        "bytes": 32812,
-        "text": "(resumed)"
+        "seconds": 0.672,
+        "peak": 0.228,
+        "rms": 0.02942,
+        "bytes": 21548,
+        "text": "apem"
       },
       "money.cedis": {
-        "seconds": 1.25,
-        "rms": 0.02,
-        "bytes": 39980,
-        "text": "(resumed)"
+        "seconds": 0.976,
+        "peak": 0.6717,
+        "rms": 0.13527,
+        "bytes": 31276,
+        "text": "sedie"
       },
       "money.pesewas": {
-        "seconds": 1.04,
-        "rms": 0.02,
-        "bytes": 33324,
-        "text": "(resumed)"
+        "seconds": 0.944,
+        "peak": 0.5189,
+        "rms": 0.0764,
+        "bytes": 30252,
+        "text": "pesewa"
       },
       "vcmd.amountToPay": {
-        "seconds": 1.78,
-        "rms": 0.02,
-        "bytes": 56876,
-        "text": "(resumed)"
+        "seconds": 1.312,
+        "peak": 0.7978,
+        "rms": 0.12574,
+        "bytes": 42028,
+        "text": "dodoɔ a wobɛtua"
       },
       "vcmd.balanceIs": {
-        "seconds": 2.06,
-        "rms": 0.02,
-        "bytes": 66092,
-        "text": "(resumed)"
+        "seconds": 1.552,
+        "peak": 0.682,
+        "rms": 0.10589,
+        "bytes": 49708,
+        "text": "wo sika a ɛwɔ mu ne"
       },
       "vcmd.callingPhone": {
-        "seconds": 1.89,
-        "rms": 0.02,
-        "bytes": 60460,
-        "text": "(resumed)"
+        "seconds": 1.216,
+        "peak": 0.5975,
+        "rms": 0.09658,
+        "bytes": 38956,
+        "text": "worefrɛ fono"
       },
       "vcmd.confirmWithFingerprint": {
-        "seconds": 2.48,
-        "rms": 0.02,
-        "bytes": 79404,
-        "text": "(resumed)"
+        "seconds": 2.784,
+        "peak": 0.7593,
+        "rms": 0.13765,
+        "bytes": 89132,
+        "text": "fa wo nsa nkyerɛwde so ahu gye to mu"
       },
       "vcmd.feeIs": {
-        "seconds": 1.86,
-        "rms": 0.02,
-        "bytes": 59436,
-        "text": "(resumed)"
+        "seconds": 1.536,
+        "peak": 0.7094,
+        "rms": 0.11844,
+        "bytes": 49196,
+        "text": "ka a wɔbɔ ne"
       },
       "vcmd.heard": {
-        "seconds": 0.7,
-        "rms": 0.02,
-        "bytes": 22572,
-        "text": "(resumed)"
+        "seconds": 1.024,
+        "peak": 0.7133,
+        "rms": 0.10441,
+        "bytes": 32812,
+        "text": "wo kae"
       },
       "vcmd.helpNative": {
-        "seconds": 9.98,
-        "rms": 0.02,
-        "bytes": 319532,
-        "text": "(resumed)"
+        "seconds": 8.944,
+        "peak": 0.6389,
+        "rms": 0.07475,
+        "bytes": 286252,
+        "text": "gye wo tom wobɛtumi aka me sika sika krataa kɔma sika tɔ airtime yi sika fie san ka bio anaagyɛ gyae"
       },
       "vcmd.notCommandNative": {
-        "seconds": 6.1,
-        "rms": 0.02,
-        "bytes": 195116,
-        "text": "(resumed)"
+        "seconds": 3.76,
+        "peak": 0.715,
+        "rms": 0.11655,
+        "bytes": 120364,
+        "text": "mante ahyɛdeɛ no aseɛ ka me sika anaa fie bio"
       },
       "vcmd.reference": {
-        "seconds": 0.62,
-        "rms": 0.02,
-        "bytes": 20012,
-        "text": "(resumed)"
+        "seconds": 1.056,
+        "peak": 0.7341,
+        "rms": 0.08908,
+        "bytes": 33836,
+        "text": "nkyerɛase"
       },
       "vcmd.sendTo": {
-        "seconds": 1.62,
-        "rms": 0.02,
-        "bytes": 51756,
-        "text": "(resumed)"
+        "seconds": 1.024,
+        "peak": 0.7271,
+        "rms": 0.10048,
+        "bytes": 32812,
+        "text": "worekɔma"
       },
       "vcmd.stepOf": {
-        "seconds": 1.5,
-        "rms": 0.02,
-        "bytes": 48172,
-        "text": "(resumed)"
+        "seconds": 1.536,
+        "peak": 0.6534,
+        "rms": 0.16973,
+        "bytes": 49196,
+        "text": "nkyɛmu x wɔ y mu"
       },
       "vcmd.topUpFor": {
-        "seconds": 2.14,
-        "rms": 0.02,
-        "bytes": 68652,
-        "text": "(resumed)"
+        "seconds": 1.536,
+        "peak": 0.7171,
+        "rms": 0.13012,
+        "bytes": 49196,
+        "text": "woretɔ airtime ma"
       },
       "vcmd.totalIs": {
-        "seconds": 1.92,
-        "rms": 0.02,
-        "bytes": 61484,
-        "text": "(resumed)"
+        "seconds": 1.264,
+        "peak": 0.6992,
+        "rms": 0.1282,
+        "bytes": 40492,
+        "text": "nyinaa bom ne"
       },
       "vcmd.transactionComplete": {
-        "seconds": 1.33,
-        "rms": 0.02,
-        "bytes": 42540,
-        "text": "(resumed)"
+        "seconds": 2.0,
+        "peak": 0.8157,
+        "rms": 0.17527,
+        "bytes": 64044,
+        "text": "dwuma no adi mu pɛpɛɛpɛ"
       },
       "vcmd.withdrawing": {
-        "seconds": 1.5,
-        "rms": 0.02,
-        "bytes": 48172,
-        "text": "(resumed)"
+        "seconds": 1.12,
+        "peak": 0.6945,
+        "rms": 0.11497,
+        "bytes": 35884,
+        "text": "woreyi sika"
       },
       "name.kwame": {
-        "seconds": 0.69,
-        "rms": 0.02,
-        "bytes": 22060,
-        "text": "(resumed)"
+        "seconds": 0.656,
+        "peak": 0.7558,
+        "rms": 0.12038,
+        "bytes": 21036,
+        "text": "kwame"
       },
       "name.ama": {
-        "seconds": 0.91,
-        "rms": 0.02,
-        "bytes": 29228,
-        "text": "(resumed)"
+        "seconds": 0.608,
+        "peak": 0.5597,
+        "rms": 0.06501,
+        "bytes": 19500,
+        "text": "ama"
       },
       "name.kofi": {
-        "seconds": 1.01,
-        "rms": 0.02,
-        "bytes": 32300,
-        "text": "(resumed)"
+        "seconds": 0.64,
+        "peak": 0.5538,
+        "rms": 0.09468,
+        "bytes": 20524,
+        "text": "kofi"
       },
       "name.abena": {
-        "seconds": 0.64,
-        "rms": 0.02,
-        "bytes": 20524,
-        "text": "(resumed)"
+        "seconds": 0.88,
+        "peak": 0.5044,
+        "rms": 0.07739,
+        "bytes": 28204,
+        "text": "abena"
       },
       "name.ama_serwaa": {
-        "seconds": 1.66,
-        "rms": 0.02,
-        "bytes": 53292,
-        "text": "(resumed)"
+        "seconds": 1.024,
+        "peak": 0.6193,
+        "rms": 0.10605,
+        "bytes": 32812,
+        "text": "ama serwaa"
       },
       "name.kwame_mensah": {
-        "seconds": 1.62,
-        "rms": 0.02,
-        "bytes": 51756,
-        "text": "(resumed)"
+        "seconds": 1.632,
+        "peak": 0.5103,
+        "rms": 0.06457,
+        "bytes": 52268,
+        "text": "kwame mensah"
       }
     }
   }
