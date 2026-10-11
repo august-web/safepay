@@ -146,7 +146,14 @@ async function recordUsage(): Promise<void> {
   }
 }
 
+/** Upload + response ceiling for the lab attempt. The gateway answers fast;
+ * failing fast here is what makes the handover to the fallback quick. */
 const UPLOAD_TIMEOUT_MS = 45_000;
+
+/** The self-hosted fallback runs MMS on CPU: inferring a full 15 s capture
+ * window can take minutes, so the alternate attempt gets a patient ceiling
+ * (see FALLBACKS.md). The user waits once, then the flow continues. */
+const FALLBACK_TIMEOUT_MS = 240_000;
 
 /** Recoverable server-side failures that may differ between Lab subscriptions. */
 const RETRYABLE_REASONS: ReadonlySet<TranscribeFailure> =
@@ -163,6 +170,7 @@ async function transcribeOnce(
   uri: string,
   baseUrl: string,
   key: string,
+  timeoutMs: number = UPLOAD_TIMEOUT_MS,
 ): Promise<TranscribeResult> {
   const form = new FormData();
 
@@ -230,28 +238,34 @@ async function transcribeOnce(
  * endpoint returns a recoverable failure (quota/auth/server/timeout) and an
  * `EXPO_PUBLIC_SPEECH_API_KEY_ALT` + `_BASE_URL_ALT` pair is configured, one
  * retry is attempted on the alternate endpoint - no new dependency required.
+ *
+ * Env caution: EXPO_PUBLIC_* values are inlined into the JS bundle at build
+ * time and the bundle task does not watch `.env` - editing `.env` alone leaves
+ * the previous values baked in until the bundle task actually reruns.
  */
 export async function transcribeFile(uri: string): Promise<TranscribeResult> {
   const key = apiKey();
+  const altBase = labAltBaseUrl();
+  const altKey = labAltApiKey();
+  const hasAlt = altBase != null && altKey != null;
+
   if (key == null) {
-    const altKey = labAltApiKey();
-    const altBase = labAltBaseUrl();
-    if (altKey == null || altBase == null) return { ok: false, reason: 'no-key' };
-    if ((await asrRemaining()) <= 0) return { ok: false, reason: 'quota' };
+    if (!hasAlt) return { ok: false, reason: 'no-key' };
+    // A fallback-only install never touches the lab meter at all.
     return transcribeOnce(uri, altBase, altKey);
   }
 
-  if ((await asrRemaining()) <= 0) return { ok: false, reason: 'quota' };
+  // Without a fallback the local meter is authoritative: a dry day ends
+  // uploads, because the gateway counts every response (429s included) for
+  // the whole shared key. With a fallback configured the ladder must still
+  // reach the alternate endpoint on a lab 429, so the attempt goes out.
+  if (!hasAlt && (await asrRemaining()) <= 0) return { ok: false, reason: 'quota' };
 
   const primary = await transcribeOnce(uri, labBaseUrl(), key);
   if (primary.ok) return primary;
-  if (RETRYABLE_REASONS.has(primary.reason)) {
-    const altBase = labAltBaseUrl();
-    const altKey = labAltApiKey();
-    if (altBase != null && altKey != null) {
-      const alt = await transcribeOnce(uri, altBase, altKey);
-      if (alt.ok) return alt;
-    }
+  if (RETRYABLE_REASONS.has(primary.reason) && hasAlt) {
+    const alt = await transcribeOnce(uri, altBase, altKey, FALLBACK_TIMEOUT_MS);
+    if (alt.ok) return alt;
   }
   return primary;
 }

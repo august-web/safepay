@@ -149,6 +149,18 @@ While a recording window is open the app holds `MODE_IN_COMMUNICATION` +
 speakerphone via `modules/audio-route`, so prompts stay audible on the
 loudspeaker instead of Android dropping media into the earpiece.
 
+### Contact lookup (Phase 3)
+
+Saying a recipient's name in the send-money flow searches the device's own
+address book — on-device only, `READ_CONTACTS` requested at the moment the
+flow needs it, names and numbers never uploaded. One match reads the name and
+number back for a spoken yes/no; several matches are numbered and read out
+("say the number of the person you want") with each candidate's phone digits
+composed from native number atoms; no match or a refused permission falls
+back to dictating the number. `src/services/contactMatch.ts` holds the pure
+matching rules (Ghana phone normalization, name scoring, spoken-choice
+parsing).
+
 ## Colour & contrast
 
 Colour is a functional requirement for an inclusion app, so the team's two
