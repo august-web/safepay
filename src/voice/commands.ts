@@ -321,7 +321,63 @@ export function matchVoiceIntent(transcript: string): VoiceIntent | null {
   if (fuzzyBest != null && (best == null || fuzzyBest.words > best.words)) {
     return fuzzyBest.intent;
   }
-  return best?.intent ?? fuzzyBest?.intent ?? null;
+  if (best != null) return best.intent;
+
+  // Pass 3 — compact-form rescue. Degraded audio (the open-source fallback
+  // tier, cheap phone mics) both drops phonemes ("kɔma sika" → "ɔma si") and
+  // fuses words ("oamase"), so the token-shape pass above finds nothing. Here
+  // space-stripped forms are compared by longest common subsequence — order
+  // is preserved but insertions, deletions and fusions all forgive. A false
+  // match can only OPEN a flow (which reads back and demands an explicit yes),
+  // never move money; stop stays exact-only (see isStopUtterance). Ties prefer
+  // the phrase that covers more of its own length, so "komasika" resolves to
+  // send (compact 8/8) and not to the longer balance phrase it overlaps.
+  if (fuzzyBest == null && utteranceWords <= 3) {
+    const compact = text.replace(/ /g, '');
+    if (compact.length >= 4) {
+      let compactBest: {
+        intent: VoiceIntent;
+        score: number;
+        coverage: number;
+      } | null = null;
+      for (const pattern of COMMAND_PATTERNS) {
+        if (pattern.intent === 'stop') continue;
+        for (const phrase of pattern.phrases) {
+          const foldedCompact = fold(phrase).replace(/ /g, '');
+          if (foldedCompact.length < 5) continue;
+          const lcs = lcsLength(compact, foldedCompact);
+          const shorter = Math.min(compact.length, foldedCompact.length);
+          if (lcs < 4 || lcs < 0.6 * shorter) continue;
+          const score = lcs / shorter;
+          const coverage = lcs / foldedCompact.length;
+          if (
+            compactBest == null ||
+            score > compactBest.score ||
+            (score === compactBest.score && coverage > compactBest.coverage)
+          ) {
+            compactBest = { intent: pattern.intent, score, coverage };
+          }
+        }
+      }
+      if (compactBest != null) return compactBest.intent;
+    }
+  }
+  return fuzzyBest?.intent ?? null;
+}
+
+/** Longest common subsequence length — the fused-word tolerance metric. */
+function lcsLength(a: string, b: string): number {
+  if (a.length === 0 || b.length === 0) return 0;
+  let prev = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i += 1) {
+    const curr = [0];
+    for (let j = 1; j <= b.length; j += 1) {
+      curr[j] =
+        a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], curr[j - 1]);
+    }
+    prev = curr;
+  }
+  return prev[b.length];
 }
 
 function levenshtein(a: string, b: string): number {

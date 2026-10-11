@@ -39,6 +39,39 @@ function fold(text) {
     .trim();
 }
 
+// Mirror of src/voice/flowParse.ts `destutter` (declared below, next to the
+// digit vocabulary it guards): the production pipeline runs every transcript
+// through this collapse (VoiceCommandProvider.handleTranscript) before
+// matching, so the harness must too. Digit tokens never collapse — a repeated
+// digit inside a phone number must survive verbatim.
+function isDigitToken(word) {
+  const w = String(word ?? '').trim().toLowerCase();
+  if (w.length === 0) return false;
+  if (/^\d+([.,]\d+)?$/.test(w)) return true;
+  return digitTokens.has(w);
+}
+
+function destutter(transcript) {
+  const kept = [];
+  for (const word of String(transcript ?? '').split(/\s+/).filter(Boolean)) {
+    const prev = kept[kept.length - 1];
+    const prevFold = prev != null ? fold(prev) : '';
+    const wordFold = fold(word);
+    if (
+      prev != null &&
+      prevFold.length > 0 &&
+      wordFold.length > 0 &&
+      prevFold === wordFold &&
+      !isDigitToken(prev) &&
+      !isDigitToken(word)
+    ) {
+      continue;
+    }
+    kept.push(word);
+  }
+  return kept.join(' ');
+}
+
 const commandPatterns = [
   ['balance', ['check my balance', 'my balance', 'my money', 'me sika a aka', 'me sika', 'mi shika']],
   ['send', ['send money', 'send', 'transfer', 'kɔma sika', 'koma sika', 'soma sika', 'ɖo ga', 'do ga']],
@@ -62,12 +95,95 @@ function matchIntent(text) {
   return best?.intent ?? null;
 }
 
+// Mirror of src/voice/commands.ts matchVoiceIntent passes 2-3: same-word-count
+// edit tolerance, then the compact-form rescue (degraded audio drops phonemes
+// and fuses words: "kɔma sika" → "ɔma si" / "oamase"). Kept in lockstep with
+// the production thresholds so the harness verdicts stay meaningful.
+function levenshtein(a, b) {
+  if (a === b) return 0;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i += 1) {
+    const curr = [i];
+    for (let j = 1; j <= b.length; j += 1) {
+      curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = curr;
+  }
+  return prev[b.length];
+}
+
+const compactPatterns = commandPatterns
+  .filter(([intent]) => intent !== 'stop')
+  .map(([intent, phrases]) => [intent, phrases.map((p) => fold(p).replace(/ /g, ''))]);
+
+function matchIntentFuzzy(text) {
+  const exact = matchIntent(text);
+  if (exact != null) return exact;
+
+  const words = text.split(' ').filter(Boolean);
+  const utteranceWords = words.length;
+  let fuzzyBest = null;
+  if (utteranceWords > 0 && utteranceWords <= 3) {
+    const maxEdits = utteranceWords === 1 ? 2 : utteranceWords === 2 ? 3 : 4;
+    for (const [intent, phrases] of commandPatterns) {
+      for (const phrase of phrases) {
+        const folded = fold(phrase);
+        if (folded.split(' ').filter(Boolean).length !== utteranceWords) continue;
+        const edits = levenshtein(text, folded);
+        if (edits <= maxEdits && (fuzzyBest == null || edits < fuzzyBest.edits)) {
+          fuzzyBest = { intent, edits };
+        }
+      }
+    }
+    if (fuzzyBest != null) return fuzzyBest.intent;
+
+    const compact = text.replace(/ /g, '');
+    if (compact.length >= 4) {
+      let compactBest = null;
+      for (const [intent, phrases] of compactPatterns) {
+        for (const foldedCompact of phrases) {
+          if (foldedCompact.length < 5) continue;
+          const lcs = lcsLength(compact, foldedCompact);
+          const shorter = Math.min(compact.length, foldedCompact.length);
+          if (lcs < 4 || lcs < 0.6 * shorter) continue;
+          const score = lcs / shorter;
+          const coverage = lcs / foldedCompact.length;
+          if (
+            compactBest == null ||
+            score > compactBest.score ||
+            (score === compactBest.score && coverage > compactBest.coverage)
+          ) {
+            compactBest = { intent, score, coverage };
+          }
+        }
+      }
+      if (compactBest != null) return compactBest.intent;
+    }
+  }
+  return null;
+}
+
+function lcsLength(a, b) {
+  if (a.length === 0 || b.length === 0) return 0;
+  let prev = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i += 1) {
+    const curr = [0];
+    for (let j = 1; j <= b.length; j += 1) {
+      curr[j] = a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], curr[j - 1]);
+    }
+    prev = curr;
+  }
+  return prev[b.length];
+}
+
 const numberWords = {
   zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5,
   six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
   twenty: 20, thirty: 30, forty: 40, fifty: 50,
   aduonu: 20, aduasa: 30, aduanan: 40, aduonum: 50,
 };
+
+const digitTokens = new Set(Object.keys(numberWords));
 
 function extractAmount(text) {
   const digit = String(text).match(/\b\d+(?:\.\d+)?\b/);
@@ -90,9 +206,9 @@ function extractPhone(text) {
 }
 
 function evaluate(item, output) {
-  const transcript = output?.transcript ?? '';
+  const transcript = destutter(output?.transcript ?? '');
   const checks = [];
-  if (item.expectedIntent != null) checks.push(matchIntent(transcript) === item.expectedIntent);
+  if (item.expectedIntent != null) checks.push(matchIntentFuzzy(transcript) === item.expectedIntent);
   if (item.expectedAmount != null) checks.push(extractAmount(transcript) === item.expectedAmount);
   if (item.expectedPhone != null) checks.push(extractPhone(transcript) === item.expectedPhone);
   if (item.expectedConfirmation != null) {
@@ -106,7 +222,7 @@ function evaluate(item, output) {
     language: item.language,
     transcript,
     passed: checks.length > 0 && checks.every(Boolean),
-    recognizedIntent: matchIntent(transcript),
+    recognizedIntent: matchIntentFuzzy(transcript),
     amount: extractAmount(transcript),
     phone: extractPhone(transcript),
   };

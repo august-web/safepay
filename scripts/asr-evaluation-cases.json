@@ -89,5 +89,47 @@
     "kind": "confirmation",
     "reference": "dabi",
     "expectedConfirmation": false
+  },
+  {
+    "id": "tw-balance-stutter-01",
+    "language": "tw",
+    "kind": "command",
+    "reference": "me me me sika a aka",
+    "expectedIntent": "balance"
+  },
+  {
+    "id": "tw-send-stutter-01",
+    "language": "tw",
+    "kind": "command",
+    "reference": "kɔma kɔma sika",
+    "expectedIntent": "send"
+  },
+  {
+    "id": "tw-send-drift-drop-01",
+    "language": "tw",
+    "kind": "command",
+    "reference": "ɔma si",
+    "expectedIntent": "send"
+  },
+  {
+    "id": "tw-send-fused-01",
+    "language": "tw",
+    "kind": "command",
+    "reference": "oamase",
+    "expectedIntent": "send"
+  },
+  {
+    "id": "en-amount-stutter-01",
+    "language": "en",
+    "kind": "flow-answer",
+    "reference": "fifty fifty cedis",
+    "expectedAmount": 50
+  },
+  {
+    "id": "en-phone-repeated-digit-01",
+    "language": "en",
+    "kind": "flow-answer",
+    "reference": "zero zero two four one two three four five six",
+    "expectedPhone": "0024123456"
   }
 ]

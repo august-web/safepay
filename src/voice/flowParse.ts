@@ -44,6 +44,51 @@ const TENS_WORDS: Record<string, number> = {
   seventy: 70, eighty: 80, ninety: 90,
 };
 
+const DIGIT_TOKENS = new Set<string>(Object.keys(DIGIT_WORDS));
+
+/** True for numerals ("20") and spoken digit words ("zero", "oh", "mmienu"). */
+export function isDigitToken(word: string): boolean {
+  const w = word.trim().toLowerCase();
+  if (w.length === 0) return false;
+  if (/^\d+([.,]\d+)?$/.test(w)) return true;
+  return DIGIT_TOKENS.has(w);
+}
+
+/**
+ * Collapses immediately repeated words — the fingerprint a stutter leaves in
+ * an ASR transcript ("me me me sika a aka") — so matching and display see the
+ * utterance the speaker meant. Speech-inclusion requirement: a user who
+ * stutters must not have every command broken by repetitions.
+ *
+ * Two deliberate limits:
+ *  - only ADJACENT duplicates collapse, so meaningful reduplication elsewhere
+ *    in the sentence is untouched;
+ *  - digit tokens NEVER collapse. A stuttered "zero zero" and a genuine
+ *    "zero zero" inside a phone number are indistinguishable, and the project
+ *    rule is that a phone number must never be silently altered — digits pass
+ *    through verbatim and any ambiguity is resolved by the spoken read-back.
+ */
+export function destutter(transcript: string): string {
+  const kept: string[] = [];
+  for (const word of transcript.split(/\s+/).filter(Boolean)) {
+    const prev = kept[kept.length - 1];
+    const prevFold = prev != null ? fold(prev) : '';
+    const wordFold = fold(word);
+    if (
+      prev != null &&
+      prevFold.length > 0 &&
+      wordFold.length > 0 &&
+      prevFold === wordFold &&
+      !isDigitToken(prev) &&
+      !isDigitToken(word)
+    ) {
+      continue;
+    }
+    kept.push(word);
+  }
+  return kept.join(' ');
+}
+
 /** Is this word a yes/no answer? Used to route transcripts inside flows. */
 export function isYesNoWord(word: string): YesNo | null {
   const w = fold(word);
