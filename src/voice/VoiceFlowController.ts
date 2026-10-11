@@ -2,11 +2,21 @@ import { getAppLanguage, i18n, type AppLanguage } from '../i18n';
 import { announce } from '../a11y/announcer';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { formatMoney, sendMoney, buyAirtime, cashOut, calculateFee } from '../services/transactions';
-import { sayKey, sayKeyAsync, sayPlan, type SayPlan } from './say';
-import { isSelfVoiceAudible } from './voicePack';
+import {
+  sayKey,
+  sayKeyAsync,
+  sayPlan,
+  playPlan,
+  canSpeakPlan,
+  nameClipKey,
+  type SayPlan,
+} from './say';
+import { hasVoiceClip, isSelfVoiceAudible } from './voicePack';
 import { extractAmount, isStopUtterance } from './commands';
 import { phoneClipKeys } from './commandText';
 import { parseRecipient, parseYesNo, extractDigitSequence } from './flowParse';
+import { requestContactsPermission, lookupContacts } from '../services/contacts';
+import { parseSpokenChoice, type ContactCandidate } from '../services/contactMatch';
 
 /**
  * Conversational voice flows.
@@ -38,6 +48,12 @@ type FlowState =
   | { step: 'recipient' }
   /** A named contact whose number must be confirmed before the amount. */
   | { step: 'contact'; recipient: FlowRecipient }
+  /** Device-contacts lookup in flight for a spoken name (Phase 3). */
+  | { step: 'lookup'; spokenName: string }
+  /** Several candidates matched the spoken name; the user must choose one. */
+  | { step: 'disambiguate'; spokenName: string; candidates: ContactCandidate[] }
+  /** One candidate found or chosen: name + number read back for a yes/no. */
+  | { step: 'recipientConfirm'; spokenName: string; candidate: ContactCandidate }
   /** The user is dictating an optional reference / narration. */
   | { step: 'reference'; recipient: FlowRecipient; amount: number; reference: string | null }
   | { step: 'amount'; recipient: FlowRecipient; reference: string | null }
@@ -74,7 +90,7 @@ export interface VoiceFlowDeps {
 
 /** Steps each flow walks through, for the HUD's "step n of m" line. */
 const FLOW_TOTAL_STEPS: Record<VoiceFlow['kind'], number> = {
-  send: 5,
+  send: 6,
   airtime: 4,
   cashout: 5,
 };
@@ -111,6 +127,13 @@ export class VoiceFlowController {
   private transcript: VoiceTranscriptEntry[] = [];
   private lastPrompt: string | null = null;
   private lang: AppLanguage = getAppLanguage();
+  /**
+   * Tri-state for Phase 3 contact lookup: null = not tried yet, true = device
+   * address book is usable, false = denied/unavailable this session, so a
+   * spoken name falls straight through to the manual-number path. Contacts
+   * are never re-prompted mid-flow after a refusal.
+   */
+  private contactsEnabled: boolean | null = null;
 
   constructor(private readonly deps: VoiceFlowDeps) {}
 
@@ -120,14 +143,18 @@ export class VoiceFlowController {
 
   /** 1-based index of the current step, or 0 with no flow. */
   currentStepNumber(): number {
+    const kind = this.flow?.kind;
     switch (this.state?.step) {
       case 'recipient': return 1;
+      case 'lookup': return 1;
       case 'contact': return 2;
-      case 'amount': return 3;
-      /** Send-only narration step: step 4 of the 5-step send flow. */
-      case 'reference': return 4;
-      case 'confirm': return 4;
-      case 'processing': return 5;
+      case 'disambiguate': return 2;
+      case 'recipientConfirm': return 3;
+      case 'amount': return kind === 'send' ? 4 : 3;
+      /** Send-only narration step. */
+      case 'reference': return 5;
+      case 'confirm': return kind === 'send' ? 5 : 4;
+      case 'processing': return kind === 'send' ? 6 : 5;
       default: return 0;
     }
   }
@@ -216,8 +243,18 @@ export class VoiceFlowController {
       case 'recipient':
         this.handleRecipient(transcript);
         return true;
+      case 'lookup':
+        // The address book is still answering; a beat of speech here is
+        // absorbed so it cannot land on the next step by surprise.
+        return true;
       case 'contact':
         this.handleContact(transcript);
+        return true;
+      case 'disambiguate':
+        this.handleDisambiguate(transcript);
+        return true;
+      case 'recipientConfirm':
+        this.handleRecipientConfirm(transcript);
         return true;
       case 'reference':
         this.handleReference(transcript);
@@ -280,6 +317,22 @@ export class VoiceFlowController {
       return;
     }
 
+    // Phase 3: a spoken name in the send flow is looked up in the device's
+    // own address book - entirely on-device, never uploaded. Numbers skip the
+    // lookup (the digits are the recipient), and the demo-wallet matcher
+    // below remains the fallback when contacts are denied or unavailable, so
+    // a missing contacts module can never dead-end a transfer.
+    if (flow.kind === 'send' && this.awaiting == null && this.contactsEnabled !== false) {
+      if (extractDigitSequence(transcript, 9) == null) {
+        const spokenName = transcript.trim();
+        this.state = { step: 'lookup', spokenName };
+        this.emitStatus('vcmd.contactLooking');
+        this.speakThen('vcmd.contactLooking');
+        void this.lookupRecipient(spokenName);
+        return;
+      }
+    }
+
     // Send / cashout first step: recipient by name or number.
     if (flow.kind === 'cashout') {
       // Agent codes are short; accept any digit sequence of 3+.
@@ -336,6 +389,181 @@ export class VoiceFlowController {
     this.lastHeard = `${state.recipient.name} ${local}`;
     this.emitStatus('vcmd.askAmount');
     this.speakThen('vcmd.askAmount');
+  }
+
+  /**
+   * Phase 3: resolves a spoken name against the device address book.
+   *
+   * The OS permission is requested here — the moment the flow actually needs
+   * it, not at launch. A refusal is answered honestly and the flow drops to
+   * the manual-number path; a miss does the same; one match reads the name
+   * and number back for a yes/no; several matches are numbered and read out
+   * one per phone number, because the number is what actually receives the
+   * money. Ambiguity is never resolved silently.
+   */
+  private async lookupRecipient(spokenName: string): Promise<void> {
+    const permission = await requestContactsPermission();
+    if (this.state?.step !== 'lookup' || this.flow?.kind !== 'send') return;
+
+    if (permission !== 'granted') {
+      this.contactsEnabled = false;
+      this.state = { step: 'contact', recipient: { name: spokenName, phone: '' } };
+      this.emitStatus('vcmd.contactDenied');
+      this.speakPlanNative(
+        [
+          { kind: 'key', key: 'vcmd.contactDenied' },
+          { kind: 'key', key: 'vcmd.contactNumber' },
+        ],
+        `${i18n.t('vcmd.contactDenied')} ${i18n.t('vcmd.contactNumber')}`,
+      );
+      return;
+    }
+
+    let candidates: ContactCandidate[] = [];
+    try {
+      candidates = await lookupContacts(spokenName);
+    } catch {
+      candidates = [];
+    }
+    if (this.state?.step !== 'lookup' || this.flow?.kind !== 'send') return;
+
+    if (candidates.length === 0) {
+      // Honest miss: the name stays on the HUD, the fixed line re-asks for
+      // the number, and the flow keeps moving.
+      this.contactsEnabled = true;
+      this.state = { step: 'contact', recipient: { name: spokenName, phone: '' } };
+      this.emitStatus('vcmd.contactNotFoundFixed');
+      this.speakPlanNative(
+        [
+          { kind: 'key', key: 'vcmd.contactNotFoundFixed' },
+          { kind: 'key', key: 'vcmd.contactNumber' },
+        ],
+        `${i18n.t('vcmd.contactNotFoundFixed')} ${i18n.t('vcmd.contactNumber')}`,
+      );
+      return;
+    }
+
+    if (candidates.length === 1) {
+      this.askRecipientConfirm(spokenName, candidates[0]);
+      return;
+    }
+
+    this.state = { step: 'disambiguate', spokenName, candidates };
+    const parts: SayPlan = [
+      { kind: 'key', key: 'vcmd.contactMany' },
+      { kind: 'key', key: 'vcmd.contactPick' },
+    ];
+    for (let index = 0; index < candidates.length; index += 1) {
+      parts.push({ kind: 'number', value: index + 1 });
+      parts.push({ kind: 'phone', phone: candidates[index].phone });
+    }
+    const spokenText = [
+      i18n.t('vcmd.contactMany'),
+      i18n.t('vcmd.contactPick'),
+      ...candidates.map((candidate, index) => `${index + 1}. ${candidate.name} ${candidate.phone}`),
+    ].join(' ');
+    this.emitStatus('vcmd.contactMany');
+    this.speakPlanNative(parts, spokenText);
+  }
+
+  /** The disambiguation step: "1", "two", "second", "mmienu", "eve"… */
+  private handleDisambiguate(transcript: string): void {
+    const state = this.state;
+    if (state?.step !== 'disambiguate') return;
+    const choice = parseSpokenChoice(transcript, state.candidates.length);
+    if (choice == null) {
+      // Re-ask, never dead-end: the choice list stays on the HUD too.
+      this.emitStatus('vcmd.contactPick');
+      this.speakThen('vcmd.contactPick');
+      return;
+    }
+    this.askRecipientConfirm(state.spokenName, state.candidates[choice - 1]);
+  }
+
+  /**
+   * Read-back before any amount is asked (build-plan rule): the chosen name
+   * and number are spoken, and a yes is required. The number is always
+   * spoken natively digit by digit — it is the truth that receives the money.
+   * The name joins when a recorded clip for it exists (demo names);
+   * otherwise it stays on the HUD rather than being read by an
+   * English-accented device voice.
+   */
+  private askRecipientConfirm(spokenName: string, candidate: ContactCandidate): void {
+    this.state = { step: 'recipientConfirm', spokenName, candidate };
+    this.lastHeard = `${candidate.name} ${candidate.phone}`;
+
+    const language = getAppLanguage();
+    const parts: SayPlan = [{ kind: 'key', key: 'vcmd.confirmSend' }];
+    if (hasVoiceClip(nameClipKey(candidate.name), language)) {
+      parts.push({ kind: 'name', name: candidate.name });
+    }
+    parts.push(
+      { kind: 'key', key: 'vcmd.confirmTo' },
+      { kind: 'phone', phone: candidate.phone },
+      { kind: 'key', key: 'vcmd.sayYesNo' },
+    );
+    const spokenText = [
+      i18n.t('vcmd.confirmSend'),
+      candidate.name,
+      i18n.t('vcmd.confirmTo'),
+      candidate.phone,
+      i18n.t('vcmd.sayYesNo'),
+    ].join(' ');
+    this.emitStatus('vcmd.recipientCheck');
+    this.speakPlanNative(parts, spokenText);
+  }
+
+  /** The recipient confirmation step: yes proceeds to the amount, no re-asks. */
+  private handleRecipientConfirm(transcript: string): void {
+    const state = this.state;
+    if (state?.step !== 'recipientConfirm') return;
+    const answer = parseYesNo(transcript);
+    if (answer == null) {
+      this.emitStatus('vcmd.recipientCheck');
+      this.speakThen('vcmd.recipientCheck');
+      return;
+    }
+    if (answer === 'no') {
+      this.state = { step: 'recipient' };
+      this.lastHeard = null;
+      this.emitStatus('vcmd.whoToPay');
+      this.speakThen('vcmd.whoToPay');
+      return;
+    }
+    this.state = {
+      step: 'amount',
+      recipient: { name: state.candidate.name, phone: state.candidate.phone },
+      reference: null,
+    };
+    this.emitStatus('vcmd.askAmount');
+    this.speakThen('vcmd.askAmount');
+  }
+
+  /**
+   * speakThen for a composed plan: native clip playback when every part has
+   * one, otherwise the announce fallback for languages without a native pack
+   * (Twi/Ewe deliberately stay silent without clips — never the
+   * English-accented device voice reading native orthography).
+   */
+  private speakPlanNative(parts: SayPlan, fallbackText: string): void {
+    const go = () => {
+      const language = getAppLanguage();
+      if (canSpeakPlan(parts, language)) {
+        void playPlan(parts, language);
+        return;
+      }
+      if (language !== 'tw' && language !== 'ee') {
+        announce(fallbackText);
+      }
+    };
+    const wait = () => {
+      if (!isSelfVoiceAudible()) {
+        go();
+        return;
+      }
+      setTimeout(wait, 150);
+    };
+    setTimeout(wait, 250);
   }
 
   /** The optional reference / narration step. "Skip" jumps past it. */

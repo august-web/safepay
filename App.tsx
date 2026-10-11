@@ -274,6 +274,7 @@ function RootNavigator() {
           <VoiceFlowHud
             status={flowStatus}
             onCancel={() => flowController.cancel(false)}
+            onTypedAnswer={(answer) => flowController.handleTranscript(answer)}
           />
         )}
       </VoiceCommandProvider>

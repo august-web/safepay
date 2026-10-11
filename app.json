@@ -14,18 +14,20 @@
     },
     "android": {
       "package": "gh.safepay.app",
-      "adaptiveIcon": {
-        "backgroundColor": "#161273",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
       "predictiveBackGestureEnabled": false,
-      "permissions": [
+      "usesCleartextTraffic": true,
+    "adaptiveIcon": {
+      "backgroundColor": "#161273",
+      "foregroundImage": "./assets/android-icon-foreground.png",
+      "backgroundImage": "./assets/android-icon-background.png",
+      "monochromeImage": "./assets/android-icon-monochrome.png"
+    },
+    "permissions": [
         "RECORD_AUDIO",
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
-        "VIBRATE"
+        "VIBRATE",
+        "READ_CONTACTS"
       ]
     },
     "web": {
@@ -39,6 +41,20 @@
           "imageWidth": 180,
           "resizeMode": "contain",
           "backgroundColor": "#F5F0E6"
+        }
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow SafePay to find the person you want to send money to."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
       ]
     ]

@@ -21,6 +21,10 @@ import {
   getBiometricCapability,
   getBiometricTypeName,
 } from '../services/biometrics';
+import {
+  getContactsPermission,
+  requestContactsPermission,
+} from '../services/contacts';
 import { saveSettings } from '../services/settings';
 import { fold, isStopUtterance, matchVoiceIntent } from '../voice/commands';
 import { parseYesNo } from '../voice/flowParse';
@@ -167,6 +171,9 @@ export function OnboardingScreen({
   const [micState, setMicState] = useState<'unknown' | 'granted' | 'denied' | 'permanent'>(
     'unknown',
   );
+  const [contactsState, setContactsState] = useState<
+    'unknown' | 'granted' | 'denied' | 'permanent'
+  >('unknown');
   const [bio, setBio] = useState<{
     hasHardware: boolean;
     isEnrolled: boolean;
@@ -245,6 +252,18 @@ export function OnboardingScreen({
     }
     pushTranscript('app', i18n.t('onboarding.micDenied'));
     void speakKeys(['onboarding.micDenied']);
+  }, [pushTranscript, speakKeys]);
+
+  // ---- contacts permission step (Phase 3: the module now exists) --------
+
+  const requestContactsAndReport = useCallback(async () => {
+    const result = await requestContactsPermission();
+    setContactsState(
+      result === 'granted' ? 'granted' : result === 'permanent' ? 'permanent' : 'denied',
+    );
+    const key = result === 'granted' ? 'onboarding.contactsAllowed' : 'onboarding.contactsDenied';
+    pushTranscript('app', i18n.t(key));
+    void speakKeys([key]);
   }, [pushTranscript, speakKeys]);
 
   // ---- microphone test step (one dictation utterance) -------------------
@@ -359,6 +378,25 @@ export function OnboardingScreen({
         }
       } catch {
         // Status unknown - the Allow button and "yes" both can still ask.
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, [step, pushTranscript, speakKeys]);
+
+  useEffect(() => {
+    if (step !== 'contacts') return;
+    let ignore = false;
+    void (async () => {
+      const status = await getContactsPermission();
+      if (ignore) return;
+      if (status === 'granted') {
+        setContactsState('granted');
+        pushTranscript('app', i18n.t('onboarding.contactsAllowed'));
+        void speakKeys(['onboarding.contactsAllowed']);
+      } else if (status === 'permanent') {
+        setContactsState('permanent');
       }
     })();
     return () => {
@@ -483,9 +521,19 @@ export function OnboardingScreen({
           return;
         }
         case 'listening':
-        case 'contacts':
           goTo(NEXT_STEP[stepRef.current]);
           return;
+        case 'contacts': {
+          // Phase 3: the contacts ask is real now. "Yes" (or the button)
+          // requests; "no" moves on without it — a refusal never traps.
+          const answer = parseYesNo(trimmed);
+          if (answer === 'yes') {
+            void requestContactsAndReport();
+            return;
+          }
+          goTo(NEXT_STEP[stepRef.current]);
+          return;
+        }
         case 'language': {
           const matched = (SUPPORTED_LANGUAGES as readonly AppLanguage[]).find((code) =>
             LANGUAGE_WORDS[code].test(fold(trimmed)),
@@ -565,6 +613,7 @@ export function OnboardingScreen({
       micState,
       playSample,
       pushTranscript,
+      requestContactsAndReport,
       requestMic,
       runBioTest,
       speakKeys,
@@ -717,9 +766,18 @@ export function OnboardingScreen({
           </>
         ) : null}
 
-        {step === 'listening' || step === 'contacts' ? (
+        {step === 'listening' ? (
           <>
             {primary('onboarding.next', () => goTo(NEXT_STEP[step]))}
+            {skipButton}
+          </>
+        ) : null}
+
+        {step === 'contacts' ? (
+          <>
+            {contactsState === 'granted' || contactsState === 'permanent'
+              ? primary('onboarding.next', () => goTo(NEXT_STEP[step]))
+              : primary('onboarding.contactsAllow', () => void requestContactsAndReport())}
             {skipButton}
           </>
         ) : null}

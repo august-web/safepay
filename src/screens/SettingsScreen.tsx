@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {ScrollView, Switch, Text, View} from 'react-native';
+import {ScrollView, Switch, Text, TextInput, View} from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { announce, voiceChannel } from '../a11y/announcer';
@@ -14,6 +14,7 @@ import { hapticTick } from '../services/haptics';
 import { useAudioRoute } from '../services/headphones';
 import { getCachedSettings, loadSettings, saveSettings, type NavPreset, type PrivacyMode } from '../services/settings';
 import { speak, stopSpeaking, voiceStatusFor, warmUpSpeech, ttsVoiceStatusFor, type TtsVoiceStatus } from '../services/speech';
+import { useVoiceCommands } from '../voice/VoiceCommandProvider';
 import { sayKey } from '../voice/say';
 import { voiceClipCount } from '../voice/voicePack';
 
@@ -42,6 +43,17 @@ export function SettingsScreen({
   useEffect(() => {
     void ttsVoiceStatusFor(getAppLanguage()).then(setTts);
   }, []);
+
+  /** Rehearsal tool: run a typed phrase through the real voice pipeline. */
+  const [testPhrase, setTestPhrase] = useState('');
+  const { injectTranscript } = useVoiceCommands();
+  const runPipelineTest = () => {
+    const phrase = testPhrase.trim();
+    if (phrase.length === 0) return;
+    void hapticTick();
+    injectTranscript(phrase);
+    announce(t('settings.testPipelineDone', { defaultValue: 'Sent through the voice pipeline. Watch the response.' }));
+  };
 
   const testVoice = () => {
     void hapticTick();
@@ -263,6 +275,42 @@ export function SettingsScreen({
             onPress={testVoice}
             style={styles.optionBtn}
           />
+
+          {/* Zero-quota rehearsal: pushes typed text through the exact
+              production pipeline (de-stutter, flows, matching, spoken reply)
+              without opening the microphone or the gateway. */}
+          <Text style={styles.optionDesc}>
+            {t('settings.testPipelineTitle', {
+              defaultValue: 'Test the voice pipeline (uses no ASR quota)',
+            })}
+          </Text>
+          <TextInput
+            value={testPhrase}
+            onChangeText={setTestPhrase}
+            placeholder={t('settings.testPipelineField', {
+              defaultValue: 'Type a phrase as if spoken, e.g. me sika a aka',
+            })}
+            placeholderTextColor={theme.colors.placeholder}
+            autoCapitalize="none"
+            autoCorrect={false}
+            accessibilityLabel={t('settings.testPipelineField', {
+              defaultValue: 'Type a phrase as if spoken',
+            })}
+            accessibilityHint={t('settings.testPipelineHint', {
+              defaultValue: 'Types the phrase the pipeline should hear',
+            })}
+            style={styles.pipelineField}
+          />
+          <AccessibleButton
+            label={t('settings.testPipelineRun', { defaultValue: 'Run through the pipeline' })}
+            hint={t('settings.testPipelineRunHint', {
+              defaultValue: 'Double-tap to run the typed phrase through the voice pipeline without using the microphone',
+            })}
+            variant="outline"
+            disabled={testPhrase.trim().length === 0}
+            onPress={runPipelineTest}
+            style={styles.optionBtn}
+          />
         </View>
 
         {/* Audio Privacy Guard Mode */}
@@ -426,6 +474,20 @@ const styles = themedStyles((colors) => ({
   optionBtn: {
     minHeight: 48,
     borderRadius: theme.radii.md,
+  },
+  // Input outline uses the 3:1 controlBorder token (WCAG 1.4.11), per the
+  // palette rules in the README.
+  pipelineField: {
+    minHeight: theme.touchTarget.minSize,
+    borderRadius: theme.radii.md,
+    borderWidth: 1.5,
+    borderColor: colors.controlBorder,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    color: colors.text,
+    fontSize: theme.typography.body,
+    backgroundColor: colors.surface,
+    marginBottom: theme.spacing.xs,
   },
   // WCAG 2.2: selected state must not rely on colour alone - a bolder border
   // plus the ✓ in the label carries it for low-vision and colour-blind users.

@@ -335,7 +335,10 @@
     "doneTitle": "Wɔshishi.",
     "doneBody": "SafePay eshishi. Wɔbɛse wɔ shika kple shika nitsumɔi, ni wɔ PIN ko jogbaŋ. Bɔɔ mi shika, ni wɔse wɔ shika.",
     "doneFinish": "Shi SafePay mli",
-    "exited": "Shishoo lɛ gbejee. Wɔbɛkɛshi le Settings mli."
+    "exited": "Shishoo lɛ gbejee. Wɔbɛkɛshi le Settings mli.",
+    "contactsAllowed": "Contacts aye kɛ. SafePay bɛtsɔɔ wɔ nɔmɔi foo din mli.",
+    "contactsDenied": "Kɛɛ daa. Ebote aka phone nɔmaa, alo eyɔɔ contacts ejwɛ Settings mli.",
+    "contactsAllow": "Yɛ contacts kɛ"
   },
   "voice": {
     "listen": "Gbɛ́ɛ mlai",
@@ -370,6 +373,12 @@
     "contactNumber": "What is their mobile money number? Say it digit by digit.",
     "askReference": "Any reference or note for this transfer? Say it, or say skip.",
     "heard": "You said",
-    "stepOf": "Step {{x}} of {{y}}"
+    "stepOf": "Step {{x}} of {{y}}",
+    "contactLooking": "Mitsɔɔ wɔ contacts lɛ hwɛ.",
+    "contactDenied": "Contacts nyɛ kwan, ekome bɔɔ phone nɔma lɛ.",
+    "contactNotFoundFixed": "Minyɛ din lɛ. Bɔɔ phone nɔma lɛ ko.",
+    "contactMany": "Mitsɔɔ amei fe fɛɛ ni shwɔ din lɛ.",
+    "contactPick": "Ka nɔ lɛ ko ni wɔpɔ.",
+    "recipientCheck": "Ka yes kɛ ha wɔye nɔ lɛ, alo no san pii."
   }
 }

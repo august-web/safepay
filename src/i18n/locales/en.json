@@ -335,7 +335,10 @@
     "doneTitle": "You are ready",
     "doneBody": "SafePay is ready. Your balance and your transactions can be read aloud, and your PIN is never spoken. Say me sika a aka to hear your balance.",
     "doneFinish": "Open SafePay",
-    "exited": "Setup paused. You can run it again from Settings."
+    "exited": "Setup paused. You can run it again from Settings.",
+    "contactsAllowed": "Contacts allowed. SafePay can find your people by name.",
+    "contactsDenied": "No problem. You can say phone numbers instead, or allow contacts later in Settings.",
+    "contactsAllow": "Allow contacts"
   },
   "voice": {
     "listen": "Voice command",
@@ -396,6 +399,12 @@
     "contactNumber": "What is their mobile money number? Say it digit by digit.",
     "askReference": "Any reference or note for this transfer? Say it, or say skip.",
     "heard": "You said",
-    "stepOf": "Step {{x}} of {{y}}"
+    "stepOf": "Step {{x}} of {{y}}",
+    "contactLooking": "Let me check your contacts.",
+    "contactDenied": "Contacts are not allowed, so say their phone number.",
+    "contactNotFoundFixed": "I don't know that name. Say their phone number instead.",
+    "contactMany": "I found more than one person with that name.",
+    "contactPick": "Say the number of the person you want.",
+    "recipientCheck": "Say yes to confirm this recipient, or no to choose again."
   }
 }

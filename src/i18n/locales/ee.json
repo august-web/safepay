@@ -335,7 +335,10 @@
     "doneTitle": "Dɔdɔ du ɖe",
     "doneBody": "SafePay ƒe ɖoɖo du ɖe. Nàse wò ga kple ga ƒe ŋkɔkɔ, eye wò PIN meƒo o. Gblɔ nye ga, nàse wò ga.",
     "doneFinish": "Ƒu SafePay",
-    "exited": "Ɖoɖo la gbe ɖe. Àgagbɔ ɖo le Settings me."
+    "exited": "Ɖoɖo la gbe ɖe. Àgagbɔ ɖo le Settings me.",
+    "contactsAllowed": "Contacts xɔ ɖe. SafePay ate ŋu akpɔ wò amewo le ŋkɔ me.",
+    "contactsDenied": "Mava o. Nàgblɔ fono nɔmbrawo ko, alo nàxɔ contacts ɖe emegbe le Settings me.",
+    "contactsAllow": "Xɔ contacts la"
   },
   "voice": {
     "listen": "Gbe ƒe sedede",
@@ -432,6 +435,12 @@
     "contactNumber": "Deko nye fono nɔmbra? Gblɔ no eve eve.",
     "askReference": "Gbeɖeɖe aɖe li na gaɖoɖo sia? Gblɔ skip ne mèle o.",
     "heard": "Nègblɔ",
-    "stepOf": "Fifi {{x}} ƒe {{y}} me"
+    "stepOf": "Fifi {{x}} ƒe {{y}} me",
+    "contactLooking": "Mekpɔ nusiwo le wo contacts me ɖa.",
+    "contactDenied": "Contacts mele ɖe o, eyata gblɔ eƒe fono nɔmbra.",
+    "contactNotFoundFixed": "Nyemete ŋu aɖo ŋkɔ la ŋu o. Gblɔ eƒe fono nɔmbra gake.",
+    "contactMany": "Medze ame geɖe si wo ŋkɔe.",
+    "contactPick": "Gblɔ ame si nèpɔ ƒe nɔmbra.",
+    "recipientCheck": "Gblɔ ɛ̃ be nàɖoe ame la, alo gblɔ ave be nàpoe gake."
   }
 }

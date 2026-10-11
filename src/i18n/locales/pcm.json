@@ -335,7 +335,10 @@
     "doneTitle": "You don ready",
     "doneBody": "SafePay don ready. Your balance and your transactions fit read aloud, and your PIN no dey talk. Talk me sika a aka make you hear your balance.",
     "doneFinish": "Open SafePay",
-    "exited": "Setup pause. You fit run am again inside Settings."
+    "exited": "Setup pause. You fit run am again inside Settings.",
+    "contactsAllowed": "Contacts don gree. SafePay fit find your people by name.",
+    "contactsDenied": "No wahala. You fit talk phone numbers instead, or allow contacts later inside Settings.",
+    "contactsAllow": "Allow contacts"
   },
   "voice": {
     "listen": "Voice command",
@@ -370,6 +373,12 @@
     "contactNumber": "What is {{name}}'s mobile money number? Say it digit by digit.",
     "askReference": "Any reference or note for this transfer? Say it, or say skip.",
     "heard": "You said",
-    "stepOf": "Step {{x}} of {{y}}"
+    "stepOf": "Step {{x}} of {{y}}",
+    "contactLooking": "Make ah check your contacts.",
+    "contactDenied": "Contacts no dey allowed, so talk im phone number.",
+    "contactNotFoundFixed": "I no know that name. Talk im phone number instead.",
+    "contactMany": "I see plenty people with that name.",
+    "contactPick": "Talk the number of the person you want.",
+    "recipientCheck": "Talk yes make you gree the person, or talk no make you pick again."
   }
 }

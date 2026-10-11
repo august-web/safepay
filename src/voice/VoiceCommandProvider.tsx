@@ -8,6 +8,7 @@ import { stopSpeaking, isSpeaking } from '../services/speech';
 import { hapticError, hapticTick } from '../services/haptics';
 import { createCaptureLoop, type CaptureFailure } from './captureLoop';
 import { matchVoiceIntent, type VoiceIntent } from './commands';
+import { destutter } from './flowParse';
 import { sayKeyAsync } from './say';
 import { isSelfVoiceAudible, stopVoiceClip } from './voicePack';
 
@@ -32,6 +33,13 @@ type VoiceCommandContextValue = {
   endDictation: () => void;
   /** True while a screen owns the next utterance for dictation. */
   dictationActive: boolean;
+  /**
+   * Pushes a literal phrase through the exact production pipeline (destutter →
+   * dictation/flow/matching). Rehearsal tool: exercises the voice wiring with
+   * NO microphone and NO gateway request, so ASR quota is never spent on
+   * testing.
+   */
+  injectTranscript: (text: string) => void;
 };
 
 const VoiceCommandContext = createContext<VoiceCommandContextValue | null>(null);
@@ -341,7 +349,12 @@ export function VoiceCommandProvider({
 
   /** A transcript from the loop: dictation first (commands are off while armed). */
   const handleTranscript = useCallback(
-    (transcript: string) => {
+    (raw: string) => {
+      // Stutter tolerance: collapse immediately repeated words once, before
+      // dictation, flows, matching and the visible transcript all read it.
+      // Digit tokens never collapse — a repeated digit inside a phone number
+      // must survive verbatim — see flowParse.destutter.
+      const transcript = destutter(raw);
       setLastTranscript(transcript);
       const dictation = dictationHandlerRef.current;
       if (dictation != null) {
@@ -356,6 +369,11 @@ export function VoiceCommandProvider({
   useEffect(() => {
     handleTranscriptRef.current = handleTranscript;
   }, [handleTranscript]);
+
+  /** Zero-quota rehearsal path: same pipeline the capture loop feeds. */
+  const injectTranscript = useCallback((text: string) => {
+    handleTranscriptRef.current(text);
+  }, []);
 
   useEffect(() => {
     handleFailureRef.current = handleFailure;
@@ -431,6 +449,7 @@ export function VoiceCommandProvider({
       beginDictation,
       endDictation,
       dictationActive,
+      injectTranscript,
     }),
     [
       available,
@@ -438,6 +457,7 @@ export function VoiceCommandProvider({
       blockedReason,
       dictationActive,
       endDictation,
+      injectTranscript,
       listening,
       lastTranscript,
       startListening,

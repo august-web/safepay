@@ -335,7 +335,10 @@
     "doneTitle": "Woasiesie",
     "doneBody": "SafePay asiesie. Wobɛtumi ate wo sika ne wo dwuma nyinaa, na wo PIN rennsɛ da. Ka me sika a aka, na wote wo sika.",
     "doneFinish": "Bue SafePay",
-    "exited": "Nhyehyɛeɛ no agyae. San fi aseɛ wɔ Settings mu."
+    "exited": "Nhyehyɛeɛ no agyae. San fi aseɛ wɔ Settings mu.",
+    "contactsAllowed": "Contacts agye tom. SafePay betumi ahu wo nkurɔfoɔ wɔ din mu.",
+    "contactsDenied": "Ɛnnɛ nnyɛ hwee. Wobɛtumi aka fono nomba, anaagyɛ agye contacts atom akyire wɔ Settings mu.",
+    "contactsAllow": "Gye contacts tom"
   },
   "voice": {
     "listen": "Nne ahyɛde",
@@ -432,6 +435,12 @@
     "contactNumber": "Dɛn ne ne fono nomba? Ka no mmienu mmienu.",
     "askReference": "Nkyerɛkyerɛmu bi wɔ hɔ ama saa som yi? Ka skip sɛ ɛnnhia.",
     "heard": "Wo kae",
-    "stepOf": "Nkyɛmu {{x}} wɔ {{y}} mu"
+    "stepOf": "Nkyɛmu {{x}} wɔ {{y}} mu",
+    "contactLooking": "Merehwɛ wo contacts mu.",
+    "contactDenied": "Contacts nni kwan, enti ka ne fono nomba.",
+    "contactNotFoundFixed": "Menim din no. Ka ne fono nomba.",
+    "contactMany": "Ahu nnipa pii a wɔ din no.",
+    "contactPick": "Ka nipa no nomba.",
+    "recipientCheck": "Ka aane gye nipa no to mu, anaagyɛ dabi san paw bio."
   }
 }
