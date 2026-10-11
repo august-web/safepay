@@ -82,7 +82,7 @@ def write_wav(path: pathlib.Path, samples, sample_rate: int) -> dict:
     }
 
 
-def synth_language(lang: str, model_id: str, keys: list[str], check_only: bool) -> dict:
+def synth_language(lang: str, model_id: str, keys: list[str], check_only: bool, force: bool = False) -> dict:
     locale = json.loads((LOCALES / f"{lang}.json").read_text(encoding="utf-8"))
 
     planned: list[tuple[str, str]] = []
@@ -102,7 +102,10 @@ def synth_language(lang: str, model_id: str, keys: list[str], check_only: bool) 
         if spoken == "":
             print(f"  ! {lang}: {key} has no speakable characters (skipped)")
             continue
-        planned.append((key, spoken))
+        # Period padding restores edge phonemes the VITS decoder otherwise
+        # drops ("kɔma sika" rendered as "ɔma si"); noise_scale is lowered
+        # below in the synthesis call (0.5 vs 0.667 default).
+        planned.append((key, f". {spoken} ."))
 
     # 2. Number atoms so amounts compose natively: num.0 .. num.19, tens, 100, 1000.
     nums = locale.get("num", {})
@@ -162,7 +165,7 @@ def synth_language(lang: str, model_id: str, keys: list[str], check_only: bool) 
         # Resume support: a clip that already exists on disk at the right size
         # is reused, so interrupted runs continue instead of restarting.
         path = OUT_DIR / lang / f"{key.replace('.', '_').replace(' ', '_')}.wav"
-        if path.exists() and path.stat().st_size > 10_000:
+        if not force and path.exists() and path.stat().st_size > 10_000:
             import wave
             with wave.open(str(path), "rb") as w:
                 seconds = w.getnframes() / w.getframerate()
@@ -175,6 +178,7 @@ def synth_language(lang: str, model_id: str, keys: list[str], check_only: bool) 
             print(f"    =  {key} (existing, {seconds:.1f}s)")
             continue
         inputs = tokenizer(spoken, return_tensors="pt")
+        model.noise_scale = 0.5
         with torch.no_grad():
             waveform = model(**inputs).waveform[0]
         path = OUT_DIR / lang / f"{key.replace('.', '_').replace(' ', '_')}.wav"
@@ -225,6 +229,7 @@ def write_generated_ts(all_results: dict[str, dict]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate Ghanaian voice clips")
     parser.add_argument("--lang", action="append", help="restrict to a language code")
+    parser.add_argument("--force", action="store_true", help="re-render even existing clips")
     parser.add_argument("--check", action="store_true", help="print the plan only")
     args = parser.parse_args()
 
@@ -247,7 +252,7 @@ def main() -> int:
 
     all_results: dict[str, dict] = {}
     for lang, model_id in languages.items():
-        all_results[lang] = synth_language(lang, model_id, keys, args.check)
+        all_results[lang] = synth_language(lang, model_id, keys, args.check, args.force)
 
     if args.check:
         return 0
