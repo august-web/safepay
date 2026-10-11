@@ -1,4 +1,5 @@
-import { AccessibilityInfo, ScrollView, Text, View } from 'react-native';
+import { AccessibilityInfo, ScrollView, Text, TextInput, View } from 'react-native';
+import { useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 
@@ -12,15 +13,29 @@ import { AccessibleButton } from './AccessibleButton';
  * The blind user hears the flow; sighted judges and the presenter see which
  * question the app just asked and what it heard. Announced politely to
  * TalkBack as well, so the visible state never contradicts the spoken one.
+ *
+ * The typed-answer row is the brief's touch/text fallback: a user who cannot
+ * speak (or a rehearsal) answers by keyboard and walks the identical flow —
+ * no microphone, no gateway request.
  */
 export function VoiceFlowHud({
   status,
   onCancel,
+  onTypedAnswer,
 }: {
   status: VoiceFlowStatus;
   onCancel: () => void;
+  onTypedAnswer?: (text: string) => void;
 }) {
   const { t } = useTranslation();
+  const [typed, setTyped] = useState('');
+
+  const sendTyped = () => {
+    const answer = typed.trim();
+    if (answer.length === 0 || onTypedAnswer == null) return;
+    setTyped('');
+    onTypedAnswer(answer);
+  };
 
   return (
     <View
@@ -31,14 +46,22 @@ export function VoiceFlowHud({
       }`}
       accessibilityHint={t('voice.transcriptHint', 'Shows the questions and recognized answers in this conversation')}
     >
+      {/* Small labels share one row and the title gets the full width below:
+          a 28px title and a long step string ("Ɖoɖo fifi 1 ƒe 6 me") can
+          together exceed a narrow screen, and the trailing label would be
+          clipped at the screen edge. */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.eyebrow}>{t('app.name')}</Text>
-          <Text accessibilityRole="header" style={styles.title}>
-            {t('voice.conversation', 'Voice conversation')}
+        <View style={styles.headerTop}>
+          <Text style={styles.eyebrow} numberOfLines={1}>
+            {t('app.name')}
+          </Text>
+          <Text style={styles.step} numberOfLines={1}>
+            {t('vcmd.stepOf', { x: status.step, y: status.of })}
           </Text>
         </View>
-        <Text style={styles.step}>{t('vcmd.stepOf', { x: status.step, y: status.of })}</Text>
+        <Text accessibilityRole="header" style={styles.title}>
+          {t('voice.conversation', 'Voice conversation')}
+        </Text>
       </View>
 
       {/* Decorative mirror of the spoken "step x of y" line — hidden from
@@ -79,6 +102,35 @@ export function VoiceFlowHud({
         <Text style={styles.prompt}>{status.prompt}</Text>
       </View>
 
+      {onTypedAnswer != null ? (
+        <View style={styles.typeRow}>
+          <TextInput
+            value={typed}
+            onChangeText={setTyped}
+            placeholder={t('voice.typeAnswer', { defaultValue: 'Or type your answer' })}
+            placeholderTextColor={theme.colors.placeholder}
+            autoCapitalize="none"
+            autoCorrect={false}
+            onSubmitEditing={sendTyped}
+            accessibilityLabel={t('voice.typeAnswer', { defaultValue: 'Or type your answer' })}
+            accessibilityHint={t('voice.typeAnswerHint', {
+              defaultValue: 'Types the answer instead of speaking it',
+            })}
+            style={styles.typeField}
+          />
+          <AccessibleButton
+            label={t('voice.sendAnswer', { defaultValue: 'Send answer' })}
+            hint={t('voice.sendAnswerHint', {
+              defaultValue: 'Double-tap to answer the current question with the typed text',
+            })}
+            variant="outline"
+            disabled={typed.trim().length === 0}
+            onPress={sendTyped}
+            style={styles.typeSend}
+          />
+        </View>
+      ) : null}
+
       <AccessibleButton
         label={t('common.cancel', 'Cancel')}
         hint={t('common.cancelHint', 'Double-tap to stop this voice conversation')}
@@ -103,14 +155,19 @@ const styles = themedStyles((colors) => ({
     gap: theme.spacing.md,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
     paddingBottom: theme.spacing.md,
     borderBottomWidth: 2,
     borderBottomColor: colors.border,
+    gap: theme.spacing.xs,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
   },
   eyebrow: {
+    flexShrink: 1,
     fontSize: theme.typography.small,
     fontWeight: '800',
     color: colors.textMuted,
@@ -164,10 +221,10 @@ const styles = themedStyles((colors) => ({
     color: colors.safepayBlue,
   },
   step: {
+    flexShrink: 0,
     fontSize: theme.typography.small,
     fontWeight: '900',
     color: colors.navyMidnight,
-    paddingTop: theme.spacing.xs,
   },
   progressTrack: {
     height: 5,
@@ -188,5 +245,24 @@ const styles = themedStyles((colors) => ({
   },
   cancelButton: {
     minHeight: 52,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+    alignItems: 'center',
+  },
+  typeField: {
+    flex: 1,
+    minHeight: theme.touchTarget.minSize,
+    borderRadius: theme.radii.md,
+    borderWidth: 1.5,
+    borderColor: colors.controlBorder,
+    backgroundColor: colors.surface,
+    paddingHorizontal: theme.spacing.md,
+    color: colors.text,
+    fontSize: theme.typography.body,
+  },
+  typeSend: {
+    minHeight: theme.touchTarget.minSize,
   },
 }));
