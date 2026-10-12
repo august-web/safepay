@@ -1,6 +1,6 @@
 # SafePay Build Status
 
-Last updated: 2026-10-02 (evening)
+Last updated: 2026-10-12
 
 ## Current Checkpoint
 
@@ -151,6 +151,44 @@ Focus decision (agreed with the team): **Akan (Twi) is the one native language w
 - **Self-hosted ASR fallback built** (`tools/asr-fallback/server.py`): serves the lab's exact `POST /api/v1/asr` shape from this laptop with Meta MMS `facebook/mms-1b-all` (Akan adapter, CC-BY-NC 4.0 documented in `FALLBACKS.md`). `.m4a` uploads decode via macOS's built-in `afconvert`; stdlib HTTP only; success body mirrors `{"transcription": ...}` so the client swaps endpoints, never code. When the lab returns `quota`, the existing `labSpeech.ts` retry against `EXPO_PUBLIC_SPEECH_API_BASE_URL_ALT` picks this server up.
 - Fallback status: server code done and syntax-checked; the one-time ~4 GB checkpoint download is running (≈2 h); a live round-trip test with a bundled Twi clip (`assets/voice/tw/*.wav` → expect send/balance text) is the next action once it lands.
 - Validation: `npm run typecheck`, `npm run lint` PASS; evaluator still 17/17.
+
+## Phase II Prep — Radial Voice Wheel (2026-10-12)
+
+The spinning-wheel prototype (`docs/radial-voice-prototype.html`, a browser mock) is now a real screen in the app.
+
+**What was built**
+
+- `src/components/RadialVoiceMenu.tsx` — the wheel: six large nodes on a 300 dp dial, `Animated.timing` spin (2.8 s, two extra rotations, JS driver), a top selector, haptic ticks as nodes pass, quick-command chips, and a status line. Ported from the prototype and adapted to the app's theme tokens and `AccessibleButton` conventions.
+- `src/screens/RadialMenuScreen.tsx` — the seam: header (back / settings), the wheel, and mic ownership. While open it registers a `TranscriptSink`, so utterances feed the wheel instead of the global command handler; it unregisters on unmount. Two utterances still bypass the wheel on purpose — "home" backs out, "stop" goes quiet — because a blind user must never lose the escape and mute controls.
+- `App.tsx` — `onboardingSink` renamed to `micOverride` (any screen may own the mic now), new `'menu'` screen, and selection routes through the existing `handleVoiceIntent`, so the wheel reuses the same intent pipeline as speech and the Home tiles.
+- `src/screens/HomeScreen.tsx` — one hero entry point, "🎡 Nne Kawa", above the wallet card.
+- Locales: `home.voiceWheel`, `home.voiceWheelHint`, and a `radial` section (`openHint`, `tryAgain`) in all five languages.
+
+**Speech design: zero quota**
+
+Every option carries a `clipKey` for an existing bundled Twi clip (`home.sendMoney`, `home.statement`, `home.buyAirtime`, `home.cashOut`, `home.listenBalance`, `settings.title`; all six verified present in `voicePack.generated.ts`), so a full spin-and-select costs no TTS request. On-device proof from the release APK on the TECNO (logcat, pid 19441): four clips, all `AudioTrack set(): sampleRate 16000` — the bundled pack's rate — and `grep -c "lab-subscription\|synthesizeTts"` over the whole capture = **0**.
+
+Wheel speech was reduced in two passes:
+
+1. *Sweep chatter*: the rotation listener used to speak every node arriving at the selector, which during a spin means 18 clipped labels in 2.8 s. Now the sweep is haptic-only; naming happens when the wheel is idle and being browsed.
+2. *Landing echo*: after landing, `home.sendMoney` played twice, ~0.9 s apart. Root cause was not the wheel — `VoiceFlowController.start()` already names the destination (`sayKey('home.sendMoney')` before its first question), and `App`'s `open(clipKey)` does the same for the non-flow intents, so the wheel's own landing clip was a third layer saying the same thing. Fixed by removing the redundant layer (the wheel now haptic-confirms, then hands over after 350 ms) and claiming the landing node in `lastAnnouncedRef` so the idle wheel cannot name it behind the destination. Re-verified: one 1.232 s `home.sendMoney` (08:06:05.3 → 08:06:06.3), then the 1.936 s `vcmd.whoToPay` step-1 question — no echo, and the flow HUD shows "Nkyɛmu 1 wɔ 6 mu".
+
+**Feel test on the TECNO BF6 (720×1612)**
+
+Good: the wheel is the first control on Home, reachable with one tap; nodes are 72 dp (well past the 48 dp minimum) and the big icons survive the small screen; spin → land → voice-flow handoff works end to end from both a tapped node and a spoken/chipped command ("Heard: Check balance — spinning to Kenkan Sika"); the mic hands over cleanly and the HUD's step counter no longer clips (the 2026-10-02 header fix holds).
+
+Known gaps, in priority order for the next pass:
+
+1. **Twi naming needs a native pass.** "Nne Kawa" was invented for this screen and `kawa` reads as *coffee* in Twi; the wheel's own node labels are also English ("Send Money", "Preferences") while the app's Twi strings use different diacritics ("Koma Sika" vs the locale's "Kɔma Sika"). Same bucket as the 12 flagged clips in `dist/tw-clip-qa.json`.
+2. **Mixed-language chrome.** Wheel status ("Say or type a command to begin"), quick chips, node labels and the HUD's English frame text ("Voice conversation", "Current question", "Or type your answer") sit on a Twi phone. `MAIN_MENU` is hardcoded rather than `t()`-driven.
+3. **Node text rotates with the dial**, so side labels are tilted and hard to read for the low-vision users this screen is meant to serve.
+4. **Ewe clip pack is on disk but unregistered** (`voicePack.generated.ts` is Twi-only, 189 clips), so the wheel falls back to the TTS ladder in Ewe.
+5. Legacy `Animated` (JS driver) instead of Reanimated, and the low-RAM TECNO still kills the app mid-demo — both pre-existing.
+
+**Validation**
+
+`npm run typecheck` PASS · `npx eslint` on all touched files clean (the port surfaced six `react-hooks` lint errors in the prototype's ref usage, fixed with `useState` for the animated value, an effect for the ref write, and a derived status) · `npm run a11y:contrast` PASS · locale diffs additive (+7/−1 per language) · release APK built and installed on the device, screenshots at `/tmp/rv-fix2-after.png`.
+
 
 ## Phase 3 Progress
 
