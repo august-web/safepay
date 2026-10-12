@@ -20,6 +20,7 @@ import { BuyAirtimeScreen } from './src/screens/BuyAirtimeScreen';
 import { CashOutScreen } from './src/screens/CashOutScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
+import { RadialMenuScreen } from './src/screens/RadialMenuScreen';
 import { SendMoneyScreen } from './src/screens/SendMoneyScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { SmsImportScreen } from './src/screens/SmsImportScreen';
@@ -119,7 +120,7 @@ export default function App() {
   );
 }
 
-type Screen = 'onboarding' | 'home' | 'send' | 'statement' | 'airtime' | 'cashout' | 'settings' | 'sms';
+type Screen = 'onboarding' | 'home' | 'send' | 'statement' | 'airtime' | 'cashout' | 'settings' | 'sms' | 'menu';
 
 function RootNavigator() {
   const { palette } = useContrastTheme();
@@ -131,8 +132,8 @@ function RootNavigator() {
   const home = () => setScreen('home');
   /** Visible mirror of the active voice conversation (VoiceFlowHud). */
   const [flowStatus, setFlowStatus] = useState<VoiceFlowStatus | null>(null);
-  /** Onboarding owns the mic's utterances while it is mounted (Phase 2). */
-  const [onboardingSink, setOnboardingSink] = useState<TranscriptSink | null>(null);
+  /** Screen (onboarding, radial menu) that owns the mic's utterances while mounted. */
+  const [micOverride, setMicOverride] = useState<TranscriptSink | null>(null);
 
   /**
    * Conversational flow driver: money features started by voice become a
@@ -225,7 +226,19 @@ function RootNavigator() {
   const content = (() => {
     switch (screen) {
       case 'onboarding':
-        return <OnboardingScreen onDone={home} onVoiceSink={setOnboardingSink} />;
+        return <OnboardingScreen onDone={home} onVoiceSink={setMicOverride} />;
+      case 'menu':
+        return (
+          <RadialMenuScreen
+            onBack={home}
+            onOpenSettings={() => setScreen('settings')}
+            onSelect={(opt) => {
+              if (opt.intent != null) handleVoiceIntent(opt.intent);
+              else home();
+            }}
+            onVoiceSink={setMicOverride}
+          />
+        );
       case 'send':
         return <SendMoneyScreen onDone={home} />;
       case 'statement':
@@ -252,6 +265,7 @@ function RootNavigator() {
             onCashOut={() => flowController.start({ kind: 'cashout' })}
             onOpenSettings={() => setScreen('settings')}
             onOpenSms={() => setScreen('sms')}
+            onOpenVoiceMenu={() => setScreen('menu')}
           />
         );
     }
@@ -263,12 +277,13 @@ function RootNavigator() {
     <View key={palette} style={styles.screenBoundary}>
       {/* Voice-first: the mic opens on launch (autoStart) and stays open
           between utterances (alwaysOn), so a blind user never has to find
-          the mic button to issue the next command. During onboarding the
-          mic's utterances route to the setup flow instead of commands. */}
+          the mic button to issue the next command. During onboarding (and
+          while the radial menu owns the mic) utterances route to that
+          screen instead of straight into commands. */}
       <VoiceCommandProvider
         onIntent={handleVoiceIntent}
         autoStart={getCachedSettings().autoListen}
-        flowController={onboardingSink ?? flowController}
+        flowController={micOverride ?? flowController}
       >
         {flowStatus == null ? content : (
           <VoiceFlowHud

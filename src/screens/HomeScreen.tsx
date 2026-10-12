@@ -31,6 +31,7 @@ export interface HomeScreenProps {
   onCashOut: () => void;
   onOpenSettings: () => void;
   onOpenSms: () => void;
+  onOpenVoiceMenu: () => void;
 }
 
 export function HomeScreen({
@@ -40,6 +41,7 @@ export function HomeScreen({
   onCashOut,
   onOpenSettings,
   onOpenSms,
+  onOpenVoiceMenu,
 }: HomeScreenProps) {
   const { t } = useTranslation();
   const [balance, setBalance] = useState<number | null>(null);
@@ -140,6 +142,21 @@ export function HomeScreen({
         accessibilityHint="Main home screen content area"
       >
         <PrivacyAudioBanner isPrivateAudio={isPrivateAudio} />
+
+        {/* Spinning voice wheel: one entry point where voice commands and
+            large targets meet, friendly to low-vision users who struggle
+            with the small action tiles. */}
+        <AccessibleButton
+          label={t('home.voiceWheel')}
+          hint={t('home.voiceWheelHint')}
+          variant="hero"
+          onPress={() => {
+            void hapticConfirm();
+            onOpenVoiceMenu();
+          }}
+          style={styles.voiceWheelBtn}
+          icon={<Text style={styles.voiceWheelEmoji}>🎡</Text>}
+        />
 
         {/* Iconic MTN MoMo Yellow Wallet Card */}
         <View style={styles.momoCard}>
@@ -526,6 +543,13 @@ const styles = themedStyles((colors) => ({
   content: {
     padding: theme.spacing.md,
     paddingBottom: theme.spacing.xxl,
+  },
+  voiceWheelBtn: {
+    marginBottom: theme.spacing.lg,
+    minHeight: 56,
+  },
+  voiceWheelEmoji: {
+    fontSize: 20,
   },
   momoCard: {
     backgroundColor: colors.momoYellow,
