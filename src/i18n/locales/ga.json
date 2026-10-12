@@ -73,7 +73,9 @@
       "failed": "Efeeko yie"
     },
     "loading": "Ebaaba amrɔ nɛɛ…",
-    "accountHolder": "Akɔ̃nta lɛ nɔ"
+    "accountHolder": "Akɔ̃nta lɛ nɔ",
+    "voiceWheel": "Fɛŋ Wheel",
+    "voiceWheelHint": "Ebu fɛŋ wheel lɛ nɔ ateŋu akane, o te kpo eŋu"
   },
   "statement": {
     "title": "MoMo Shika Wɔlɔ",
@@ -380,5 +382,9 @@
     "contactMany": "Mitsɔɔ amei fe fɛɛ ni shwɔ din lɛ.",
     "contactPick": "Ka nɔ lɛ ko ni wɔpɔ.",
     "recipientCheck": "Ka yes kɛ ha wɔye nɔ lɛ, alo no san pii."
+  },
+  "radial": {
+    "openHint": "Fɛŋ wheel lɛ abue. Ateŋu akane: tsu shika, gba shika, tɔ airtime, yi shika; o kpo eŋu.",
+    "tryAgain": "Mate niŋ o shishɛ, taflatse kane ko."
   }
 }

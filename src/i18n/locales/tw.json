@@ -73,7 +73,9 @@
       "failed": "Anyɛ yie"
     },
     "loading": "Ɛreba…",
-    "accountHolder": "Akonta sofo"
+    "accountHolder": "Akonta sofo",
+    "voiceWheel": "Nne Kawa",
+    "voiceWheelHint": "Ɛbue nne kawa no - wobɛtumi aka ahyɛdeɛ anaagyɛ kura pɔtee biara"
   },
   "statement": {
     "title": "MoMo Sika Krataa",
@@ -442,5 +444,9 @@
     "contactMany": "Ahu nnipa pii a wɔ din no.",
     "contactPick": "Ka nipa no nomba.",
     "recipientCheck": "Ka aane gye nipa no to mu, anaagyɛ dabi san paw bio."
+  },
+  "radial": {
+    "openHint": "Nne kawa no abue. Wobɛtumi aka: kɔma sika, kenkan sika, tɔ airtime, yi sika; anaagyɛ kura pɔtee biara.",
+    "tryAgain": "Mante aseɛ, mepa wo kyɛw san ka bio."
   }
 }

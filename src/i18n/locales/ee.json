@@ -73,7 +73,9 @@
       "failed": "Womeɖo ŋu o"
     },
     "loading": "Éle dɔwɔwɔwo ƒe ɖoɖo wɔm…",
-    "accountHolder": "Akɔ̃nta ɖola"
+    "accountHolder": "Akɔ̃nta ɖola",
+    "voiceWheel": "Gadze Wili",
+    "voiceWheelHint": "Ɔpena gadze wili la - àte ŋu agblɔ aɖe alo ɖu dzi edzi"
   },
   "statement": {
     "title": "MoMo Ga Kpɔkplɔ",
@@ -442,5 +444,9 @@
     "contactMany": "Medze ame geɖe si wo ŋkɔe.",
     "contactPick": "Gblɔ ame si nèpɔ ƒe nɔmbra.",
     "recipientCheck": "Gblɔ ɛ̃ be nàɖoe ame la, alo gblɔ ave be nàpoe gake."
+  },
+  "radial": {
+    "openHint": "Gadze wili la ʋu. Àte ŋu agblɔ: gatsɔ ga, kpɔ wò ga, tɔ airtime, xe ga; alo ɖu dzi edzi.",
+    "tryAgain": "Nyemate ŋu o, taflatse ɖo go."
   }
 }
