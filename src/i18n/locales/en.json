@@ -73,9 +73,7 @@
       "failed": "Failed"
     },
     "loading": "Loading transactions…",
-    "accountHolder": "Account holder",
-    "voiceWheel": "Voice Wheel",
-    "voiceWheelHint": "Opens the spinning voice menu - say a command or tap an option"
+    "accountHolder": "Account holder"
   },
   "statement": {
     "title": "MoMo Statement",
@@ -408,9 +406,5 @@
     "contactMany": "I found more than one person with that name.",
     "contactPick": "Say the number of the person you want.",
     "recipientCheck": "Say yes to confirm this recipient, or no to choose again."
-  },
-  "radial": {
-    "openHint": "Voice menu open. Say a command like send money or check balance - or tap an option.",
-    "tryAgain": "Sorry, I did not understand. Please try again."
   }
 }

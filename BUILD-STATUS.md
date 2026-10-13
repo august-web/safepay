@@ -189,6 +189,11 @@ Known gaps, in priority order for the next pass:
 
 `npm run typecheck` PASS · `npx eslint` on all touched files clean (the port surfaced six `react-hooks` lint errors in the prototype's ref usage, fixed with `useState` for the animated value, an effect for the ref write, and a derived status) · `npm run a11y:contrast` PASS · locale diffs additive (+7/−1 per language) · release APK built and installed on the device, screenshots at `/tmp/rv-fix2-after.png`.
 
+**Removed again (2026-10-13)**
+
+- The user asked for the previous Home back, then for the wheel to go: `RadialVoiceMenu.tsx`, `RadialMenuScreen.tsx`, the 🎡 entry point on Home, the `'menu'` screen and the `home.voiceWheel*` / `radial.*` strings in all five locales are deleted. Everything above stays accurate as the record of what was built and measured; `git log -- src/components/RadialVoiceMenu.tsx` has the code.
+- A fuller variant (the dial as the launch screen, no tile Home) was also built and device-tested this session; it is parked in `git stash` entry "wheel-as-launch-screen (parked 2026-10-13 per request)".
+
 
 ## Phase 3 Progress
 

@@ -73,9 +73,7 @@
       "failed": "E no go"
     },
     "loading": "E dey load…",
-    "accountHolder": "Account owner",
-    "voiceWheel": "Voice Wheel",
-    "voiceWheelHint": "Open the spinning voice menu - you fit talk command or tap any option"
+    "accountHolder": "Account owner"
   },
   "statement": {
     "title": "MoMo Statement",
@@ -382,9 +380,5 @@
     "contactMany": "I see plenty people with that name.",
     "contactPick": "Talk the number of the person you want.",
     "recipientCheck": "Talk yes make you gree the person, or talk no make you pick again."
-  },
-  "radial": {
-    "openHint": "Voice menu dey open. You fit talk command like send money or check balance - or tap any option.",
-    "tryAgain": "Sorry, I no understand. Try again."
   }
 }
