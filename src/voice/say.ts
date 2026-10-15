@@ -19,8 +19,16 @@ export type SayPart =
 
 export type SayPlan = SayPart[];
 
-/** Small pause between composed segments, so numbers do not blur together. */
+/** Pause after a whole plan part, i.e. between phrase boundaries. */
 const SEGMENT_GAP_MS = 220;
+/**
+ * Pause between the atoms that make up one amount. 432 is `ɔha` + `aduasa` +
+ * `mmienu`: at the phrase gap above it lands as three unrelated words with
+ * silence between them instead of one number.
+ */
+const ATOM_GAP_MS = 70;
+/** Phone numbers and agent codes are read digit by digit, so they need air. */
+const DIGIT_GAP_MS = 120;
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -136,11 +144,14 @@ export async function playPlan(plan: SayPlan, language: AppLanguage): Promise<bo
         return false; // Cannot compose free text - caller decides the fallback.
     }
 
-    for (const key of keys) {
+    for (const [index, key] of keys.entries()) {
       if (!hasVoiceClip(key, language)) return false;
       const played = await playVoiceClip(key, language);
       if (!played) return false;
-      await sleep(SEGMENT_GAP_MS);
+      const lastAtom = index === keys.length - 1;
+      await sleep(
+        lastAtom ? SEGMENT_GAP_MS : part.kind === 'phone' ? DIGIT_GAP_MS : ATOM_GAP_MS,
+      );
     }
   }
   return true;
