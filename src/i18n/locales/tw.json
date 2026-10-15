@@ -48,7 +48,7 @@
     "statementHint": "Ebue sika ho asɛm a yɛkenkan no kratafa",
     "readStatement": "Tie Sika Krataa",
     "readStatementHint": "Ɛbɛkenkan ndwuma a woadi nansa yi nyinaa akyerɛ wo",
-    "buyAirtime": "Airtime & Data",
+    "buyAirtime": "Airtime ne Data",
     "buyAirtimeHint": "Tɔ fon so sika anaasɛ intanɛt data",
     "cashOut": "Yi Sika",
     "cashOutHint": "Mmoa ma sika a wobɛyi afi MoMo wɛnda hɔ",
@@ -211,7 +211,7 @@
     "voiceReadBack": "Woreyi {{amount}} fi agent {{agentCode}} hɔ. Ka aane, anaasɛ bɔ Continue."
   },
   "settings": {
-    "title": "Ahobammbɔ & Nhyehyɛeɛ",
+    "title": "Ahobammbɔ ne Nhyehyɛeɛ",
     "titleShort": "Nhyehyɛeɛ",
     "subtitle": "Siesie SafePay sɛnea ɛbɛyɛ ma wo",
     "navSection": "Kwan a yɛfa so kɔ ne ba (WCAG 2.2)",
