@@ -1,27 +1,43 @@
 import { useEffect, useState } from 'react';
-import {Image, Platform, Pressable, ScrollView, Text, View} from 'react-native';
+import { Pressable, ScrollView, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { announce } from '../a11y/announcer';
-import { AccessibleButton } from '../components/AccessibleButton';
+import { useEarLight, useSpotlight } from '../a11y/spotlight';
 import { HeaderBar } from '../components/HeaderBar';
 import { PrivacyAudioBanner } from '../components/PrivacyAudioBanner';
 import { theme, themedStyles } from '../constants/theme';
 import { getAppLanguage } from '../i18n';
-import { hapticAmount, hapticConfirm, hapticTick } from '../services/haptics';
+import { hapticAmount, hapticNav, hapticTick, type NavSignature } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { getCachedSettings, loadSettings, type NavPreset } from '../services/settings';
 import { speak, stopSpeaking } from '../services/speech';
-import { DEMO_ACCOUNT_NAME, getBalance, listTransactions, type Transaction } from '../services/transactions';
+import {
+  DEMO_ACCOUNT_NAME,
+  formatMoney,
+  getBalance,
+  listTransactions,
+  type Transaction,
+} from '../services/transactions';
 import { sayPlan, type SayPlan } from '../voice/say';
 
-const GHS = 'GH₵';
+/**
+ * Home for ears first: five regions, one focus stop per thing a user can do.
+ * No icons (a merged label replaces the children in the a11y tree anyway, so an
+ * emoji costs layout and buys no information), no nested buttons, no decorative
+ * images, nothing under the 48dp floor.
+ */
 
-function formatMoney(amount: number): string {
-  return `${GHS} ${amount.toLocaleString('en-GH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+const SPOT_BALANCE = 'balance';
+const SPOT_SPEAK = 'speak';
+const SPOT_SMS = 'sms';
+
+interface Service {
+  id: string;
+  nav: NavSignature;
+  label: string;
+  hint: string;
+  run: () => void;
 }
 
 export interface HomeScreenProps {
@@ -49,6 +65,8 @@ export function HomeScreen({
   // Live audio-route state: updates when headphones are plugged or unplugged.
   const isPrivateAudio = useIsPrivateAudio();
   const [navPreset, setNavPreset] = useState<NavPreset>(getCachedSettings().navPreset);
+  const spot = useSpotlight();
+  const light = useEarLight();
 
   useEffect(() => {
     let ignore = false;
@@ -71,17 +89,23 @@ export function HomeScreen({
     };
   }, []);
 
+  /**
+   * The band is also the privacy toggle, so hiding the figure costs one focus
+   * stop instead of two. A blind user is never offered dots: the hidden state
+   * is the word for "hidden".
+   */
   const toggleBalance = () => {
     const nextVisible = !balanceVisible;
     setBalanceVisible(nextVisible);
     void hapticTick();
+    light(SPOT_BALANCE);
     announce(nextVisible ? t('home.balanceShown') : t('home.balanceHidden'));
   };
 
   const speakBalance = () => {
     if (balance == null) return;
-    void hapticTick();
     void hapticAmount();
+    light(SPOT_BALANCE);
     const plan: SayPlan = [
       { kind: 'key', key: 'vcmd.balanceIs' },
       { kind: 'money', amount: balance },
@@ -101,8 +125,8 @@ export function HomeScreen({
   };
 
   const speakSingleTransaction = (txn: Transaction) => {
-    void hapticTick();
-    void hapticConfirm();
+    void hapticAmount();
+    light(`txn:${txn.id}`);
     const language = getAppLanguage();
     const plan: SayPlan = [
       { kind: 'name', name: txn.recipientName },
@@ -127,395 +151,248 @@ export function HomeScreen({
     });
   };
 
-  const balanceDisplay = balanceVisible && balance != null ? formatMoney(balance) : '••••••';
+  const services: Service[] = [
+    { id: 'send', nav: 'send', label: t('home.sendMoney'), hint: t('home.sendMoneyHint'), run: onSendMoney },
+    { id: 'airtime', nav: 'airtime', label: t('home.buyAirtime'), hint: t('home.buyAirtimeHint'), run: onBuyAirtime },
+    { id: 'cashout', nav: 'cashout', label: t('home.cashOut'), hint: t('home.cashOutHint'), run: onCashOut },
+    {
+      id: 'statement',
+      nav: 'statement',
+      label: t('home.statement'),
+      hint: t('home.statementHint'),
+      run: onViewStatement,
+    },
+  ];
+
+  const figure = balanceVisible && balance != null ? formatMoney(balance) : null;
+  const balanceSpoken =
+    figure != null ? `${t('home.balanceLabel')}: ${figure}` : t('home.balanceHiddenLabel');
 
   return (
     <View style={styles.screen}>
       <HeaderBar onOpenSettings={onOpenSettings} />
 
-      <ScrollView
-        style={styles.screen}
-        contentContainerStyle={styles.content}
-        accessibilityLabel={t('home.greeting')}
-        accessibilityHint="Main home screen content area"
-      >
+      <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
         <PrivacyAudioBanner isPrivateAudio={isPrivateAudio} />
 
-        {/* Iconic MTN MoMo Yellow Wallet Card */}
-        <View style={styles.momoCard}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardPill}>
-              <Image
-                source={require('../../assets/safepay-symbol.png')}
-                style={styles.cardLogoSymbol}
-                resizeMode="contain"
-                accessibilityLabel="SafePay logo"
-                accessibilityHint="SafePay verified account emblem"
-                accessibilityIgnoresInvertColors
-              />
-              <Text style={styles.cardPillText}>{t('home.momoAccount', 'MTN Mobile Money')}</Text>
-            </View>
-
-            {/* Demo account holder (Polish 9): a real name, not initials. */}
-            <Text
-              accessibilityRole="text"
-              accessibilityLabel={`${t('home.accountHolder', 'Account holder')}: ${DEMO_ACCOUNT_NAME}`}
-              accessibilityHint="Name of the logged-in demo account"
-              style={styles.accountHolder}
-            >
-              {DEMO_ACCOUNT_NAME}
-            </Text>
-
-            <AccessibleButton
-              label={balanceVisible ? t('home.hideBalance', 'Hide') : t('home.showBalance', 'Show')}
-              hint={balanceVisible ? t('home.hideBalance') : t('home.showBalance')}
-              variant="navy"
-              onPress={toggleBalance}
-              style={styles.cardEyeBtn}
-              textStyle={styles.cardEyeText}
-            />
-          </View>
-
-          <Text style={styles.balanceCaption}>
-            {balanceVisible ? t('home.balanceLabel') : t('home.balanceHiddenLabel')}
+        {/* Region 1 - the money itself, flat on the MoMo band. */}
+        <Pressable
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel={`${t('home.accountHolder')}: ${DEMO_ACCOUNT_NAME}. ${balanceSpoken}`}
+          accessibilityHint={t('home.balanceToggleHint')}
+          onFocus={() => light(SPOT_BALANCE)}
+          onPressIn={() => {
+            void hapticTick();
+            light(SPOT_BALANCE);
+          }}
+          onPress={toggleBalance}
+          style={({ pressed }) => [
+            styles.band,
+            spot === SPOT_BALANCE ? styles.bandLit : null,
+            spot != null && spot !== SPOT_BALANCE ? styles.bandDim : null,
+            pressed ? styles.pressed : null,
+          ]}
+        >
+          <Text style={styles.bandCaption}>{t('home.momoAccount')}</Text>
+          <Text style={styles.bandFigure} numberOfLines={1} adjustsFontSizeToFit>
+            {figure ?? t('home.balanceHiddenShort')}
           </Text>
-
-          <Text
-            accessibilityRole="text"
-            accessibilityLabel={`${t('home.balanceLabel')}: ${balanceDisplay}`}
-            accessibilityHint="Current mobile money balance"
-            style={styles.balanceAmount}
-          >
-            {balanceDisplay}
+          <Text style={styles.bandNote}>
+            {balanceVisible ? DEMO_ACCOUNT_NAME : t('home.tapToReveal')}
           </Text>
+        </Pressable>
 
-          <View style={styles.cardActionsRow}>
-            <AccessibleButton
-              label={t('home.listenBalance', 'Speak Balance')}
-              hint={t('home.listenBalanceHint')}
-              variant="navy"
-              onPress={speakBalance}
-              style={styles.cardActionBtn}
-              icon={<Text style={styles.cardBtnEmoji}>🔊</Text>}
-            />
-          </View>
-        </View>
+        {/* Region 2 - hear the figure without pressing the toggle. */}
+        <TextRow
+          id={SPOT_SPEAK}
+          spot={spot}
+          label={t('home.listenBalance')}
+          hint={t('home.listenBalanceHint')}
+          light={light}
+          onPress={speakBalance}
+        />
 
-        {/* MTN MoMo Signature Circular Action Tiles */}
+        {/* Region 3 - the four things a MoMo user does. */}
         <View style={styles.section}>
-          <Text
-            accessibilityRole="header"
-            aria-level={2}
-            accessibilityHint="Quick access mobile money actions"
-            style={styles.sectionHeading}
-          >
-            {t('home.quickActions', 'MoMo Services')}
+          <Text accessibilityRole="header" aria-level={2} style={styles.sectionHeading}>
+            {t('home.quickActions')}
           </Text>
 
           {navPreset === 'spatial' ? (
+            // Physical positions kept for muscle memory; the text stays, the
+            // "Quadrant 1 Top-Left" narration goes.
             <View style={styles.spatialGrid}>
               <View style={styles.spatialRow}>
-                {/* Quadrant 1: Top-Left - Send */}
-                <Pressable
-                  accessible
-                  accessibilityRole="button"
-                  accessibilityLabel={`Quadrant 1 Top-Left: ${t('home.sendMoney')}`}
-                  accessibilityHint="Double-tap to open Send Money transfer"
-                  onPressIn={() => {
-                    void hapticTick();
-                  }}
-                  onPress={() => {
-                    void hapticTick();
-                    onSendMoney();
-                  }}
-                  style={({ pressed }) => [styles.spatialTile, pressed ? styles.tilePressed : null]}
-                >
-                  <View style={[styles.spatialTileCircle, styles.circlePrimary]}>
-                    <Text style={styles.spatialEmoji}>💸</Text>
-                  </View>
-                  <Text style={styles.spatialLabel}>{t('home.sendMoney')}</Text>
-                  <Text style={styles.spatialHint}>Q1 • Top-Left</Text>
-                </Pressable>
-
-                {/* Quadrant 2: Top-Right - Statement */}
-                <Pressable
-                  accessible
-                  accessibilityRole="button"
-                  accessibilityLabel={`Quadrant 2 Top-Right: ${t('home.statement', 'Statement')}`}
-                  accessibilityHint="Double-tap to open Spoken Statement Narrator"
-                  onPressIn={() => {
-                    void hapticTick();
-                  }}
-                  onPress={() => {
-                    void hapticTick();
-                    onViewStatement();
-                  }}
-                  style={({ pressed }) => [styles.spatialTile, pressed ? styles.tilePressed : null]}
-                >
-                  <View style={[styles.spatialTileCircle, styles.circleYellow]}>
-                    <Text style={styles.spatialEmoji}>📻</Text>
-                  </View>
-                  <Text style={styles.spatialLabel}>{t('home.statement', 'Statement')}</Text>
-                  <Text style={styles.spatialHint}>Q2 • Top-Right</Text>
-                </Pressable>
+                <ServiceRow service={services[0]} spot={spot} light={light} compact />
+                <ServiceRow service={services[3]} spot={spot} light={light} compact />
               </View>
-
               <View style={styles.spatialRow}>
-                {/* Quadrant 3: Bottom-Left - Airtime */}
-                <Pressable
-                  accessible
-                  accessibilityRole="button"
-                  accessibilityLabel={`Quadrant 3 Bottom-Left: ${t('home.buyAirtime', 'Airtime & Data')}`}
-                  accessibilityHint="Double-tap to open Airtime and Internet Data top-up"
-                  onPressIn={() => {
-                    void hapticTick();
-                  }}
-                  onPress={() => {
-                    void hapticTick();
-                    onBuyAirtime();
-                  }}
-                  style={({ pressed }) => [styles.spatialTile, pressed ? styles.tilePressed : null]}
-                >
-                  <View style={[styles.spatialTileCircle, styles.circleMuted]}>
-                    <Text style={styles.spatialEmoji}>📱</Text>
-                  </View>
-                  <Text style={styles.spatialLabel}>{t('home.buyAirtime', 'Airtime')}</Text>
-                  <Text style={styles.spatialHint}>Q3 • Bottom-Left</Text>
-                </Pressable>
-
-                {/* Quadrant 4: Bottom-Right - Cash Out */}
-                <Pressable
-                  accessible
-                  accessibilityRole="button"
-                  accessibilityLabel={`Quadrant 4 Bottom-Right: ${t('home.cashOut', 'Cash Out')}`}
-                  accessibilityHint="Double-tap to open Agent Cash Out without PIN sharing"
-                  onPressIn={() => {
-                    void hapticTick();
-                  }}
-                  onPress={() => {
-                    void hapticTick();
-                    onCashOut();
-                  }}
-                  style={({ pressed }) => [styles.spatialTile, pressed ? styles.tilePressed : null]}
-                >
-                  <View style={[styles.spatialTileCircle, styles.circleMuted]}>
-                    <Text style={styles.spatialEmoji}>🏧</Text>
-                  </View>
-                  <Text style={styles.spatialLabel}>{t('home.cashOut', 'Cash Out')}</Text>
-                  <Text style={styles.spatialHint}>Q4 • Bottom-Right</Text>
-                </Pressable>
+                <ServiceRow service={services[1]} spot={spot} light={light} compact />
+                <ServiceRow service={services[2]} spot={spot} light={light} compact />
               </View>
             </View>
           ) : (
-            <View style={styles.momoActionRow}>
-              {/* Send Money */}
-              <Pressable
-                accessible
-                accessibilityRole="button"
-                accessibilityLabel={t('home.sendMoney')}
-                accessibilityHint={t('home.sendMoneyHint')}
-                onPress={() => {
-                  void hapticTick();
-                  onSendMoney();
-                }}
-                style={({ pressed }) => [styles.momoTile, pressed ? styles.tilePressed : null]}
-              >
-                <View style={[styles.momoTileCircle, styles.circlePrimary]}>
-                  <Text style={styles.tileEmoji}>💸</Text>
-                </View>
-                <Text style={styles.tileLabel}>{t('home.sendMoney')}</Text>
-              </Pressable>
-
-              {/* Statement Narrator */}
-              <Pressable
-                accessible
-                accessibilityRole="button"
-                accessibilityLabel={t('home.statement', 'Statement')}
-                accessibilityHint={t('home.statementHint', 'Opens spoken statement narrator')}
-                onPress={() => {
-                  void hapticTick();
-                  onViewStatement();
-                }}
-                style={({ pressed }) => [styles.momoTile, pressed ? styles.tilePressed : null]}
-              >
-                <View style={[styles.momoTileCircle, styles.circleYellow]}>
-                  <Text style={styles.tileEmoji}>📻</Text>
-                </View>
-                <Text style={styles.tileLabel}>{t('home.statement', 'Statement')}</Text>
-              </Pressable>
-
-              {/* Airtime & Data */}
-              <Pressable
-                accessible
-                accessibilityRole="button"
-                accessibilityLabel={t('home.buyAirtime', 'Airtime & Data')}
-                accessibilityHint={t('home.buyAirtimeHint')}
-                onPress={() => {
-                  void hapticTick();
-                  onBuyAirtime();
-                }}
-                style={({ pressed }) => [styles.momoTile, pressed ? styles.tilePressed : null]}
-              >
-                <View style={[styles.momoTileCircle, styles.circleMuted]}>
-                  <Text style={styles.tileEmoji}>📱</Text>
-                </View>
-                <Text style={styles.tileLabel}>{t('home.buyAirtime', 'Airtime')}</Text>
-              </Pressable>
-
-              {/* Cash Out */}
-              <Pressable
-                accessible
-                accessibilityRole="button"
-                accessibilityLabel={t('home.cashOut', 'Cash Out')}
-                accessibilityHint={t('home.cashOutHint')}
-                onPress={() => {
-                  void hapticTick();
-                  onCashOut();
-                }}
-                style={({ pressed }) => [styles.momoTile, pressed ? styles.tilePressed : null]}
-              >
-                <View style={[styles.momoTileCircle, styles.circleMuted]}>
-                  <Text style={styles.tileEmoji}>🏧</Text>
-                </View>
-                <Text style={styles.tileLabel}>{t('home.cashOut', 'Cash Out')}</Text>
-              </Pressable>
+            <View style={styles.serviceList}>
+              {services.map((service) => (
+                <ServiceRow key={service.id} service={service} spot={spot} light={light} />
+              ))}
             </View>
           )}
         </View>
 
-        {/* Recent Transactions Feed */}
+        {/* Region 4 - the last two movements; the sentence is the button. */}
         <View style={styles.section}>
-          <View style={styles.sectionHeaderRow}>
-            <Text
-              accessibilityRole="header"
-              aria-level={2}
-              accessibilityHint="Recent transaction history"
-              style={styles.sectionHeading}
-            >
-              {t('home.recentTransactions')}
-            </Text>
-
-            <AccessibleButton
-              label={t('home.viewAllStatement', 'View Statement')}
-              hint={t('home.statementHint')}
-              variant="ghost"
-              onPress={onViewStatement}
-              style={styles.viewStatementBtn}
-              textStyle={styles.viewStatementText}
-            />
-          </View>
+          <Text accessibilityRole="header" aria-level={2} style={styles.sectionHeading}>
+            {t('home.recentTransactions')}
+          </Text>
 
           {loading ? (
-            <View style={styles.emptyCard}>
-              <Text style={styles.mutedText}>{t('home.loading')}</Text>
-            </View>
+            <Text style={styles.plainText}>{t('home.loading')}</Text>
           ) : transactions.length === 0 ? (
-            <View style={styles.emptyCard}>
-              <Text style={styles.mutedText}>{t('home.noTransactions')}</Text>
-            </View>
+            <Text style={styles.plainText}>{t('home.noTransactions')}</Text>
           ) : (
-            transactions.slice(0, 5).map((txn) => {
-              const isReceive = txn.type === 'receive';
-              const isAirtime = txn.type === 'airtime';
-              const isFailed = txn.status === 'failed';
-              const icon = isReceive ? '📥' : isAirtime ? '📶' : '📤';
-
+            transactions.slice(0, 2).map((txn) => {
+              const id = `txn:${txn.id}`;
+              const sentence = t('home.transactionLabel', {
+                name: txn.recipientName,
+                type: t(`home.type.${txn.type}`),
+                amount: formatMoney(txn.amount),
+                status: t(`home.status.${txn.status}`),
+              });
               return (
-                <View
+                <Pressable
                   key={txn.id}
                   accessible
-                  accessibilityRole="text"
-                  accessibilityLabel={t('home.transactionLabel', {
-                    name: txn.recipientName,
-                    type: t(`home.type.${txn.type}`),
-                    amount: formatMoney(txn.amount),
-                    status: t(`home.status.${txn.status}`),
-                  })}
+                  accessibilityRole="button"
+                  accessibilityLabel={sentence}
                   accessibilityHint={t('home.listenHint')}
-                  style={styles.txnCard}
+                  onFocus={() => light(id)}
+                  onPressIn={() => light(id)}
+                  onPress={() => speakSingleTransaction(txn)}
+                  style={({ pressed }) => [
+                    styles.txnRow,
+                    spot === id ? styles.txnRowLit : null,
+                    pressed ? styles.pressed : null,
+                  ]}
                 >
-                  <View style={[styles.txnIconCircle, isReceive ? styles.iconIn : styles.iconOut]}>
-                    <Text style={styles.txnEmoji}>{icon}</Text>
-                  </View>
-
-                  <View style={styles.txnBody}>
-                    <Text style={styles.txnName}>{txn.recipientName}</Text>
-                    <View style={styles.txnSubRow}>
-                      <Text style={styles.txnSubText}>{t(`home.type.${txn.type}`)}</Text>
-                      <Text style={styles.txnDot}>•</Text>
-                      <Text
-                        style={[
-                          styles.statusBadge,
-                          isFailed
-                            ? styles.statusFailed
-                            : txn.status === 'confirmed'
-                              ? styles.statusConfirmed
-                              : styles.statusPending,
-                        ]}
-                      >
-                        {t(`home.status.${txn.status}`)}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.txnRight}>
-                    <Text
-                      style={[
-                        styles.txnAmount,
-                        isReceive ? styles.amountIn : styles.amountOut,
-                        isFailed ? styles.amountFailed : null,
-                      ]}
-                    >
-                      {isReceive ? '+' : '−'}
-                      {formatMoney(txn.amount)}
-                    </Text>
-
-                    <AccessibleButton
-                      label={`${t('home.listen', 'Listen')}: ${txn.recipientName}`}
-                      hint={`${t('home.listenHint', 'Double-tap to hear this transaction read aloud')}: ${formatMoney(txn.amount)}`}
-                      variant="ghost"
-                      onPress={() => speakSingleTransaction(txn)}
-                      style={styles.speakBtn}
-                      textStyle={styles.speakBtnText}
-                    >
-                      <Text style={styles.speakBtnText}>🔊</Text>
-                    </AccessibleButton>
-                  </View>
-                </View>
+                  <Text
+                    style={[styles.txnSentence, recede(spot, id) ? styles.textReceded : null]}
+                    numberOfLines={2}
+                  >
+                    {sentence}
+                  </Text>
+                </Pressable>
               );
             })
           )}
         </View>
 
-        {/* MoMo SMS Reader & Parser Card */}
-        <View style={styles.section}>
-          <Pressable
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel={`${t('home.smsTool', 'MoMo SMS Parser')}. ${t('sms.subtitle', 'Extract & import transactions on-device from SMS')}`}
-            accessibilityHint={t('home.smsToolHint', 'Parse and import transaction confirmation SMS')}
-            onPress={() => {
-              void hapticTick();
-              onOpenSms();
-            }}
-            style={({ pressed }) => [styles.smsBanner, pressed ? styles.smsBannerPressed : null]}
-          >
-            <View style={styles.smsBannerIcon}>
-              <Text style={styles.smsEmoji}>📩</Text>
-            </View>
-            <View style={styles.smsBannerBody}>
-              <Text style={styles.smsBannerTitle}>{t('home.smsTool', 'MoMo SMS Parser')}</Text>
-              <Text style={styles.smsBannerSubtitle}>
-                {t('sms.subtitle', 'Extract & import transactions on-device from SMS')}
-              </Text>
-            </View>
-            <Text style={styles.smsBannerArrow}>→</Text>
-          </Pressable>
-        </View>
-
+        {/* Region 5 - the SMS importer, one plain row at the bottom. */}
+        <TextRow
+          id={SPOT_SMS}
+          spot={spot}
+          label={t('home.smsTool')}
+          hint={t('home.smsToolHint')}
+          light={light}
+          onPress={onOpenSms}
+        />
       </ScrollView>
     </View>
   );
+}
+
+/** A destination is felt before it is seen: each one has its own rhythm. */
+function openNav(destination: NavSignature, run: () => void): void {
+  void hapticNav(destination);
+  run();
+}
+
+function ServiceRow({
+  service,
+  spot,
+  light,
+  compact,
+}: {
+  service: Service | undefined;
+  spot: string | null;
+  light: (id: string) => void;
+  compact?: boolean;
+}) {
+  if (service == null) return null;
+  return (
+    <TextRow
+      id={service.id}
+      spot={spot}
+      label={service.label}
+      hint={service.hint}
+      light={light}
+      onPress={() => openNav(service.nav, service.run)}
+      compact={compact}
+      style={compact ? styles.spatialCell : styles.divider}
+    />
+  );
+}
+
+interface TextRowProps {
+  id: string;
+  spot: string | null;
+  label: string;
+  hint: string;
+  light: (id: string) => void;
+  onPress: () => void;
+  compact?: boolean;
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * One focus stop, one sentence. Nothing inside it is separately reachable, so
+ * TalkBack never has to step through a decoration on the way to an action.
+ */
+function TextRow({ id, spot, label, hint, light, onPress, compact, style }: TextRowProps) {
+  const receded = recede(spot, id);
+  return (
+    <Pressable
+      accessible
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={hint}
+      onFocus={() => light(id)}
+      onPressIn={() => {
+        void hapticTick();
+        light(id);
+      }}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.row,
+        compact ? styles.rowCompact : null,
+        spot === id ? styles.rowLit : null,
+        pressed ? styles.pressed : null,
+        style,
+      ]}
+    >
+      <Text
+        style={[styles.rowLabel, receded ? styles.textReceded : null]}
+        numberOfLines={compact ? 2 : 1}
+      >
+        {label}
+      </Text>
+      {compact ? null : (
+        <Text style={[styles.rowHint, receded ? styles.textReceded : null]} numberOfLines={2}>
+          {hint}
+        </Text>
+      )}
+    </Pressable>
+  );
+}
+
+/**
+ * True when the ear is on something else. Recession is carried by the palette's
+ * muted roles rather than a fractional opacity, because opacity on text drops it
+ * under the AA contrast this repo gates on.
+ */
+function recede(spot: string | null, id: string): boolean {
+  return spot != null && spot !== id;
 }
 
 const styles = themedStyles((colors) => ({
@@ -524,399 +401,143 @@ const styles = themedStyles((colors) => ({
     backgroundColor: colors.background,
   },
   content: {
-    padding: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
     paddingBottom: theme.spacing.xxl,
   },
-  momoCard: {
+  band: {
     backgroundColor: colors.momoYellow,
-    borderRadius: theme.radii.xl,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-    borderWidth: 1.5,
-    borderColor: colors.momoYellowDark,
-    ...Platform.select({
-      web: {
-        boxShadow: '0 4px 14px rgba(229, 183, 0, 0.35)',
-      },
-      default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 4,
-      },
-    }),
+    borderRadius: theme.radii.lg,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.lg,
+    minHeight: 168,
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: 'transparent',
   },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
+  bandLit: {
+    borderWidth: 4,
+    borderColor: colors.borderFocus,
+    transform: [{ scale: 1.02 }],
   },
-  cardPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(22, 18, 115, 0.12)',
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 4,
-    borderRadius: theme.radii.full,
-    gap: 6,
+  bandDim: {
+    backgroundColor: colors.momoYellowLight,
   },
-  cardLogoSymbol: {
-    width: 18,
-    height: 18,
-  },
-  cardPillDot: {
-    color: colors.navyMidnight,
-    fontSize: 10,
-  },
-  cardPillText: {
-    fontSize: theme.typography.tiny,
-    fontWeight: '900',
-    color: colors.navyMidnight,
-    letterSpacing: 0.5,
-  },
-  cardEyeBtn: {
-    minHeight: 36,
-    minWidth: 70,
-    paddingHorizontal: theme.spacing.sm,
-    borderRadius: theme.radii.full,
-  },
-  cardEyeText: {
-    color: colors.momoYellow,
+  bandCaption: {
     fontSize: theme.typography.small,
     fontWeight: '800',
-  },
-  balanceCaption: {
-    fontSize: theme.typography.small,
-    color: colors.navyMidnight,
-    fontWeight: '700',
-    opacity: 0.8,
-    marginBottom: 4,
-  },
-  accountHolder: {
-    fontSize: theme.typography.tiny,
-    fontWeight: '800',
-    color: colors.navyMidnight,
+    color: colors.onGold,
     opacity: 0.9,
-    marginBottom: 2,
+    marginBottom: theme.spacing.xs,
+    letterSpacing: 0.2,
   },
-  balanceAmount: {
-    fontSize: 38,
+  bandFigure: {
+    fontSize: 48,
     fontWeight: '900',
-    color: colors.navyMidnight,
-    marginBottom: theme.spacing.md,
-    letterSpacing: -0.8,
+    color: colors.onGold,
+    letterSpacing: -1,
   },
-  cardActionsRow: {
-    flexDirection: 'row',
+  bandNote: {
+    fontSize: theme.typography.small,
+    fontWeight: '700',
+    color: colors.onGold,
+    opacity: 0.9,
+    marginTop: theme.spacing.xs,
   },
-  cardActionBtn: {
-    flex: 1,
-    minHeight: 48,
+  row: {
+    minHeight: 76,
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
     borderRadius: theme.radii.md,
+    borderWidth: 3,
+    borderColor: 'transparent',
+    backgroundColor: 'transparent',
   },
-  cardBtnEmoji: {
-    fontSize: 16,
-    marginRight: 4,
+  rowCompact: {
+    minHeight: 104,
+    paddingHorizontal: theme.spacing.md,
   },
-  section: {
-    marginBottom: theme.spacing.xl,
+  rowLit: {
+    borderColor: colors.borderFocus,
+    backgroundColor: colors.surfaceElevated,
+    transform: [{ scale: 1.01 }],
   },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-  },
-  sectionHeading: {
+  rowLabel: {
     fontSize: theme.typography.heading,
     fontWeight: '900',
-    color: colors.navyMidnight,
-    letterSpacing: -0.3,
-    marginBottom: theme.spacing.xs,
-  },
-  viewStatementBtn: {
-    minHeight: 36,
-    paddingHorizontal: theme.spacing.sm,
-  },
-  viewStatementText: {
-    fontSize: theme.typography.small,
-    fontWeight: '800',
-    color: colors.navyMidnight,
-  },
-  momoActionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: theme.spacing.xs,
-  },
-  momoTile: {
-    flex: 1,
-    alignItems: 'center',
-    minHeight: theme.touchTarget.minSize,
-    paddingVertical: theme.spacing.xs,
-  },
-  tilePressed: {
-    opacity: 0.8,
-    transform: [{ scale: 0.95 }],
-  },
-  momoTileCircle: {
-    width: 58,
-    height: 58,
-    borderRadius: theme.radii.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: theme.spacing.xs,
-    ...Platform.select({
-      web: {
-        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
-      },
-      default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-      },
-    }),
-  },
-  circlePrimary: {
-    backgroundColor: colors.navyMidnight,
-  },
-  circleYellow: {
-    backgroundColor: colors.momoYellow,
-    borderWidth: 2,
-    borderColor: colors.navyMidnight,
-  },
-  circleMuted: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  tileEmoji: {
-    fontSize: 24,
-  },
-  tileLabel: {
-    fontSize: theme.typography.tiny,
-    fontWeight: '800',
-    color: colors.navyMidnight,
-    textAlign: 'center',
-  },
-  emptyCard: {
-    backgroundColor: colors.surface,
-    padding: theme.spacing.lg,
-    borderRadius: theme.radii.lg,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  mutedText: {
-    fontSize: theme.typography.body,
-    color: colors.textMuted,
-  },
-  txnCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    padding: theme.spacing.md,
-    borderRadius: theme.radii.lg,
-    marginBottom: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    minHeight: 64,
-  },
-  txnIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: theme.radii.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: theme.spacing.md,
-  },
-  iconIn: {
-    backgroundColor: colors.successLight,
-  },
-  iconOut: {
-    backgroundColor: colors.surfaceMuted,
-  },
-  txnEmoji: {
-    fontSize: 18,
-  },
-  txnBody: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  txnName: {
-    fontSize: theme.typography.body,
-    fontWeight: '800',
     color: colors.text,
-    marginBottom: 2,
+    letterSpacing: -0.2,
   },
-  txnSubRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  txnSubText: {
-    fontSize: theme.typography.tiny,
-    color: colors.textMuted,
+  rowHint: {
+    fontSize: theme.typography.small,
     fontWeight: '600',
-  },
-  txnDot: {
-    fontSize: 10,
-    color: colors.textLight,
-  },
-  statusBadge: {
-    fontSize: theme.typography.tiny,
-    fontWeight: '800',
-  },
-  statusConfirmed: {
-    color: colors.success,
-  },
-  statusPending: {
-    color: colors.warning,
-  },
-  statusFailed: {
-    color: colors.danger,
-  },
-  txnRight: {
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  txnAmount: {
-    fontSize: theme.typography.body,
-    fontWeight: '900',
-  },
-  amountIn: {
-    color: colors.success,
-  },
-  amountOut: {
-    color: colors.navyMidnight,
-  },
-  amountFailed: {
-    color: colors.danger,
-    textDecorationLine: 'line-through',
-  },
-  speakBtn: {
-    minHeight: 32,
-    minWidth: 32,
-    paddingHorizontal: 4,
-    paddingVertical: 2,
+    color: colors.textMuted,
     marginTop: 2,
   },
-  speakBtnText: {
-    fontSize: 14,
+  textReceded: {
+    color: colors.textMuted,
   },
-  smsBanner: {
-    backgroundColor: colors.surface,
-    borderRadius: theme.radii.lg,
-    padding: theme.spacing.md,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.md,
-    minHeight: theme.touchTarget.minSize,
-    ...Platform.select({
-      web: {
-        boxShadow: '0 2px 8px rgba(0, 27, 58, 0.06)',
-      },
-      default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-      },
-    }),
+  serviceList: {
+    marginTop: theme.spacing.xs,
   },
-  smsBannerPressed: {
-    backgroundColor: colors.surfaceMuted,
-    borderColor: colors.momoYellow,
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    borderRadius: 0,
   },
-  smsBannerIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: theme.radii.full,
-    backgroundColor: colors.momoYellowLight,
-    borderWidth: 1.5,
-    borderColor: colors.momoYellow,
-    alignItems: 'center',
+  section: {
+    marginTop: theme.spacing.xl,
+  },
+  sectionHeading: {
+    fontSize: theme.typography.subheading,
+    fontWeight: '900',
+    color: colors.text,
+    letterSpacing: -0.2,
+  },
+  txnRow: {
+    minHeight: 76,
     justifyContent: 'center',
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
+    borderRadius: theme.radii.md,
+    borderWidth: 3,
+    borderColor: 'transparent',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-  smsEmoji: {
-    fontSize: 20,
+  txnRowLit: {
+    borderColor: colors.borderFocus,
+    borderBottomColor: colors.borderFocus,
+    backgroundColor: colors.surfaceElevated,
+    transform: [{ scale: 1.01 }],
   },
-  smsBannerBody: {
-    flex: 1,
-  },
-  smsBannerTitle: {
+  txnSentence: {
     fontSize: theme.typography.body,
-    fontWeight: '800',
-    color: colors.navyMidnight,
+    fontWeight: '700',
+    color: colors.text,
+    lineHeight: 24,
   },
-  smsBannerSubtitle: {
-    fontSize: theme.typography.tiny,
+  plainText: {
+    fontSize: theme.typography.body,
     color: colors.textMuted,
     fontWeight: '600',
-    marginTop: 2,
-  },
-  smsBannerArrow: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: colors.navyMidnight,
+    paddingVertical: theme.spacing.md,
   },
   spatialGrid: {
-    gap: theme.spacing.md,
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.sm,
   },
   spatialRow: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
+    gap: theme.spacing.sm,
   },
-  spatialTile: {
+  spatialCell: {
     flex: 1,
+    borderColor: colors.border,
     backgroundColor: colors.surface,
-    borderRadius: theme.radii.lg,
-    padding: theme.spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: colors.borderDark,
-    minHeight: 115,
-    ...Platform.select({
-      web: {
-        boxShadow: '0 2px 8px rgba(22, 18, 115, 0.06)',
-      },
-      default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        elevation: 2,
-      },
-    }),
   },
-  spatialTileCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: theme.radii.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: theme.spacing.xs,
-  },
-  spatialEmoji: {
-    fontSize: 24,
-  },
-  spatialLabel: {
-    fontSize: theme.typography.body,
-    fontWeight: '800',
-    color: colors.navyMidnight,
-    textAlign: 'center',
-  },
-  spatialHint: {
-    fontSize: theme.typography.tiny,
-    fontWeight: '700',
-    color: colors.textMuted,
-    marginTop: 2,
+  pressed: {
+    opacity: 0.85,
   },
 }));
