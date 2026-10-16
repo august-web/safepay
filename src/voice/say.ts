@@ -211,16 +211,23 @@ export function sayPlan(
     language?: AppLanguage;
     native?: () => void;
     fallback: () => void;
+    /**
+     * Fired when nothing is being spoken any more: after the last clip of a
+     * native plan finishes, or right after `fallback` hands the sentence to
+     * another channel. Lets a call site tie a visual state to the utterance.
+     */
+    onDone?: () => void;
   },
 ): void {
   const language = options.language ?? getAppLanguage();
   if (canSpeakPlan(plan, language)) {
     rememberSpoken(planText(plan));
     options.native?.();
-    void playPlan(plan, language);
+    void playPlan(plan, language).then(() => options.onDone?.());
     return;
   }
   options.fallback();
+  options.onDone?.();
 }
 
 export function stopAllVoices(): void {
