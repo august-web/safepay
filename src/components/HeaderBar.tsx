@@ -43,12 +43,14 @@ export function HeaderBar({
           </AccessibleButton>
         ) : (
           <View style={styles.brandIconContainer}>
+            {/* Decoration: the brand name is already in the title's label, so the
+                mark must not cost a focus stop on every screen. */}
             <Image
               source={require('../../assets/safepay-symbol.png')}
               style={styles.brandIconImage}
               resizeMode="contain"
-              accessibilityLabel="SafePay logo"
-              accessibilityHint="SafePay brand emblem"
+              importantForAccessibility="no"
+              accessibilityElementsHidden
               accessibilityIgnoresInvertColors
             />
           </View>
@@ -57,8 +59,6 @@ export function HeaderBar({
         <View style={styles.titleContainer}>
           <Text
             accessibilityRole="header"
-            accessibilityLabel={`${displayTitle}${subtitle ? `, ${subtitle}` : ''}`}
-            accessibilityHint="Header navigation"
             numberOfLines={1}
             ellipsizeMode="tail"
             style={styles.title}
@@ -120,7 +120,7 @@ const styles = themedStyles((colors) => ({
   },
   backButton: {
     minWidth: 56,
-    minHeight: 44,
+    minHeight: theme.touchTarget.minSize,
     paddingHorizontal: theme.spacing.sm,
     marginRight: theme.spacing.xs,
   },
@@ -175,8 +175,8 @@ const styles = themedStyles((colors) => ({
     marginLeft: theme.spacing.sm,
   },
   settingsButton: {
-    minWidth: 44,
-    minHeight: 44,
+    minWidth: theme.touchTarget.minSize,
+    minHeight: theme.touchTarget.minSize,
     paddingHorizontal: 4,
     marginLeft: 6,
   },
