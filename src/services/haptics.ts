@@ -77,3 +77,45 @@ export async function hapticTick(): Promise<void> {
     Haptics.ImpactFeedbackStyle.Light,
   );
 }
+
+/**
+ * Destination signatures - the haptic vocabulary that replaces the icons on
+ * Home. Each service the user can reach has one rhythm they can learn once and
+ * then recognise with the phone in a pocket:
+ *  - send: two rising taps (money going up and out)
+ *  - airtime: two even taps (topping up)
+ *  - cashout: one long heavy buzz (physical cash)
+ *  - statement: three short taps (a list)
+ */
+export type NavSignature = 'send' | 'airtime' | 'cashout' | 'statement';
+
+const NAV_PATTERNS: Record<NavSignature, () => Promise<void>> = {
+  send: async () => {
+    await hapticTick();
+    await delay(110);
+    await hapticConfirm();
+  },
+  airtime: async () => {
+    await hapticConfirm();
+    await delay(110);
+    await hapticConfirm();
+  },
+  cashout: async () => {
+    await hapticAmount();
+  },
+  statement: async () => {
+    await hapticTick();
+    await delay(90);
+    await hapticTick();
+    await delay(90);
+    await hapticTick();
+  },
+};
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function hapticNav(destination: NavSignature): Promise<void> {
+  await NAV_PATTERNS[destination]();
+}
