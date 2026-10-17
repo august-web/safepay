@@ -19,7 +19,13 @@ import {
 import { hapticAmount, hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { speak, stopSpeaking } from '../services/speech';
-import { calculateFee, getBalance, sendMoney, type SendResult } from '../services/transactions';
+import {
+  calculateFee,
+  getBalance,
+  sendMoney,
+  type SendResult,
+  type Transaction,
+} from '../services/transactions';
 import { sayPlan } from '../voice/say';
 import { parseSendUtterance } from '../voice/dictation';
 import { useScreenDictation } from '../voice/useScreenDictation';
@@ -50,7 +56,13 @@ type Phase = 'form' | 'review' | 'processing' | 'result';
 
 const CANCEL_WINDOW_MS = 3000;
 
-export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
+export function SendMoneyScreen({
+  onDone,
+  onTransactionComplete,
+}: {
+  onDone: () => void;
+  onTransactionComplete: (transaction: Transaction) => void;
+}) {
   const { t } = useTranslation();
 
   const [phase, setPhase] = useState<Phase>('form');
@@ -220,6 +232,13 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
       recipientName: nameText.trim(),
     });
 
+    if (sendResult.status === 'confirmed' && sendResult.transaction != null) {
+      // The receipt screen reads the whole transaction and returns Home itself.
+      void hapticConfirm();
+      onTransactionComplete(sendResult.transaction);
+      return;
+    }
+
     setResult(sendResult);
     setPhase('result');
 
@@ -240,7 +259,7 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
         }),
       );
     }
-  }, [amount, fee, nameText, phoneText, reviewName, t]);
+  }, [amount, fee, nameText, onTransactionComplete, phoneText, reviewName, t]);
 
   const startCancelWindow = useCallback(() => {
     cancelledRef.current = false;
@@ -326,16 +345,6 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
     } finally {
       setConfirming(false);
     }
-  };
-
-  const resetForm = () => {
-    setAmountText('');
-    setPhoneText('');
-    setNameText('');
-    setErrors({});
-    setResult(null);
-    setPhase('form');
-    void getBalance().then(setBalance);
   };
 
   // Step indicator
@@ -619,62 +628,43 @@ export function SendMoneyScreen({ onDone }: { onDone: () => void }) {
     );
   }
 
-  // --------------------------------------------------------------- result
-  const isSuccess = result?.status === 'confirmed';
-
+  // ------------------------------------------------- failure (success gets a receipt)
   return (
     <View style={styles.screen}>
-      <HeaderBar title={isSuccess ? t('send.confirmed') : t('send.failed')} />
+      <HeaderBar title={t('send.failed')} />
 
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.content}
-        accessibilityLabel={isSuccess ? t('send.confirmed') : t('send.failed')}
-        accessibilityHint="Transaction outcome summary voucher"
+        accessibilityLabel={t('send.failed')}
+        accessibilityHint={t('send.retryHint')}
       >
         {renderStepIndicator()}
 
-        <View style={[styles.resultCard, isSuccess ? styles.resultSuccess : styles.resultFailed]}>
-          <View style={[styles.resultBadge, isSuccess ? styles.badgeSuccess : styles.badgeFailed]}>
-            <Text style={styles.resultIcon}>{isSuccess ? '✓' : '✕'}</Text>
+        <View style={[styles.resultCard, styles.resultFailed]}>
+          <View style={[styles.resultBadge, styles.badgeFailed]}>
+            <Text style={styles.resultIcon}>{'✕'}</Text>
           </View>
 
           <Text
             accessibilityRole="header"
-            style={[styles.resultTitle, isSuccess ? styles.textSuccess : styles.textFailed]}
+            style={[styles.resultTitle, styles.textFailed]}
           >
-            {isSuccess ? t('send.confirmed') : t('send.failed')}
+            {t('send.failed')}
           </Text>
 
-          {isSuccess && result?.transaction != null ? (
-            <View style={styles.resultDetails}>
-              <ReviewRow
-                caption={t('send.reviewAmountLabel')}
-                value={formatMoney(result.transaction.amount)}
-              />
-              <ReviewRow
-                caption={t('send.reviewRecipientLabel')}
-                value={result.transaction.recipientName}
-              />
-              <ReviewRow
-                caption={t('send.reference')}
-                value={result.transaction.reference}
-              />
-            </View>
-          ) : (
-            <Text style={styles.failReason}>
-              {result?.reason != null
-                ? localizedFailureReason(t, result.reason)
-                : t('send.failureGeneric')}
-            </Text>
-          )}
+          <Text style={styles.failReason}>
+            {result?.reason != null
+              ? localizedFailureReason(t, result.reason)
+              : t('send.failureGeneric')}
+          </Text>
         </View>
 
         <AccessibleButton
-          label={t('send.sendAnother', 'Send Another Payment')}
-          hint={t('send.sendAnother')}
+          label={t('common.retry')}
+          hint={t('send.retryHint')}
           variant="primary"
-          onPress={resetForm}
+          onPress={backToForm}
           style={styles.ctaButton}
         />
 
@@ -962,9 +952,6 @@ const styles = themedStyles((colors) => ({
     marginBottom: theme.spacing.lg,
     borderWidth: 1.5,
   },
-  resultSuccess: {
-    borderColor: colors.success,
-  },
   resultFailed: {
     borderColor: colors.danger,
   },
@@ -975,9 +962,6 @@ const styles = themedStyles((colors) => ({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: theme.spacing.md,
-  },
-  badgeSuccess: {
-    backgroundColor: colors.successLight,
   },
   badgeFailed: {
     backgroundColor: colors.dangerLight,
@@ -993,17 +977,8 @@ const styles = themedStyles((colors) => ({
     marginBottom: theme.spacing.md,
     textAlign: 'center',
   },
-  textSuccess: {
-    color: colors.successDark,
-  },
   textFailed: {
     color: colors.dangerDark,
-  },
-  resultDetails: {
-    width: '100%',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: theme.spacing.sm,
   },
   failReason: {
     fontSize: theme.typography.body,
