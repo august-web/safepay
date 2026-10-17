@@ -304,29 +304,3 @@ export async function cashOut(params: {
   return failed ? { status: 'failed', reason: 'network', transaction } : { status: 'confirmed', transaction };
 }
 
-export async function importSmsTransaction(data: {
-  type: TransactionType;
-  amount: number;
-  recipientPhone: string;
-  recipientName: string;
-  fee: number;
-  reference: string;
-}): Promise<Transaction> {
-  const transaction: Transaction = {
-    id: `sms-${Date.now()}`,
-    type: data.type,
-    amount: data.amount,
-    currency: 'GHS',
-    recipientPhone: data.recipientPhone,
-    recipientName: data.recipientName,
-    fee: data.fee,
-    reference: data.reference,
-    status: 'confirmed',
-    createdAt: Date.now(),
-  };
-  const currentList = await listTransactions();
-  memoryTransactions = [transaction, ...currentList];
-  persistTransactions(memoryTransactions);
-  return transaction;
-}
-
