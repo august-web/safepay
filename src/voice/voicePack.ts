@@ -124,10 +124,19 @@ export function stopVoiceClip(): void {
 /**
  * Plays the clip for a key.
  *
+ * `rate` re-pitches the bundled WAV through expo-audio's playback rate, which
+ * is how the speech-rate setting can be heard at the speed it just chose
+ * without leaving the native voice or spending a TTS request. Android accepts
+ * 0.1-2.0, so callers keep their rates inside that band.
+ *
  * @returns true when a clip existed and playback started (or completed),
  *   false when this language has no clip, so the caller can use device TTS.
  */
-export function playVoiceClip(key: string, language: AppLanguage): Promise<boolean> {
+export function playVoiceClip(
+  key: string,
+  language: AppLanguage,
+  rate?: number,
+): Promise<boolean> {
   const source = VOICE_CLIPS[language]?.[key];
   if (source == null) return Promise.resolve(false);
 
@@ -160,6 +169,7 @@ export function playVoiceClip(key: string, language: AppLanguage): Promise<boole
         if (status.didJustFinish) finish(true);
       });
 
+      if (rate != null && rate !== 1) player.setPlaybackRate(rate);
       player.play();
 
       // Safety net: clips are short; never hang a composed sentence on one.
