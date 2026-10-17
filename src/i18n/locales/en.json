@@ -217,31 +217,61 @@
     "title": "Accessibility & Settings",
     "titleShort": "Settings",
     "subtitle": "Tailor SafePay to your assistive preferences",
-    "navSection": "Navigation Preset (WCAG 2.2)",
-    "navLinear": "Linear Sequential (TalkBack)",
+    "navSection": "How the screen moves",
+    "navValue": {
+      "linear": "In order",
+      "spatial": "Fixed places"
+    },
     "navLinearDesc": "Step-by-step layout optimized for screen readers (congenitally blind)",
-    "navSpatial": "Spatial Grid (Memory-Based)",
     "navSpatialDesc": "Fixed-position tactile layout for muscle memory (adventitiously blind)",
     "voiceSection": "TTS Voice Narration Speed",
-    "speedSlow": "0.75× Slow",
-    "speedStandard": "0.85× Accessible",
-    "speedNormal": "1.0× Normal",
+    "speedValue": {
+      "slow": "Slow",
+      "standard": "Steady",
+      "fast": "Fast"
+    },
     "privacySection": "Audio Privacy Guard",
-    "privacyAuto": "Auto (Headphones = Voice, Speaker = Haptics)",
-    "privacyVoiceOnly": "Always Speak Aloud",
-    "privacyHapticsOnly": "Always Silent Haptics",
+    "privacyValue": {
+      "auto": "Auto",
+      "voice": "Speak",
+      "haptic": "Vibrate"
+    },
     "savedNote": "Preferences saved automatically.",
     "contrastSection": "Screen Contrast",
-    "contrast": {
-      "soft": {
-        "label": "Soft cream",
-        "hint": "Low-glare colours, easier on tired eyes"
-      },
-      "crisp": {
-        "label": "High contrast",
-        "hint": "Maximum contrast for severe low vision or bright sunlight"
-      }
+    "contrastValue": {
+      "soft": "Soft",
+      "crisp": "Crisp"
     },
+    "languageValue": {
+      "tw": "Twi",
+      "ee": "Ewe",
+      "ga": "Ga",
+      "pcm": "Pidgin",
+      "en": "English"
+    },
+    "cycleHint": "Double-tap for the next value: {{options}}",
+    "diagOpenHint": "Double-tap to see every voice detail",
+    "diagCloseHint": "Double-tap to close these details",
+    "diagSummary": "Voice: {{channel}} · left today: {{remaining}}",
+    "diagChannel": {
+      "lab": "Lab",
+      "public": "GhanaNLP",
+      "device": "Device"
+    },
+    "listenValue": {
+      "on": "Yes",
+      "off": "No"
+    },
+    "voiceTtsLoading": "Checking voice channel…",
+    "voiceTtsChannelLab": "Native voice: SafePay Lab TTS ({{remaining}} of {{limit}} left today)",
+    "voiceTtsChannelPublic": "Native voice: GhanaNLP public endpoint (device fallback when offline)",
+    "voiceTtsChannelDevice": "Device voice only (no native model for this language)",
+    "testPipelineTitle": "Test the voice pipeline (uses no ASR quota)",
+    "testPipelineField": "Type a phrase as if spoken, e.g. me sika a aka",
+    "testPipelineHint": "Types the phrase the pipeline should hear",
+    "testPipelineRun": "Run through the pipeline",
+    "testPipelineRunHint": "Double-tap to run the typed phrase through the voice pipeline without the microphone",
+    "testPipelineDone": "Sent through the voice pipeline. Watch the response.",
     "voiceCheckSection": "Voice Output Check",
     "voiceChannelTts": "SafePay is speaking with its own voice",
     "voiceChannelScreenReader": "Your screen reader is reading SafePay aloud",
