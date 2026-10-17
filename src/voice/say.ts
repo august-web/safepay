@@ -178,7 +178,7 @@ export function sayKey(key: string, options: SayOptions = {}): 'clip' | 'skipped
 
   if (hasVoiceClip(key, language)) {
     rememberSpoken(text, key);
-    void playVoiceClip(key, language);
+    void playVoiceClip(key, language, options.rate);
     return 'clip';
   }
   return 'skipped';
