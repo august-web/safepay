@@ -119,3 +119,24 @@ function delay(ms: number): Promise<void> {
 export async function hapticNav(destination: NavSignature): Promise<void> {
   await NAV_PATTERNS[destination]();
 }
+
+/**
+ * Cycling signatures for Settings, where one stop holds a whole option list.
+ * Neither rhythm is used by the Home destinations above, so a value change is
+ * recognisable with the phone still in a pocket.
+ */
+
+/** One firm pulse: the value moved to the next choice. */
+export async function hapticCycle(): Promise<void> {
+  await hapticConfirm();
+}
+
+/** Pulse then a heavy buzz: the cycle came back round to its first value. */
+export async function hapticWrap(): Promise<void> {
+  await hapticConfirm();
+  await delay(160);
+  await withAndroidFallback(
+    Haptics.ImpactFeedbackStyle.Heavy,
+    Haptics.ImpactFeedbackStyle.Heavy,
+  );
+}
