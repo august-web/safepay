@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +10,13 @@ import { theme, themedStyles } from '../constants/theme';
 import { getAppLanguage } from '../i18n';
 import { hapticAmount, hapticNav, hapticTick, type NavSignature } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
+import {
+  alertSummary,
+  listAlerts,
+  subscribeSms,
+  takePendingBanner,
+  type MoMoAlert,
+} from '../services/momoSms';
 import { getCachedSettings, loadSettings, type NavPreset } from '../services/settings';
 import { speak, stopSpeaking } from '../services/speech';
 import {
@@ -30,7 +37,10 @@ import { sayPlan, type SayPlan } from '../voice/say';
 
 const SPOT_BALANCE = 'balance';
 const SPOT_SPEAK = 'speak';
-const SPOT_SMS = 'sms';
+const SPOT_INBOX = 'inbox';
+const SPOT_BANNER = 'banner';
+/** Long enough to be noticed and reached for, short enough to not litter Home. */
+const BANNER_MS = 10_000;
 
 interface Service {
   id: string;
@@ -46,7 +56,7 @@ export interface HomeScreenProps {
   onBuyAirtime: () => void;
   onCashOut: () => void;
   onOpenSettings: () => void;
-  onOpenSms: () => void;
+  onOpenInbox: () => void;
 }
 
 export function HomeScreen({
@@ -55,12 +65,15 @@ export function HomeScreen({
   onBuyAirtime,
   onCashOut,
   onOpenSettings,
-  onOpenSms,
+  onOpenInbox,
 }: HomeScreenProps) {
   const { t } = useTranslation();
   const [balance, setBalance] = useState<number | null>(null);
   const [balanceVisible, setBalanceVisible] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [alerts, setAlerts] = useState<MoMoAlert[]>([]);
+  const [banner, setBanner] = useState<MoMoAlert | null>(null);
+  const bannerSpoken = useRef(false);
   const [loading, setLoading] = useState(true);
   // Live audio-route state: updates when headphones are plugged or unplugged.
   const isPrivateAudio = useIsPrivateAudio();
@@ -88,6 +101,52 @@ export function HomeScreen({
       stopSpeaking();
     };
   }, []);
+
+  // The MoMo alert thread mirrors what just happened: unread count live, so the
+  // Home stop can say "2 new" without the user opening anything.
+  useEffect(() => {
+    const refresh = () => {
+      void listAlerts().then(setAlerts);
+    };
+    refresh();
+    return subscribeSms(refresh);
+  }, []);
+
+  /**
+   * A transaction's SMS lands when Home is back, never over the receipt that is
+   * still reading itself out. The banner says its own name and fades on its own.
+   */
+  useEffect(() => {
+    let ignore = false;
+    let fade: ReturnType<typeof setTimeout> | null = null;
+    void (async () => {
+      const arrived = takePendingBanner();
+      if (arrived == null || ignore || bannerSpoken.current) return;
+      bannerSpoken.current = true;
+      setBanner(arrived);
+      fade = setTimeout(() => setBanner(null), BANNER_MS);
+      light(SPOT_BANNER);
+      const plan: SayPlan = [
+        { kind: 'key', key: 'sms.sayNew' },
+        { kind: 'money', amount: arrived.transaction.amount },
+      ];
+      sayPlan(plan, {
+        fallback: () => {
+          const message = t('sms.banner', { summary: alertSummary(arrived) });
+          if (isPrivateAudio) speak(message, getAppLanguage());
+          else announce(message);
+        },
+      });
+    })();
+    return () => {
+      ignore = true;
+      if (fade != null) clearTimeout(fade);
+    };
+    // Mount only: Home re-receives an alert through the subscription, not here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const unread = alerts.filter((alert) => !alert.read).length;
 
   /**
    * The band is also the privacy toggle, so hiding the figure costs one focus
@@ -174,6 +233,27 @@ export function HomeScreen({
 
       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
         <PrivacyAudioBanner isPrivateAudio={isPrivateAudio} />
+
+        {banner != null ? (
+          <Pressable
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={t('sms.banner', { summary: alertSummary(banner) })}
+            accessibilityHint={t('sms.bannerHint')}
+            onFocus={() => light(SPOT_BANNER)}
+            onPressIn={() => light(SPOT_BANNER)}
+            onPress={onOpenInbox}
+            style={({ pressed }) => [
+              styles.smsBanner,
+              spot === SPOT_BANNER ? styles.smsBannerLit : null,
+              pressed ? styles.pressed : null,
+            ]}
+          >
+            <Text style={styles.smsBannerLabel} numberOfLines={2}>
+              {t('sms.banner', { summary: alertSummary(banner) })}
+            </Text>
+          </Pressable>
+        ) : null}
 
         {/* Region 1 - the money itself, flat on the MoMo band. */}
         <Pressable
@@ -288,14 +368,18 @@ export function HomeScreen({
           )}
         </View>
 
-        {/* Region 5 - the SMS importer, one plain row at the bottom. */}
+        {/* Region 5 - the MoMo alert thread, one plain row at the bottom. */}
         <TextRow
-          id={SPOT_SMS}
+          id={SPOT_INBOX}
           spot={spot}
-          label={t('home.smsTool')}
-          hint={t('home.smsToolHint')}
+          label={
+            unread > 0
+              ? `${t('sms.openInbox')}. ${t('sms.unread', { count: unread })}`
+              : t('sms.openInbox')
+          }
+          hint={t('sms.openInboxHint')}
           light={light}
-          onPress={onOpenSms}
+          onPress={onOpenInbox}
         />
       </ScrollView>
     </View>
@@ -443,6 +527,25 @@ const styles = themedStyles((colors) => ({
     color: colors.onGold,
     opacity: 0.9,
     marginTop: theme.spacing.xs,
+  },
+  smsBanner: {
+    minHeight: 60,
+    justifyContent: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radii.lg,
+    backgroundColor: colors.navyMidnight,
+    borderWidth: 3,
+    borderColor: 'transparent',
+    marginTop: theme.spacing.sm,
+  },
+  smsBannerLit: {
+    borderColor: colors.borderFocus,
+  },
+  smsBannerLabel: {
+    fontSize: theme.typography.body,
+    fontWeight: '800',
+    color: colors.textOnNavy,
   },
   row: {
     minHeight: 76,
