@@ -1,0 +1,74 @@
+{
+  "tw/settings.navValue.linear": {
+    "source": "ghananlp-public",
+    "text": "Ɛtoa so"
+  },
+  "tw/settings.navValue.spatial": {
+    "source": "ghananlp-public",
+    "text": "Ɛwɔ baabi a ɛnsesa"
+  },
+  "tw/settings.speedValue.slow": {
+    "source": "ghananlp-public",
+    "text": "Nyaanyaa"
+  },
+  "tw/settings.speedValue.standard": {
+    "source": "ghananlp-public",
+    "text": "Ɛfata"
+  },
+  "tw/settings.speedValue.fast": {
+    "source": "ghananlp-public",
+    "text": "Mprenpren"
+  },
+  "tw/settings.privacyValue.auto": {
+    "source": "ghananlp-public",
+    "text": "Ankasa"
+  },
+  "tw/settings.privacyValue.voice": {
+    "source": "ghananlp-public",
+    "text": "Kasa"
+  },
+  "tw/settings.privacyValue.haptic": {
+    "source": "ghananlp-public",
+    "text": "Wosowoso"
+  },
+  "tw/settings.contrastValue.soft": {
+    "source": "ghananlp-public",
+    "text": "Dɛdɛ"
+  },
+  "tw/settings.contrastValue.crisp": {
+    "source": "ghananlp-public",
+    "text": "Den"
+  },
+  "tw/settings.languageValue.tw": {
+    "source": "ghananlp-public",
+    "text": "Twi"
+  },
+  "tw/settings.languageValue.ee": {
+    "source": "ghananlp-public",
+    "text": "Ewe"
+  },
+  "tw/settings.languageValue.ga": {
+    "source": "ghananlp-public",
+    "text": "Ga"
+  },
+  "tw/settings.languageValue.pcm": {
+    "source": "ghananlp-public",
+    "text": "Pidgin"
+  },
+  "tw/settings.languageValue.en": {
+    "source": "ghananlp-public",
+    "text": "English"
+  },
+  "tw/settings.listenValue.on": {
+    "source": "ghananlp-public",
+    "text": "Ane"
+  },
+  "tw/settings.listenValue.off": {
+    "source": "ghananlp-public",
+    "text": "Dabi"
+  },
+  "tw/settings.navSection": {
+    "source": "ghananlp-public",
+    "text": "Kwan a wɔfa so"
+  }
+}
