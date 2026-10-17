@@ -79,3 +79,13 @@ export function phoneClipKeys(phone: string): string[] {
   const local = digits.length > 10 ? `0${digits.slice(-9)}` : digits;
   return Array.from(local, (d) => `num.${d}`);
 }
+
+/**
+ * Digits exactly as written, for references and agent codes.
+ *
+ * Deliberately not `phoneClipKeys`: a 12-digit MoMo reference is not a phone
+ * number, and normalising it would drop its first digits and prepend a zero.
+ */
+export function digitClipKeys(value: string): string[] {
+  return Array.from((value ?? '').replace(/\D/g, ''), (d) => `num.${d}`);
+}
