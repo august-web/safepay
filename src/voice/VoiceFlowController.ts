@@ -1,7 +1,14 @@
 import { getAppLanguage, i18n, type AppLanguage } from '../i18n';
 import { announce } from '../a11y/announcer';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { formatMoney, sendMoney, buyAirtime, cashOut, calculateFee } from '../services/transactions';
+import {
+  formatMoney,
+  sendMoney,
+  buyAirtime,
+  cashOut,
+  calculateFee,
+  type Transaction,
+} from '../services/transactions';
 import {
   sayKey,
   sayKeyAsync,
@@ -86,6 +93,12 @@ export interface VoiceFlowDeps {
   onDone: () => void;
   /** Receives every prompt/answer pair for the visible conversation HUD. */
   onStatus?: (status: VoiceFlowStatus | null) => void;
+  /**
+   * Opens the receipt for a transaction that went through - the same seam the
+   * touch forms use, so a spoken transfer gets read back exactly like a tapped
+   * one. When absent, the controller falls back to announcing completion.
+   */
+  onTransactionComplete?: (transaction: Transaction) => void;
 }
 
 /** Steps each flow walks through, for the HUD's "step n of m" line. */
@@ -700,6 +713,8 @@ export class VoiceFlowController {
       sayKey('vcmd.noBiometrics');
     }
 
+    let succeeded: Transaction | null = null;
+
     try {
       let result;
       if (flow.kind === 'send') {
@@ -726,7 +741,12 @@ export class VoiceFlowController {
       }
 
       if (result.status === 'confirmed') {
-        await this.announceCompletion(result.transaction?.reference ?? '');
+        const transaction = result.transaction;
+        if (transaction != null && this.deps.onTransactionComplete != null) {
+          succeeded = transaction;
+        } else {
+          await this.announceCompletion(transaction?.reference ?? '');
+        }
       } else {
         sayKey(result.reason === 'insufficient_funds' ? 'send.failureFunds' : 'send.failureNetwork');
       }
@@ -734,7 +754,12 @@ export class VoiceFlowController {
       sayKey('send.failureGeneric');
     } finally {
       this.reset();
-      this.deps.onDone();
+      if (succeeded != null) {
+        // The receipt owns what comes next: it reads itself, then returns Home.
+        this.deps.onTransactionComplete?.(succeeded);
+      } else {
+        this.deps.onDone();
+      }
     }
   }
 
