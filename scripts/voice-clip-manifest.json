@@ -27,7 +27,6 @@
     "home.quickActions",
     "home.recentTransactions",
     "home.listenBalance",
-    "home.smsTool",
     "settings.title",
     "settings.voiceCheckSection",
     "settings.testVoice",
@@ -158,6 +157,23 @@
     "onboarding.teachStop",
     "onboarding.teachAgain",
     "onboarding.doneBody",
-    "onboarding.exited"
+    "onboarding.exited",
+    "receipt.title",
+    "receipt.heading",
+    "receipt.typeLabel",
+    "receipt.amountLabel",
+    "receipt.feeLabel",
+    "receipt.referenceLabel",
+    "receipt.newBalanceLabel",
+    "receipt.direction.send",
+    "receipt.direction.receive",
+    "receipt.direction.airtime",
+    "receipt.direction.withdraw",
+    "receipt.reRead",
+    "sms.inboxTitle",
+    "sms.openInbox",
+    "sms.empty",
+    "sms.sayNew",
+    "sms.reRead"
   ]
 }
