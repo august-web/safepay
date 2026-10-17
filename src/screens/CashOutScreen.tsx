@@ -14,7 +14,13 @@ import { authenticateWithBiometrics, getBiometricCapability } from '../services/
 import { hapticAmount, hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { speak, stopSpeaking } from '../services/speech';
-import { calculateFee, cashOut, getBalance, type SendResult } from '../services/transactions';
+import {
+  calculateFee,
+  cashOut,
+  getBalance,
+  type SendResult,
+  type Transaction,
+} from '../services/transactions';
 import { sayPlan } from '../voice/say';
 import { parseCashoutUtterance } from '../voice/dictation';
 import { useScreenDictation } from '../voice/useScreenDictation';
@@ -31,7 +37,13 @@ function formatMoney(amount: number): string {
 
 const CANCEL_WINDOW_MS = 3000;
 
-export function CashOutScreen({ onDone }: { onDone: () => void }) {
+export function CashOutScreen({
+  onDone,
+  onTransactionComplete,
+}: {
+  onDone: () => void;
+  onTransactionComplete: (transaction: Transaction) => void;
+}) {
   const { t } = useTranslation();
 
   const [phase, setPhase] = useState<'form' | 'review' | 'processing' | 'result'>('form');
@@ -179,6 +191,13 @@ export function CashOutScreen({ onDone }: { onDone: () => void }) {
       fee,
     });
 
+    if (res.status === 'confirmed' && res.transaction != null) {
+      // The receipt screen reads the whole withdrawal and returns Home itself.
+      void hapticConfirm();
+      onTransactionComplete(res.transaction);
+      return;
+    }
+
     setResult(res);
     setPhase('result');
 
@@ -194,7 +213,7 @@ export function CashOutScreen({ onDone }: { onDone: () => void }) {
       void hapticError();
       announceError(t('send.failedAnnouncement', { reason: localizedFailureReason(t, res.reason) }));
     }
-  }, [amount, agentCode, displayAgentName, fee, t]);
+  }, [amount, agentCode, displayAgentName, fee, onTransactionComplete, t]);
 
   const startCancelWindow = useCallback(() => {
     setPhase('processing');
@@ -252,14 +271,6 @@ export function CashOutScreen({ onDone }: { onDone: () => void }) {
     } finally {
       setConfirming(false);
     }
-  };
-
-  const resetForm = () => {
-    setAgentCode('');
-    setAgentName('');
-    setAmountText('');
-    setPhase('form');
-    void getBalance().then(setBalance);
   };
 
   // Form Phase
@@ -474,48 +485,42 @@ export function CashOutScreen({ onDone }: { onDone: () => void }) {
     );
   }
 
-  // Result Screen
-  const isSuccess = result?.status === 'confirmed';
-
+  // Failure screen (a successful withdrawal gets the receipt)
   return (
     <View style={styles.screen}>
-      <HeaderBar title={isSuccess ? t('cashout.confirmed') : t('send.failed')} />
+      <HeaderBar title={t('send.failed')} />
 
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.content}
-        accessibilityLabel={isSuccess ? t('cashout.confirmed') : t('send.failed')}
-        accessibilityHint="Cash out authorization outcome voucher"
+        accessibilityLabel={t('send.failed')}
+        accessibilityHint={t('send.retryHint')}
       >
-        <View style={[styles.resultCard, isSuccess ? styles.resultSuccess : styles.resultFailed]}>
-          <View style={[styles.resultBadge, isSuccess ? styles.badgeSuccess : styles.badgeFailed]}>
-            <Text style={styles.resultIcon}>{isSuccess ? '✓' : '✕'}</Text>
+        <View style={[styles.resultCard, styles.resultFailed]}>
+          <View style={[styles.resultBadge, styles.badgeFailed]}>
+            <Text style={styles.resultIcon}>{'✕'}</Text>
           </View>
 
-          <Text style={[styles.resultTitle, isSuccess ? styles.textSuccess : styles.textFailed]}>
-            {isSuccess ? t('cashout.confirmed') : t('send.failed')}
+          <Text style={[styles.resultTitle, styles.textFailed]} accessibilityRole="header">
+            {t('send.failed')}
           </Text>
 
-          {isSuccess && result?.transaction != null ? (
-            <View style={styles.resultRows}>
-              <ReviewRow caption={t('cashout.voucherTag')} value={formatMoney(result.transaction.amount)} />
-              <ReviewRow caption={t('cashout.voucherAgent')} value={result.transaction.recipientName} />
-              <ReviewRow caption={t('send.reference')} value={result.transaction.reference} />
-            </View>
-          ) : (
-            <Text style={styles.errorText}>
-              {result?.reason != null
-                ? localizedFailureReason(t, result.reason)
-                : t('send.failureGeneric')}
-            </Text>
-          )}
+          <Text style={styles.errorText}>
+            {result?.reason != null
+              ? localizedFailureReason(t, result.reason)
+              : t('send.failureGeneric')}
+          </Text>
         </View>
 
         <AccessibleButton
-          label={t('cashout.cashOutAnother', 'Another Cash Out')}
-          hint="Make another cash withdrawal"
+          label={t('common.retry')}
+          hint={t('send.retryHint')}
           variant="primary"
-          onPress={resetForm}
+          onPress={() => {
+            stopSpeaking();
+            void hapticTick();
+            setPhase('form');
+          }}
           style={styles.ctaButton}
         />
 
@@ -731,9 +736,6 @@ const styles = themedStyles((colors) => ({
     marginBottom: theme.spacing.lg,
     borderWidth: 1.5,
   },
-  resultSuccess: {
-    borderColor: colors.success,
-  },
   resultFailed: {
     borderColor: colors.danger,
   },
@@ -744,9 +746,6 @@ const styles = themedStyles((colors) => ({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: theme.spacing.md,
-  },
-  badgeSuccess: {
-    backgroundColor: colors.successLight,
   },
   badgeFailed: {
     backgroundColor: colors.dangerLight,
@@ -761,17 +760,8 @@ const styles = themedStyles((colors) => ({
     marginBottom: theme.spacing.md,
     textAlign: 'center',
   },
-  textSuccess: {
-    color: colors.successDark,
-  },
   textFailed: {
     color: colors.dangerDark,
-  },
-  resultRows: {
-    width: '100%',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: theme.spacing.sm,
   },
   errorText: {
     fontSize: theme.typography.body,
