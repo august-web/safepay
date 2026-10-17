@@ -9,6 +9,8 @@ import { announce } from './src/a11y/announcer';
 import { initScreenReaderState, needsOwnVoice } from './src/a11y/screenReader';
 import { i18n, initI18n } from './src/i18n';
 import { formatMoney, getBalance } from './src/services/transactions';
+import { recordTransactionAlert } from './src/services/momoSms';
+import type { Transaction } from './src/services/transactions';
 import { stopSpeaking, warmUpSpeech } from './src/services/speech';
 import { VoiceCommandProvider } from './src/voice/VoiceCommandProvider';
 import { VoiceFlowController } from './src/voice/VoiceFlowController';
@@ -22,8 +24,9 @@ import { HomeScreen } from './src/screens/HomeScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { SendMoneyScreen } from './src/screens/SendMoneyScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
-import { SmsImportScreen } from './src/screens/SmsImportScreen';
+import { SmsInboxScreen } from './src/screens/SmsInboxScreen';
 import { StatementScreen } from './src/screens/StatementScreen';
+import { TransactionReceiptScreen } from './src/screens/TransactionReceiptScreen';
 import { VoiceFlowHud } from './src/components/VoiceFlowHud';
 import type { TranscriptSink } from './src/voice/VoiceCommandProvider';
 import type { VoiceFlowStatus } from './src/voice/VoiceFlowController';
@@ -119,7 +122,16 @@ export default function App() {
   );
 }
 
-type Screen = 'onboarding' | 'home' | 'send' | 'statement' | 'airtime' | 'cashout' | 'settings' | 'sms';
+type Screen =
+  | 'onboarding'
+  | 'home'
+  | 'send'
+  | 'statement'
+  | 'airtime'
+  | 'cashout'
+  | 'settings'
+  | 'inbox'
+  | 'receipt';
 
 function RootNavigator() {
   const { palette } = useContrastTheme();
@@ -133,6 +145,23 @@ function RootNavigator() {
   const [flowStatus, setFlowStatus] = useState<VoiceFlowStatus | null>(null);
   /** Screen (onboarding) that owns the mic's utterances while mounted. */
   const [micOverride, setMicOverride] = useState<TranscriptSink | null>(null);
+  /** The transaction whose receipt is on screen; set only with `screen: 'receipt'`. */
+  const [receipt, setReceipt] = useState<Transaction | null>(null);
+
+  /**
+   * One completion seam for both ways of moving money. Whether a transfer came
+   * from the form or from a spoken dialogue, this is what runs: the wallet has
+   * already moved the money, so the receipt is the only next thing, and the MoMo
+   * alert is queued behind it rather than spoken over it.
+   */
+  const completeTransaction = useCallback((transaction: Transaction) => {
+    void getBalance().then((balanceAfter) => {
+      void recordTransactionAlert(transaction, balanceAfter);
+    });
+    setFlowStatus(null);
+    setReceipt(transaction);
+    setScreen('receipt');
+  }, []);
 
   /**
    * Conversational flow driver: money features started by voice become a
@@ -149,6 +178,7 @@ function RootNavigator() {
           setScreen('home');
         },
         onStatus: setFlowStatus,
+        onTransactionComplete: completeTransaction,
       }),
   );
 
@@ -223,17 +253,27 @@ function RootNavigator() {
   );
 
   const content = (() => {
+    const homeContent = (
+      <HomeScreen
+        onSendMoney={() => flowController.start({ kind: 'send' })}
+        onViewStatement={() => setScreen('statement')}
+        onBuyAirtime={() => flowController.start({ kind: 'airtime', self: false })}
+        onCashOut={() => flowController.start({ kind: 'cashout' })}
+        onOpenSettings={() => setScreen('settings')}
+        onOpenInbox={() => setScreen('inbox')}
+      />
+    );
     switch (screen) {
       case 'onboarding':
         return <OnboardingScreen onDone={home} onVoiceSink={setMicOverride} />;
       case 'send':
-        return <SendMoneyScreen onDone={home} />;
+        return <SendMoneyScreen onDone={home} onTransactionComplete={completeTransaction} />;
       case 'statement':
         return <StatementScreen onDone={home} />;
       case 'airtime':
-        return <BuyAirtimeScreen onDone={home} />;
+        return <BuyAirtimeScreen onDone={home} onTransactionComplete={completeTransaction} />;
       case 'cashout':
-        return <CashOutScreen onDone={home} />;
+        return <CashOutScreen onDone={home} onTransactionComplete={completeTransaction} />;
       case 'settings':
         return (
           <SettingsScreen
@@ -241,19 +281,22 @@ function RootNavigator() {
             onRunSetup={() => setScreen('onboarding')}
           />
         );
-      case 'sms':
-        return <SmsImportScreen onDone={home} onViewStatement={() => setScreen('statement')} />;
-      default:
-        return (
-          <HomeScreen
-            onSendMoney={() => flowController.start({ kind: 'send' })}
-            onViewStatement={() => setScreen('statement')}
-            onBuyAirtime={() => flowController.start({ kind: 'airtime', self: false })}
-            onCashOut={() => flowController.start({ kind: 'cashout' })}
-            onOpenSettings={() => setScreen('settings')}
-            onOpenSms={() => setScreen('sms')}
+      case 'inbox':
+        return <SmsInboxScreen onDone={home} />;
+      case 'receipt':
+        return receipt != null ? (
+          <TransactionReceiptScreen
+            transaction={receipt}
+            onDone={() => {
+              setReceipt(null);
+              home();
+            }}
           />
+        ) : (
+          homeContent
         );
+      default:
+        return homeContent;
     }
   })();
 
