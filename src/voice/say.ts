@@ -4,6 +4,7 @@ import { stopSpeaking } from '../services/speech';
 import { hasVoiceClip, playVoiceClip, stopVoiceClip } from './voicePack';
 import { hasNativeVoicePack } from './commandText';
 import {
+  digitClipKeys,
   moneyClipKeys,
   numberClipKeys,
   phoneClipKeys,
@@ -15,7 +16,8 @@ export type SayPart =
   | { kind: 'name'; name: string }
   | { kind: 'money'; amount: number }
   | { kind: 'number'; value: number }
-  | { kind: 'phone'; phone: string };
+  | { kind: 'phone'; phone: string }
+  | { kind: 'digits'; value: string };
 
 export type SayPlan = SayPart[];
 
@@ -58,6 +60,8 @@ export function canSpeakPlan(plan: SayPlan, language: AppLanguage): boolean {
         return numberClipKeys(part.value).every((k) => hasVoiceClip(k, language));
       case 'phone':
         return phoneClipKeys(part.phone).every((k) => hasVoiceClip(k, language));
+      case 'digits':
+        return digitClipKeys(part.value).every((k) => hasVoiceClip(k, language));
       case 'text':
         return false;
     }
@@ -79,6 +83,9 @@ export function planClipKeys(plan: SayPlan, language: AppLanguage): string[] {
         break;
       case 'phone':
         keys.push(...phoneClipKeys(part.phone));
+        break;
+      case 'digits':
+        keys.push(...digitClipKeys(part.value));
         break;
       case 'text':
         break;
@@ -104,6 +111,8 @@ export function planText(plan: SayPlan): string {
           return String(part.value);
         case 'phone':
           return part.phone;
+        case 'digits':
+          return part.value;
       }
     })
     .filter((s) => s.trim().length > 0)
@@ -140,6 +149,9 @@ export async function playPlan(plan: SayPlan, language: AppLanguage): Promise<bo
       case 'phone':
         keys = phoneClipKeys(part.phone);
         break;
+      case 'digits':
+        keys = digitClipKeys(part.value);
+        break;
       case 'text':
         return false; // Cannot compose free text - caller decides the fallback.
     }
@@ -150,7 +162,11 @@ export async function playPlan(plan: SayPlan, language: AppLanguage): Promise<bo
       if (!played) return false;
       const lastAtom = index === keys.length - 1;
       await sleep(
-        lastAtom ? SEGMENT_GAP_MS : part.kind === 'phone' ? DIGIT_GAP_MS : ATOM_GAP_MS,
+        lastAtom
+          ? SEGMENT_GAP_MS
+          : part.kind === 'phone' || part.kind === 'digits'
+            ? DIGIT_GAP_MS
+            : ATOM_GAP_MS,
       );
     }
   }
