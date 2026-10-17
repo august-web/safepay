@@ -15,7 +15,12 @@ import { authenticateWithBiometrics, getBiometricCapability } from '../services/
 import { hapticAmount, hapticCancel, hapticConfirm, hapticError, hapticTick } from '../services/haptics';
 import { useIsPrivateAudio } from '../services/headphones';
 import { speak, stopSpeaking } from '../services/speech';
-import { buyAirtime, getBalance, type SendResult } from '../services/transactions';
+import {
+  buyAirtime,
+  getBalance,
+  type SendResult,
+  type Transaction,
+} from '../services/transactions';
 import { sayPlan } from '../voice/say';
 import { parseAirtimeUtterance } from '../voice/dictation';
 import { useScreenDictation } from '../voice/useScreenDictation';
@@ -33,7 +38,13 @@ function formatMoney(amount: number): string {
 const PRESET_AMOUNTS = [5, 10, 20, 50];
 const MY_NUMBER = '0241234567';
 
-export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
+export function BuyAirtimeScreen({
+  onDone,
+  onTransactionComplete,
+}: {
+  onDone: () => void;
+  onTransactionComplete: (transaction: Transaction) => void;
+}) {
   const { t } = useTranslation();
 
   const [phase, setPhase] = useState<'form' | 'review' | 'result'>('form');
@@ -215,6 +226,13 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
         recipientName: recipientType === 'self' ? 'Self' : phone,
       });
 
+      if (res.status === 'confirmed' && res.transaction != null) {
+        // The receipt screen reads the whole purchase and returns Home itself.
+        void hapticConfirm();
+        onTransactionComplete(res.transaction);
+        return;
+      }
+
       setResult(res);
       setPhase('result');
 
@@ -233,14 +251,6 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
     } finally {
       setConfirming(false);
     }
-  };
-
-  const resetForm = () => {
-    setAmountText('10');
-    setRecipientType('self');
-    setPhone(MY_NUMBER);
-    setPhase('form');
-    void getBalance().then(setBalance);
   };
 
   // Form Screen
@@ -467,48 +477,42 @@ export function BuyAirtimeScreen({ onDone }: { onDone: () => void }) {
     );
   }
 
-  // Result Screen
-  const isSuccess = result?.status === 'confirmed';
-
+  // Failure screen (a successful purchase gets the receipt)
   return (
     <View style={styles.screen}>
-      <HeaderBar title={isSuccess ? t('airtime.confirmed') : t('send.failed')} />
+      <HeaderBar title={t('send.failed')} />
 
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.content}
-        accessibilityLabel={isSuccess ? t('airtime.confirmed') : t('send.failed')}
-        accessibilityHint="Airtime purchase confirmation result"
+        accessibilityLabel={t('send.failed')}
+        accessibilityHint={t('send.retryHint')}
       >
-        <View style={[styles.resultCard, isSuccess ? styles.resultSuccess : styles.resultFailed]}>
-          <View style={[styles.resultBadge, isSuccess ? styles.badgeSuccess : styles.badgeFailed]}>
-            <Text style={styles.resultIcon}>{isSuccess ? '✓' : '✕'}</Text>
+        <View style={[styles.resultCard, styles.resultFailed]}>
+          <View style={[styles.resultBadge, styles.badgeFailed]}>
+            <Text style={styles.resultIcon}>{'✕'}</Text>
           </View>
 
-          <Text style={[styles.resultTitle, isSuccess ? styles.textSuccess : styles.textFailed]}>
-            {isSuccess ? t('airtime.confirmed') : t('send.failed')}
+          <Text style={[styles.resultTitle, styles.textFailed]} accessibilityRole="header">
+            {t('send.failed')}
           </Text>
 
-          {isSuccess && result?.transaction != null ? (
-            <View style={styles.resultRows}>
-              <ReviewRow caption={t('airtime.amountLabel')} value={formatMoney(result.transaction.amount)} />
-              <ReviewRow caption={t('airtime.phoneLabel')} value={result.transaction.recipientPhone} />
-              <ReviewRow caption={t('send.reference')} value={result.transaction.reference} />
-            </View>
-          ) : (
-            <Text style={styles.errorText}>
-              {result?.reason != null
-                ? localizedFailureReason(t, result.reason)
-                : t('send.failureGeneric')}
-            </Text>
-          )}
+          <Text style={styles.errorText}>
+            {result?.reason != null
+              ? localizedFailureReason(t, result.reason)
+              : t('send.failureGeneric')}
+          </Text>
         </View>
 
         <AccessibleButton
-          label={t('airtime.buyMore', 'Buy More Airtime')}
-          hint="Make another airtime purchase"
+          label={t('common.retry')}
+          hint={t('send.retryHint')}
           variant="primary"
-          onPress={resetForm}
+          onPress={() => {
+            stopSpeaking();
+            void hapticTick();
+            setPhase('form');
+          }}
           style={styles.ctaButton}
         />
 
@@ -667,9 +671,6 @@ const styles = themedStyles((colors) => ({
     marginBottom: theme.spacing.lg,
     borderWidth: 1.5,
   },
-  resultSuccess: {
-    borderColor: colors.success,
-  },
   resultFailed: {
     borderColor: colors.danger,
   },
@@ -680,9 +681,6 @@ const styles = themedStyles((colors) => ({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: theme.spacing.md,
-  },
-  badgeSuccess: {
-    backgroundColor: colors.successLight,
   },
   badgeFailed: {
     backgroundColor: colors.dangerLight,
@@ -697,17 +695,8 @@ const styles = themedStyles((colors) => ({
     marginBottom: theme.spacing.md,
     textAlign: 'center',
   },
-  textSuccess: {
-    color: colors.successDark,
-  },
   textFailed: {
     color: colors.dangerDark,
-  },
-  resultRows: {
-    width: '100%',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: theme.spacing.sm,
   },
   errorText: {
     fontSize: theme.typography.body,
