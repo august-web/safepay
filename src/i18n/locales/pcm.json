@@ -214,30 +214,30 @@
     "title": "Accessibility & Settings",
     "titleShort": "Settings",
     "subtitle": "Tune SafePay make e fit your style",
-    "navSection": "Navigation Preset (WCAG 2.2)",
-    "navLinear": "Linear Sequential (TalkBack)",
+    "navSection": "How di screen dey waka",
+    "navValue": {
+      "linear": "One after another",
+      "spatial": "Fixed places"
+    },
     "navLinearDesc": "Step-by-step layout for blind users using screen reader swipes",
-    "navSpatial": "Spatial Grid (Memory-Based)",
     "navSpatialDesc": "Fixed 4-corner screen layout for muscle memory",
     "voiceSection": "Voice Narration Speed",
-    "speedSlow": "0.75× Slow & Clear",
-    "speedStandard": "0.85× Standard",
-    "speedNormal": "1.0× Normal",
+    "speedValue": {
+      "slow": "Slow & clear",
+      "standard": "Standard",
+      "fast": "Normal"
+    },
     "privacySection": "Privacy Audio Shield",
-    "privacyAuto": "Auto (Earphone = Voice, Speaker = Haptics)",
-    "privacyVoiceOnly": "Always Speak Aloud",
-    "privacyHapticsOnly": "Always Silent Haptics",
+    "privacyValue": {
+      "auto": "Auto",
+      "voice": "Speak aloud",
+      "haptic": "Silent haptics"
+    },
     "savedNote": "Settings saved successfully.",
     "contrastSection": "Screen Colour",
-    "contrast": {
-      "soft": {
-        "label": "Soft cream colour",
-        "hint": "Colour wey no too bright — e good for eye wey don tire"
-      },
-      "crisp": {
-        "label": "Strong contrast",
-        "hint": "Full strong colour — e good when eye no dey see well"
-      }
+    "contrastValue": {
+      "soft": "Soft cream",
+      "crisp": "Strong contrast"
     },
     "voiceCheckSection": "Voice Output Check",
     "voiceChannelTts": "SafePay dey talk with e own voice",
