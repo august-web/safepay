@@ -214,30 +214,30 @@
     "title": "Hebuu & Gbɛjianɔtooi",
     "titleShort": "Settings",
     "subtitle": "Saa SafePay bɔni baahi eha bo",
-    "navSection": "Gbɛ ni atsɔɔ nɔ kɛyaa kɛbaa (WCAG 2.2)",
-    "navLinear": "Gbɛjianɔtoo ni nyiɛɔ sɛɛ kɛ sɛɛ (TalkBack)",
+    "navSection": "Gbɛ ni atsɔɔ nɔ kɛyaa kɛbaa",
+    "navValue": {
+      "linear": "Gbɛjianɔtoo ni nyiɛɔ sɛɛ kɛ sɛɛ",
+      "spatial": "He gbɛjianɔtoo ni tsakeee"
+    },
     "navLinearDesc": "Ehi kɛha hintaŋfoi ni kɛ fon kanelɔi tsuɔ nii",
-    "navSpatial": "He gbɛjianɔtoo ni tsakeee (Spatial Grid)",
     "navSpatialDesc": "Ewaa jwɛŋmɔ koni nine ale he ni nɔ fɛɛ nɔ yɔɔ oya",
     "voiceSection": "Wiemɔ Lɛ Oyayeli",
-    "speedSlow": "0.75× Blɛoo",
-    "speedStandard": "0.85× Bɔ ni sa",
-    "speedNormal": "1.0× Oya",
+    "speedValue": {
+      "slow": "Blɛoo",
+      "standard": "Bɔ ni sa",
+      "fast": "Oya"
+    },
     "privacySection": "Teemɔŋ Hebuu",
-    "privacyAuto": "Toi nɔ = Wiemɔ, Maŋ mli = Hoso-hoso",
-    "privacyVoiceOnly": "Gba mi be fɛɛ be",
-    "privacyHapticsOnly": "Hoso-hoso pɛ",
+    "privacyValue": {
+      "auto": "Toi nɔ",
+      "voice": "Gba mi be fɛɛ be",
+      "haptic": "Hoso-hoso pɛ"
+    },
     "savedNote": "Gbɛjianɔtoo lɛ eto he pɛpɛɛpɛ.",
     "contrastSection": "Kɔla kɛ Hwɛmɔ",
-    "contrast": {
-      "soft": {
-        "label": "Kɔla bɔbɔ (Cream)",
-        "hint": "Kɔla bɔbɔ — eye kɛha hiŋmɛi ni mɔɔɔ"
-      },
-      "crisp": {
-        "label": "Kɔla ni wa",
-        "hint": "Kɔla ni wa waa — eye kɛha hiŋmɛi ni naa nɔ"
-      }
+    "contrastValue": {
+      "soft": "Kɔla bɔbɔ",
+      "crisp": "Kɔla ni wa"
     },
     "voiceCheckSection": "Gbɛ́ɛ Kɛmɔ",
     "voiceChannelTts": "SafePay kɛ́ɔ wiemɔ kɛ egbɛ́ɛ nɔ́",
