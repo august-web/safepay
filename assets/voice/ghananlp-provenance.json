@@ -70,5 +70,73 @@
   "tw/settings.navSection": {
     "source": "ghananlp-public",
     "text": "Kwan a wɔfa so"
+  },
+  "tw/receipt.title": {
+    "source": "ghananlp-public",
+    "text": "Dwuma Krataa"
+  },
+  "tw/receipt.heading": {
+    "source": "ghananlp-public",
+    "text": "Dwuma no adi mu"
+  },
+  "tw/receipt.typeLabel": {
+    "source": "ghananlp-public",
+    "text": "Dwuma no su"
+  },
+  "tw/receipt.amountLabel": {
+    "source": "ghananlp-public",
+    "text": "Dodoɔ"
+  },
+  "tw/receipt.feeLabel": {
+    "source": "ghananlp-public",
+    "text": "Ka a wɔbɔ"
+  },
+  "tw/receipt.referenceLabel": {
+    "source": "ghananlp-public",
+    "text": "MoMo Nkyerɛase"
+  },
+  "tw/receipt.newBalanceLabel": {
+    "source": "ghananlp-public",
+    "text": "Sika foforɔ a ɛwɔ mu"
+  },
+  "tw/receipt.direction.send": {
+    "source": "ghananlp-public",
+    "text": "Wosomaa kɔɔ"
+  },
+  "tw/receipt.direction.receive": {
+    "source": "ghananlp-public",
+    "text": "Wo nsa so atɔ afi"
+  },
+  "tw/receipt.direction.airtime": {
+    "source": "ghananlp-public",
+    "text": "Wotɔɔ airtime maa"
+  },
+  "tw/receipt.direction.withdraw": {
+    "source": "ghananlp-public",
+    "text": "Woyii sika fii"
+  },
+  "tw/receipt.reRead": {
+    "source": "ghananlp-public",
+    "text": "San kenkan krataa no"
+  },
+  "tw/sms.inboxTitle": {
+    "source": "ghananlp-public",
+    "text": "MoMo Nkrakra"
+  },
+  "tw/sms.openInbox": {
+    "source": "ghananlp-public",
+    "text": "MoMo Nkrakra"
+  },
+  "tw/sms.empty": {
+    "source": "ghananlp-public",
+    "text": "MoMo nkra biara nni ha sara. Ɛba berɛ a dwuma awie."
+  },
+  "tw/sms.sayNew": {
+    "source": "ghananlp-public",
+    "text": "MoMo nkra foforɔ adu so"
+  },
+  "tw/sms.reRead": {
+    "source": "ghananlp-public",
+    "text": "Kenkan nkra no"
   }
 }
