@@ -214,30 +214,30 @@
     "title": "Ɖoɖowo & Nɔnɔmewo",
     "titleShort": "Ɖoɖowo",
     "subtitle": "Sɔ SafePay ɖe wò kpekpeɖeŋu zãnuwo nu",
-    "navSection": "Ɖoɖo Mɔnu (WCAG 2.2)",
-    "navLinear": "Ɖoɖo kukuɖe nu (TalkBack)",
+    "navSection": "Ɖoɖo Mɔnu",
+    "navValue": {
+      "linear": "Ɖoɖo kukuɖe nu",
+      "spatial": "Ɖoɖo si nɔ teƒe ɖeka"
+    },
     "navLinearDesc": "Ɖoɖo tso afi yi afi na ŋkunɔwo",
-    "navSpatial": "Ɖoɖo si nɔ teƒe ɖeka",
     "navSpatialDesc": "Asi nɔnɔ teƒe na susu me lele",
     "voiceSection": "Nuƒo ƒe Kabakabanyenye",
-    "speedSlow": "0.75× Bɔbɔe",
-    "speedStandard": "0.85× Ɖeɖe",
-    "speedNormal": "1.0× Kabakaba",
+    "speedValue": {
+      "slow": "Bɔbɔe",
+      "standard": "Ɖeɖe",
+      "fast": "Kabakaba"
+    },
     "privacySection": "Vivivi Ɖoɖo",
-    "privacyAuto": "Asitefe = Gbe, Gbagba = Wosowoso",
-    "privacyVoiceOnly": "Gbe Ko",
-    "privacyHapticsOnly": "Wosowoso Ko",
+    "privacyValue": {
+      "auto": "Asitefe",
+      "voice": "Gbe Ko",
+      "haptic": "Wosowoso Ko"
+    },
     "savedNote": "Ɖoɖowo sɔ nyuie.",
     "contrastSection": "Dze kple Nukpɔkpɔ",
-    "contrast": {
-      "soft": {
-        "label": "Dze bɔbɔ (Cream)",
-        "hint": "Nukpɔkpɔ bɔbɔ — enyo na ŋku si mekɔ o"
-      },
-      "crisp": {
-        "label": "Dze sesẽ",
-        "hint": "Nukpɔkpɔ sesẽ — enyo na ŋku si mekɔ geɖe o"
-      }
+    "contrastValue": {
+      "soft": "Dze bɔbɔ",
+      "crisp": "Dze sesẽ"
     },
     "voiceCheckSection": "Gbe Dzesi",
     "voiceChannelTts": "SafePay gblɔa nya kple eƒe gbe ŋutɔ",
