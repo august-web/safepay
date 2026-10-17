@@ -217,31 +217,61 @@
     "title": "Ahobammbɔ ne Nhyehyɛeɛ",
     "titleShort": "Nhyehyɛeɛ",
     "subtitle": "Siesie SafePay sɛnea ɛbɛyɛ ma wo",
-    "navSection": "Kwan a yɛfa so kɔ ne ba (WCAG 2.2)",
-    "navLinear": "Nhyehyɛeɛ a ɛtoa so (TalkBack)",
+    "navSection": "Kwan a wɔfa so",
+    "navValue": {
+      "linear": "Ɛtoa so",
+      "spatial": "Ɛwɔ baabi a ɛnsesa"
+    },
     "navLinearDesc": "Ɛyɛ ma anifuraefoɔ a wɔde fon akenkanfoɔ di dwuma",
-    "navSpatial": "Nhyehyɛeɛ a ɛwɔ baabi a ɛnsesa",
     "navSpatialDesc": "Ɛboa adwene ma nsa te baabi a biribiara si ntɛm",
     "voiceSection": "Kasa no Ahoɔhare",
-    "speedSlow": "0.75× Nyaanyaa",
-    "speedStandard": "0.85× Ɛfata",
-    "speedNormal": "1.0× Mprenpren",
+    "speedValue": {
+      "slow": "Nyaanyaa",
+      "standard": "Ɛfata",
+      "fast": "Mprenpren"
+    },
     "privacySection": "Kokoam Ahobammbɔ",
-    "privacyAuto": "Fon mu = Kasa, Bagua mu = Wosowoso",
-    "privacyVoiceOnly": "Ka Kyerɛ me Berɛ Biara",
-    "privacyHapticsOnly": "Wosowoso Nko ara",
+    "privacyValue": {
+      "auto": "Ankasa",
+      "voice": "Kasa",
+      "haptic": "Wosowoso"
+    },
     "savedNote": "Nhyehyɛeɛ no asie pɛpɛɛpɛ.",
     "contrastSection": "Kɔla ne Hwɛbea",
-    "contrast": {
-      "soft": {
-        "label": "Kɔla Dɛdɛ (Cream)",
-        "hint": "Kɔla a ɛnyɛ hyerɛn — eye ma ani a ɛyɛ mmerɛw"
-      },
-      "crisp": {
-        "label": "Kɔla a Ɛyɛ Den",
-        "hint": "Kɔla a ɛyɛ den paa — eye ma ani a ɛnnhu yie"
-      }
+    "contrastValue": {
+      "soft": "Dɛdɛ",
+      "crisp": "Den"
     },
+    "languageValue": {
+      "tw": "Twi",
+      "ee": "Ewe",
+      "ga": "Ga",
+      "pcm": "Pidgin",
+      "en": "English"
+    },
+    "cycleHint": "Bɔ mmienu kɔ afofor so: {{options}}",
+    "diagOpenHint": "Bɔ mmienu hwɛ nne ho nsɛm nyinaa",
+    "diagCloseHint": "Bɔ mmienu to nsɛm yi mu",
+    "diagSummary": "Nne: {{channel}} · kataso: {{remaining}}",
+    "diagChannel": {
+      "lab": "Lab",
+      "public": "GhanaNLP",
+      "device": "Fon nne"
+    },
+    "listenValue": {
+      "on": "Ane",
+      "off": "Dabi"
+    },
+    "voiceTtsLoading": "Yɛhwehwɛ nne no mu…",
+    "voiceTtsChannelLab": "Nne ankasa: SafePay Lab TTS ({{remaining}} fi {{limit}} mu ka ɛnnɛ)",
+    "voiceTtsChannelPublic": "Nne ankasa: GhanaNLP (ɛsan kɔ fon nne so sɛ intanɛt nni hɔ)",
+    "voiceTtsChannelDevice": "Fon nne nko ara (native model biara nni kasa yi mma)",
+    "testPipelineTitle": "Sɔ kasa no akwan hwɛ (ɛntwe ASR kataso)",
+    "testPipelineField": "Twerɛ nsɛm sɛnea wobɛka no, nhwɛdeɛ: me sika a aka",
+    "testPipelineHint": "Kyerɛ nsɛm a kasa no akwan benya",
+    "testPipelineRun": "Fa so kɔ akwan so",
+    "testPipelineRunHint": "Bɔ mmienu fa nsɛm a dotɔ no so kɔ akwan so a microphone nni mu",
+    "testPipelineDone": "Woade no akɔ kasa no akwan so; tie ne buasa",
     "voiceCheckSection": "Nne Nhwehwɛmu",
     "voiceChannelTts": "SafePay de n’ankasa nne reka",
     "voiceChannelScreenReader": "W’akenkanfoɔ no rekan SafePay den",
