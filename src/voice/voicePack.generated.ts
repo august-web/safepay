@@ -2,7 +2,9 @@
    Native Twi/Ewe clips rendered from Meta's MMS TTS models:
    fixed phrases, number atoms for composed amounts, names and
    voice-command feedback. English/Pidgin stay on device TTS.
-   Regenerate with: npm run voice-clips */
+   Regenerate with: npm run voice-clips
+   Some clips are re-rendered from the public GhanaNLP TTS endpoint by
+   scripts/render-clips-ghananlp.py (see assets/voice/ghananlp-provenance.json). */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const VOICE_CLIPS: Record<string, Record<string, any>> = {
@@ -136,9 +138,26 @@ export const VOICE_CLIPS: Record<string, Record<string, any>> = {
     'send.failureNetwork': require('../../assets/voice/tw/send_failureNetwork.wav'),
     'send.processing': require('../../assets/voice/tw/send_processing.wav'),
     'settings.contrastSection': require('../../assets/voice/tw/settings_contrastSection.wav'),
+    'settings.contrastValue.crisp': require('../../assets/voice/tw/settings_contrastValue_crisp.wav'),
+    'settings.contrastValue.soft': require('../../assets/voice/tw/settings_contrastValue_soft.wav'),
+    'settings.languageValue.ee': require('../../assets/voice/tw/settings_languageValue_ee.wav'),
+    'settings.languageValue.en': require('../../assets/voice/tw/settings_languageValue_en.wav'),
+    'settings.languageValue.ga': require('../../assets/voice/tw/settings_languageValue_ga.wav'),
+    'settings.languageValue.pcm': require('../../assets/voice/tw/settings_languageValue_pcm.wav'),
+    'settings.languageValue.tw': require('../../assets/voice/tw/settings_languageValue_tw.wav'),
+    'settings.listenValue.off': require('../../assets/voice/tw/settings_listenValue_off.wav'),
+    'settings.listenValue.on': require('../../assets/voice/tw/settings_listenValue_on.wav'),
     'settings.navSection': require('../../assets/voice/tw/settings_navSection.wav'),
+    'settings.navValue.linear': require('../../assets/voice/tw/settings_navValue_linear.wav'),
+    'settings.navValue.spatial': require('../../assets/voice/tw/settings_navValue_spatial.wav'),
     'settings.privacySection': require('../../assets/voice/tw/settings_privacySection.wav'),
+    'settings.privacyValue.auto': require('../../assets/voice/tw/settings_privacyValue_auto.wav'),
+    'settings.privacyValue.haptic': require('../../assets/voice/tw/settings_privacyValue_haptic.wav'),
+    'settings.privacyValue.voice': require('../../assets/voice/tw/settings_privacyValue_voice.wav'),
     'settings.savedNote': require('../../assets/voice/tw/settings_savedNote.wav'),
+    'settings.speedValue.fast': require('../../assets/voice/tw/settings_speedValue_fast.wav'),
+    'settings.speedValue.slow': require('../../assets/voice/tw/settings_speedValue_slow.wav'),
+    'settings.speedValue.standard': require('../../assets/voice/tw/settings_speedValue_standard.wav'),
     'settings.testVoice': require('../../assets/voice/tw/settings_testVoice.wav'),
     'settings.title': require('../../assets/voice/tw/settings_title.wav'),
     'settings.voiceCheckSection': require('../../assets/voice/tw/settings_voiceCheckSection.wav'),
@@ -201,5 +220,5 @@ export const VOICE_CLIPS: Record<string, Record<string, any>> = {
 
 /** Clips that ship with the app, for diagnostics in Settings. */
 export const VOICE_CLIP_COUNTS: Record<string, number> = {
-  tw: 189,
+  tw: 206,
 };
